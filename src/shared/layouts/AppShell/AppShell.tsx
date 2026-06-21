@@ -22,7 +22,7 @@ export function AppShell({ children }: AppShellProps) {
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <strong>CPA</strong>
+          <img src="/logo.png" alt="CPA Centro de Preparación Académica" className={styles.brandLogo} />
           <span>Centro de Preparación Académica</span>
         </div>
         <nav className={styles.nav} aria-label="Navegación principal">
@@ -58,9 +58,12 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
       <div className={styles.mainArea}>
         <header className={styles.header}>
-          <div>
-            <p>Plataforma interna</p>
-            <h1>Gestión CPA</h1>
+          <div className={styles.headerBrand}>
+            <img src="/logo.png" alt="CPA" className={styles.headerLogo} />
+            <div>
+              <p>Plataforma interna</p>
+              <h1>Gestión CPA</h1>
+            </div>
           </div>
           <div className={styles.userBox}>
             <NavLink to="/perfil">

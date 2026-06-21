@@ -19,6 +19,16 @@
   gap: var(--space-4);
 }
 
+.logo {
+  width: min(13rem, 55vw);
+  height: auto;
+  object-fit: contain;
+  border-radius: 1.3rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.75rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
 .copy span {
   color: var(--color-text-secondary);
   font-weight: 800;

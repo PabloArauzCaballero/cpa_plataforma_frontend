@@ -6,6 +6,7 @@ export function LoginPage() {
     <main className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.copy}>
+          <img src="/logo.png" alt="CPA Centro de Preparación Académica" className={styles.logo} />
           <span>CPA Plataforma</span>
           <h2>Gestión académica, administrativa y financiera en un solo lugar.</h2>
           <p>
