@@ -14,7 +14,7 @@ export function ResourceHeader({ resource, total, visible }: ResourceHeaderProps
       <div>
         <span>{resource.moduleLabel}</span>
         <h2>{resource.label}</h2>
-        <p>Tabla: {resource.table} · PK: {resource.primaryKey} · {visible} de {total} registros visibles</p>
+        <p>{visible} de {total} registros visibles · Gestiona esta información desde una vista segura y operativa.</p>
       </div>
       <Link to={`/batch/${resource.module}/${resource.key}`}>Importar Excel</Link>
     </div>

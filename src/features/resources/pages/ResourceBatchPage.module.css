@@ -154,30 +154,44 @@
   transform: translateY(-1px);
 }
 
-.endpointBox {
+.processBox {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
-.endpointBox div {
+.processBox > div {
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   padding: var(--space-4);
   background: var(--color-surface-soft);
   display: grid;
-  gap: var(--space-2);
+  grid-template-columns: 44px 1fr;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
-.endpointBox strong {
+.stepIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--color-white);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.processBox strong {
   color: var(--color-primary);
 }
 
-.endpointBox code {
-  color: var(--color-accent);
-  white-space: normal;
-  overflow-wrap: anywhere;
-  line-height: 1.45;
+.processBox p {
+  margin: 0.3rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .error {
@@ -312,7 +326,7 @@
 @media (max-width: 840px) {
   .header,
   .uploadGrid,
-  .endpointBox {
+  .processBox {
     grid-template-columns: 1fr;
     display: grid;
   }

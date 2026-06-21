@@ -43,7 +43,6 @@ export function UserProfilePage() {
   const initialProfile = useMemo(buildInitialProfile, []);
   const [profile, setProfile] = useState<ProfileFormState>(initialProfile);
   const [message, setMessage] = useState<string | null>(null);
-  const token = window.localStorage.getItem('cpa.sessionToken') ?? '';
   const initials = getInitials(profile.firstName, profile.lastName);
 
   function updateField(field: keyof ProfileFormState, value: string) {
@@ -141,11 +140,11 @@ export function UserProfilePage() {
 
             <div className={styles.summaryItem}>
               <div className={styles.summaryIcon}>
-                <i className="fa-solid fa-key" aria-hidden="true" />
+                <i className="fa-solid fa-lock" aria-hidden="true" />
               </div>
               <div>
-                <small>Token de sesión</small>
-                <strong>{token ? `${token.slice(0, 10)}...${token.slice(-6)}` : 'Sin token'}</strong>
+                <small>Seguridad de sesión</small>
+                <strong>Sesión privada activa</strong>
               </div>
             </div>
           </div>

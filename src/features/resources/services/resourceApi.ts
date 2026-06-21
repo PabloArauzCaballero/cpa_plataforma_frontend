@@ -101,7 +101,6 @@ function buildBatchFormData(resource: CrudResourceDefinition, file: File, mode: 
   formData.append('archivo', file);
   formData.append('module', resource.module);
   formData.append('resource', resource.key);
-  formData.append('table', resource.table);
   formData.append('mode', mode);
 
   if (importId) {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
 import { Card } from '@/shared/components/Card';
@@ -52,7 +52,7 @@ export function ResourceBatchPage() {
   const resource = findResourceDefinition(module, resourceKey);
 
   if (!resource) {
-    return <PageState title="Recurso no encontrado" message="La ruta solicitada no existe en la matriz de endpoints documentada." />;
+    return <PageState title="Recurso no encontrado" message="La opción solicitada no está disponible en este momento." />;
   }
 
   return <ResourceBatchContent resource={resource} />;
@@ -68,8 +68,6 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
   const [isProcessing, setIsProcessing] = useState(false);
 
   const canProcess = !!file && !!validation && validation.errorRows === 0;
-  const validationEndpoint = useMemo(() => resource.endpoints.batchValidate ?? `${resource.endpoints.list}/batch/validate`, [resource]);
-  const processEndpoint = useMemo(() => resource.endpoints.batchProcess ?? `${resource.endpoints.list}/batch/process`, [resource]);
 
   async function validateFile() {
     if (!file) {
@@ -113,7 +111,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
           <span>{resource.moduleLabel}</span>
           <h2>Importar Excel · {resource.label}</h2>
           <p>
-            Carga masiva real para muchos registros. Primero se valida el archivo y luego se procesa el lote contra el backend.
+            Carga masiva real para muchos registros. Primero se valida el archivo y luego se procesa el lote en el sistema.
           </p>
         </div>
         <Link to={`/modulos/${resource.module}/${resource.key}`}>Volver a lista</Link>
@@ -152,14 +150,24 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
           </div>
         </div>
 
-        <div className={styles.endpointBox}>
+        <div className={styles.processBox}>
           <div>
-            <strong>Validación</strong>
-            <code>POST {validationEndpoint}</code>
+            <span className={styles.stepIcon}>
+              <i className="fa-solid fa-file-shield" aria-hidden="true" />
+            </span>
+            <div>
+              <strong>Validación previa</strong>
+              <p>El archivo se revisa antes de importar para detectar filas incompletas, formatos inválidos o datos observados.</p>
+            </div>
           </div>
           <div>
-            <strong>Procesamiento</strong>
-            <code>POST {processEndpoint}</code>
+            <span className={styles.stepIcon}>
+              <i className="fa-solid fa-cloud-arrow-up" aria-hidden="true" />
+            </span>
+            <div>
+              <strong>Procesamiento seguro</strong>
+              <p>Solo se habilita la importación cuando el lote no tiene errores críticos.</p>
+            </div>
           </div>
         </div>
 

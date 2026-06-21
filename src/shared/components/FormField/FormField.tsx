@@ -1,6 +1,6 @@
 import styles from './FormField.module.css';
 
-export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox';
+export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox' | 'select';
 
 interface FormFieldProps {
   id: string;
@@ -10,6 +10,7 @@ interface FormFieldProps {
   error?: string;
   placeholder?: string;
   required?: boolean;
+  options?: string[];
   onChange: (value: string | number | boolean) => void;
 }
 
@@ -21,6 +22,7 @@ export function FormField({
   error,
   placeholder,
   required = false,
+  options = [],
   onChange,
 }: FormFieldProps) {
   if (type === 'checkbox') {
@@ -33,6 +35,25 @@ export function FormField({
           onChange={(event) => onChange(event.target.checked)}
         />
         <span>{label}</span>
+      </label>
+    );
+  }
+
+
+  if (type === 'select') {
+    return (
+      <label className={styles.field} htmlFor={id}>
+        <span>
+          {label}
+          {required ? <strong> *</strong> : null}
+        </span>
+        <select id={id} value={String(value ?? '')} onChange={(event) => onChange(event.target.value)}>
+          <option value="">Seleccionar</option>
+          {options.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+        {error ? <small>{error}</small> : null}
       </label>
     );
   }

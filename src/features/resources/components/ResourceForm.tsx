@@ -33,8 +33,8 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
       }}
     >
       <div className={styles.notice}>
-        <strong>{resource.table}</strong>
-        <span>{isJsonMode ? 'Contrato de body no documentado: usa payload JSON controlado.' : 'Campos sugeridos desde el modelo del dominio.'}</span>
+        <strong>Contrato de datos</strong>
+        <span>{isJsonMode ? 'Usa un cuerpo JSON controlado para este registro.' : 'Campos alineados al payload documentado para este recurso.'}</span>
       </div>
 
       {isJsonMode ? (
@@ -54,6 +54,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
               value={viewModel.payload[field.name] as string | number | boolean}
               error={viewModel.errors[field.name]}
               required={field.required}
+              options={field.options}
               onChange={(value) => viewModel.setField(field.name, value)}
             />
           ))}

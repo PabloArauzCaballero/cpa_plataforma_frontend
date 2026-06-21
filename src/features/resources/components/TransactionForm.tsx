@@ -2,7 +2,7 @@ import type { FormEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/shared/components/Button';
 import { FormField } from '@/shared/components/FormField';
-import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
+import type { CrudRecord, CrudResourceDefinition, ResourceFieldDefinition } from '../domain/CrudResource';
 import styles from './TransactionForm.module.css';
 
 interface TransactionFormProps {
@@ -62,12 +62,14 @@ function getRecordMovements(record: CrudRecord | null): MovementDraft[] {
 
   return source.map((item) => {
     const row = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};
-    const movementType = String(row.tipoMovimiento ?? row.tipo_movimiento ?? row.tipo ?? 'DEBE').toUpperCase();
+    const debe = Number(row.debe ?? 0);
+    const haber = Number(row.haber ?? 0);
+    const movementType = String(row.tipoMovimiento ?? row.tipo_movimiento ?? row.tipo ?? (haber > debe ? 'HABER' : 'DEBE')).toUpperCase();
 
     return {
       cuentaId: String(row.cuentaId ?? row.id_cuenta ?? row.idCuenta ?? row.cuenta ?? ''),
       tipoMovimiento: movementType === 'HABER' ? 'HABER' : 'DEBE',
-      monto: String(row.monto ?? ''),
+      monto: String(row.monto ?? (movementType === 'HABER' ? haber : debe) ?? ''),
       descripcion: String(row.descripcion ?? row.observacion ?? ''),
     };
   });
@@ -79,13 +81,30 @@ function toMoney(value: string): number {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
+function normalizeFieldValue(field: ResourceFieldDefinition, value: unknown): unknown {
+  if (value === '') return undefined;
+  if (field.type === 'number') {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value;
+  }
+  return value;
+}
+
+function buildCleanHeaderPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
+  return resource.fields.reduce<CrudRecord>((clean, field) => {
+    const normalized = normalizeFieldValue(field, payload[field.name]);
+    if (normalized === undefined || normalized === null) return clean;
+    clean[field.name] = normalized;
+    return clean;
+  }, {});
+}
+
 function getMovementPayload(movement: MovementDraft): CrudRecord {
+  const amount = toMoney(movement.monto);
   return {
-    cuentaId: movement.cuentaId.trim(),
-    id_cuenta: movement.cuentaId.trim(),
-    tipoMovimiento: movement.tipoMovimiento,
-    monto: toMoney(movement.monto),
-    descripcion: movement.descripcion.trim(),
+    id_cuenta: Number(movement.cuentaId),
+    debe: movement.tipoMovimiento === 'DEBE' ? amount : 0,
+    haber: movement.tipoMovimiento === 'HABER' ? amount : 0,
   };
 }
 
@@ -95,6 +114,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   const [movements, setMovements] = useState<MovementDraft[]>(() => getRecordMovements(record));
   const [movementDraft, setMovementDraft] = useState<MovementDraft>(emptyMovement);
   const [error, setError] = useState<string | null>(null);
+  const [headerErrors, setHeaderErrors] = useState<Record<string, string>>({});
 
   const totals = useMemo(() => {
     const debe = movements.filter((movement) => movement.tipoMovimiento === 'DEBE').reduce((sum, movement) => sum + toMoney(movement.monto), 0);
@@ -111,8 +131,8 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   }
 
   function addMovement() {
-    if (!movementDraft.cuentaId.trim()) {
-      setError('Debes indicar la cuenta del movimiento.');
+    if (!movementDraft.cuentaId.trim() || !Number.isFinite(Number(movementDraft.cuentaId))) {
+      setError('Debes indicar un ID de cuenta válido.');
       return;
     }
 
@@ -133,6 +153,20 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const nextHeaderErrors: Record<string, string> = {};
+    for (const field of resource.fields) {
+      const value = headerPayload[field.name];
+      if (field.required && (value === undefined || value === null || String(value).trim() === '')) {
+        nextHeaderErrors[field.name] = 'Campo obligatorio.';
+      }
+    }
+
+    setHeaderErrors(nextHeaderErrors);
+    if (Object.keys(nextHeaderErrors).length) {
+      setError('Completa los campos obligatorios de la transacción.');
+      return;
+    }
+
     if (movements.length < 2) {
       setError('Una transacción contable debe tener al menos dos movimientos.');
       return;
@@ -145,7 +179,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
     setError(null);
     onSubmit({
-      ...headerPayload,
+      ...buildCleanHeaderPayload(resource, headerPayload),
       movimientos: movements.map(getMovementPayload),
     });
   }
@@ -153,8 +187,8 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   return (
     <form className={styles.form} onSubmit={submit}>
       <div className={styles.notice}>
-        <strong>{resource.table}</strong>
-        <span>Formulario fusionado: encabezado de transacción + movimientos de cuenta en un solo envío.</span>
+        <strong>Transacción contable</strong>
+        <span>Encabezado de transacción + movimientos de cuenta en un solo envío.</span>
       </div>
 
       <section className={styles.section}>
@@ -167,7 +201,9 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
               label={humanizeFieldName(field.name)}
               type={field.type}
               value={headerPayload[field.name] as string | number | boolean}
+              error={headerErrors[field.name]}
               required={field.required}
+              options={field.options}
               onChange={(value) => setHeaderField(field.name, value)}
             />
           ))}

@@ -40,12 +40,37 @@ async function parseResponse(response: Response): Promise<unknown> {
   return response.text();
 }
 
+function sanitizeTechnicalPaths(message: string): string {
+  return message
+    .replace(/https?:\/\/\S+/gi, 'servicio interno')
+    .replace(/\b(?:GET|POST|PUT|PATCH|DELETE)\s+\/[^\s,;)]*/gi, 'acción del sistema')
+    .replace(/\/api\/[^\s,;)]*/gi, 'servicio interno')
+    .replace(/endpoint/gi, 'servicio')
+    .replace(/ruta/gi, 'opción')
+    .trim();
+}
+
+function fallbackErrorMessage(status: number): string {
+  if (status === 400) return 'La solicitud no pudo procesarse. Revisa los datos ingresados.';
+  if (status === 401) return 'Tu sesión expiró o no es válida. Vuelve a iniciar sesión.';
+  if (status === 403) return 'No tienes permisos para realizar esta acción.';
+  if (status === 404) return 'La información solicitada no está disponible.';
+  if (status >= 500) return 'El servicio no está disponible en este momento. Intenta nuevamente.';
+  return `No se pudo completar la operación. Código ${status}.`;
+}
+
 function resolveErrorMessage(payload: unknown, status: number): string {
   if (typeof payload === 'object' && payload !== null && 'message' in payload) {
-    return String((payload as { message?: unknown }).message);
+    const message = sanitizeTechnicalPaths(String((payload as { message?: unknown }).message));
+    return message || fallbackErrorMessage(status);
   }
 
-  return `Error HTTP ${status}`;
+  if (typeof payload === 'string' && payload.trim()) {
+    const message = sanitizeTechnicalPaths(payload);
+    return message || fallbackErrorMessage(status);
+  }
+
+  return fallbackErrorMessage(status);
 }
 
 export async function request<TResponse, TBody = unknown>(

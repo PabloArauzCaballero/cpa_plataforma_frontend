@@ -38,6 +38,7 @@ Antes de generar código, revisa estos insumos si están disponibles:
 
 ```txt
 /docs/theme/cpa-palette.json
+/docs/validation/frontend-checks-catalog.json
 /template
 /endpoints/endpoints.md
 /.env.example
@@ -109,6 +110,83 @@ La documentación de endpoints puede incluir:
 Si la documentación de endpoints está incompleta, no inventes contratos de API como si fueran definitivos. Indica claramente qué asumiste y qué debe confirmarse.
 
 ---
+
+
+---
+
+## Regla obligatoria sobre catálogo de checks y validaciones de campos
+
+Además de endpoints, template y paleta, el frontend debe revisar obligatoriamente el catálogo de validaciones antes de generar cualquier formulario, DTO, hook de formulario o serializador de payload.
+
+Ubicaciones esperadas del catálogo:
+
+```txt
+docs/validation/frontend-checks-catalog.json
+docs/validation/frontend-checks-catalog.md
+docs/checks/frontend-checks-catalog.json
+docs/checks/frontend-checks-catalog.md
+```
+
+### Prioridad de fuentes para validar campos
+
+El frontend debe resolver los campos y checks con esta prioridad:
+
+1. `frontend-checks-catalog`: fuente obligatoria para reglas de validación, checks por patrón, enums, reglas condicionales y serialización.
+2. `endpoints.md`: fuente oficial para rutas, payloads mínimos, campos relevantes y obligatoriedad por recurso.
+3. DDL / dump SQL: fuente para `NOT NULL`, `DEFAULT`, `ENUM`, `CHECK`, longitudes y restricciones condicionales.
+4. Postman Collection: solo sirve para confirmar rutas y flujo de pruebas. No reemplaza el contrato cuando sus cuerpos son genéricos.
+
+### Reglas que el generador frontend debe cumplir
+
+- No puede crear inputs genéricos si existe un campo real documentado.
+- No puede enviar payloads con campos inventados.
+- No puede enviar números como string.
+- No puede enviar strings vacíos para campos opcionales.
+- No puede renderizar enums como input libre.
+- No puede ignorar `CHECK constraints`.
+- No puede ignorar reglas condicionales entre campos.
+- No puede mostrar endpoints, rutas, nombres de tabla, PK, token ni detalles técnicos en pantalla.
+- Debe generar un `FormSchema` por recurso desde el catálogo de checks.
+- Debe generar validadores reutilizables en `src/shared/validation`.
+- Debe aplicar los checks en el hook/ViewModel antes de enviar al servicio.
+- El backend sigue siendo la autoridad final, pero el frontend debe prevenir errores evidentes.
+
+### Estructura recomendada para validaciones
+
+```txt
+src/shared/validation/
+  fieldChecksCatalog.ts
+  validators.ts
+  formSchema.ts
+  payloadSerializer.ts
+```
+
+### Flujo obligatorio para formularios
+
+Antes de renderizar un formulario:
+
+1. Leer campos del recurso desde `endpoints.md`.
+2. Buscar reglas aplicables en `frontend-checks-catalog`.
+3. Resolver tipo visual del campo.
+4. Resolver required/optional.
+5. Resolver enum/select si aplica.
+6. Resolver reglas condicionales.
+7. Construir `FormSchema`.
+8. Validar en ViewModel.
+9. Serializar payload limpio.
+10. Enviar solo campos aceptados por el contrato.
+
+### Criterio de aceptación adicional
+
+Un formulario será rechazado si:
+
+- muestra campos que no existen en el payload real,
+- omite campos obligatorios,
+- no aplica checks del catálogo,
+- envía valores con tipo incorrecto,
+- expone endpoints o rutas técnicas en UI,
+- usa nombres genéricos como `campo`, `valor`, `name`, `description` sin existir en el contrato real.
+
 
 ## Regla fundamental sobre el template
 La carpeta template debe tratarse como una **guía estructural cruda**, no como implementación final.

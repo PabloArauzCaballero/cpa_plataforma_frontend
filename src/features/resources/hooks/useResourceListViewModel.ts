@@ -14,11 +14,18 @@ function includesSearch(record: CrudRecord, search: string): boolean {
 }
 
 function resolveRecordId(resource: CrudResourceDefinition, record: CrudRecord): string | null {
+  if (resource.primaryKeys?.length) {
+    const values = resource.primaryKeys.map((key) => record[key]);
+    if (values.every((value) => value !== undefined && value !== null && String(value).trim())) {
+      return values.map((value) => encodeURIComponent(String(value))).join('/');
+    }
+  }
+
   const candidates = [resource.primaryKey, 'id', ...Object.keys(record).filter((key) => key.startsWith('id_'))];
   for (const key of candidates) {
     const value = record[key];
     if (value !== undefined && value !== null && String(value).trim()) {
-      return String(value);
+      return encodeURIComponent(String(value));
     }
   }
   return null;
@@ -126,7 +133,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
       setIsSaving(true);
       setError(null);
       await updateResource(resource, id, buildDisablePayload(record));
-      setMessage('Registro inhabilitado mediante PATCH.');
+      setMessage('Registro inhabilitado correctamente.');
       await load();
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : 'No se pudo inhabilitar el registro.');

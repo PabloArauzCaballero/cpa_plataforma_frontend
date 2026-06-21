@@ -16,7 +16,7 @@ export function ResourceListPage() {
   const resource = findResourceDefinition(module, resourceKey);
 
   if (!resource) {
-    return <PageState title="Recurso no encontrado" message="La ruta solicitada no existe en la matriz de endpoints documentada." />;
+    return <PageState title="Recurso no encontrado" message="La opción solicitada no está disponible en este momento." />;
   }
 
   return <ResourceListContent resource={resource} />;
@@ -26,7 +26,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
   const viewModel = useResourceListViewModel(resource);
 
   if (viewModel.isLoading) {
-    return <PageState title="Cargando registros" message={`Consultando ${resource.endpoints.list}`} />;
+    return <PageState title="Cargando registros" message={`Preparando información de ${resource.label}.`} />;
   }
 
   return (

@@ -5,6 +5,7 @@ export interface ResourceFieldDefinition {
   label: string;
   type: FieldType;
   required?: boolean;
+  options?: string[];
 }
 
 export interface CrudResourceDefinition {
@@ -14,6 +15,7 @@ export interface CrudResourceDefinition {
   label: string;
   table: string;
   primaryKey: string;
+  primaryKeys?: string[];
   endpoints: {
     list: string;
     detail: (id: string) => string;

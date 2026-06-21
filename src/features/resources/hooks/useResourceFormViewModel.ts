@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
+import type { CrudRecord, CrudResourceDefinition, ResourceFieldDefinition } from '../domain/CrudResource';
 
 function stringifyInitialValue(value: unknown): string | number | boolean {
   if (typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') return value;
@@ -13,6 +13,26 @@ function buildInitialPayload(resource: CrudResourceDefinition, record: CrudRecor
   return resource.fields.reduce<CrudRecord>((payload, field) => {
     payload[field.name] = stringifyInitialValue(record?.[field.name]);
     return payload;
+  }, {});
+}
+
+function normalizeFieldValue(field: ResourceFieldDefinition, value: unknown): unknown {
+  if (value === '') return undefined;
+
+  if (field.type === 'number') {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value;
+  }
+
+  return value;
+}
+
+function buildCleanPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
+  return resource.fields.reduce<CrudRecord>((clean, field) => {
+    const normalized = normalizeFieldValue(field, payload[field.name]);
+    if (normalized === undefined || normalized === null) return clean;
+    clean[field.name] = normalized;
+    return clean;
   }, {});
 }
 
@@ -41,13 +61,14 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     }
 
     for (const field of resource.fields) {
-      if (field.required && !String(payload[field.name] ?? '').trim()) {
+      const value = payload[field.name];
+      if (field.required && (value === undefined || value === null || String(value).trim() === '')) {
         nextErrors[field.name] = 'Campo obligatorio.';
       }
     }
 
     setErrors(nextErrors);
-    return Object.keys(nextErrors).length ? null : payload;
+    return Object.keys(nextErrors).length ? null : buildCleanPayload(resource, payload);
   }
 
   return {
