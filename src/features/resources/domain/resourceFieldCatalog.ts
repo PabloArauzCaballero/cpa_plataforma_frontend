@@ -1,5 +1,5 @@
 import frontendCheckCatalogRaw from '../../../../docs/validation/frontend-checks-catalog.json';
-import type { CrudResourceDefinition, ResourceFieldDefinition } from './CrudResource';
+import type { CrudResourceDefinition, ResourceFieldDefinition, ConditionalSelectOptions } from './CrudResource';
 
 type FieldCatalogPatch = Partial<ResourceFieldDefinition>;
 
@@ -14,6 +14,9 @@ type CatalogFieldDefinition = {
   maxLength?: number;
   min?: number;
   max?: number;
+  conditionalOptions?: ConditionalSelectOptions;
+  requiredWhen?: Record<string, string | number | boolean>;
+  exclusiveGroup?: string;
 };
 
 type CatalogPatternRule = {
@@ -142,6 +145,9 @@ function catalogDefinitionToPatch(definition: CatalogFieldDefinition | undefined
   if (definition.max !== undefined) patch.max = definition.max;
   if (checks.length) patch.checks = checks;
   if (definition.message) patch.helpText = definition.message;
+  if (definition.conditionalOptions) patch.conditionalOptions = definition.conditionalOptions;
+  if (definition.requiredWhen) patch.requiredWhen = definition.requiredWhen;
+  if (definition.exclusiveGroup) patch.exclusiveGroup = definition.exclusiveGroup;
 
   return Object.keys(patch).length ? patch : undefined;
 }
@@ -164,6 +170,10 @@ function mergeFieldPatches(
 
   const checks = unique([...(field.checks ?? []), ...(generatedPatch?.checks ?? []), ...(catalogPatch?.checks ?? [])]);
   if (checks.length) merged.checks = checks;
+
+  if (catalogPatch?.conditionalOptions) merged.conditionalOptions = catalogPatch.conditionalOptions;
+  if (catalogPatch?.requiredWhen) merged.requiredWhen = catalogPatch.requiredWhen;
+  if (catalogPatch?.exclusiveGroup) merged.exclusiveGroup = catalogPatch.exclusiveGroup;
 
   if (catalogPatch?.options) merged.options = catalogPatch.options;
   else if (generatedPatch?.options) merged.options = generatedPatch.options;

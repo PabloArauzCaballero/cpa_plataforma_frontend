@@ -12,6 +12,11 @@ export interface SelectOption {
   label: string;
 }
 
+export interface ConditionalSelectOptions {
+  dependsOn: string;
+  valuesByControllerValue: Record<string, Array<string | SelectOption>>;
+}
+
 export type FieldValueKind = 'string' | 'number' | 'boolean';
 
 export interface ResourceFieldDefinition {
@@ -28,6 +33,9 @@ export interface ResourceFieldDefinition {
   maxLength?: number;
   checks?: string[];
   helpText?: string;
+  conditionalOptions?: ConditionalSelectOptions;
+  requiredWhen?: Record<string, string | number | boolean>;
+  exclusiveGroup?: string;
 }
 
 export interface CrudResourceDefinition {

@@ -71,6 +71,51 @@ function toMoney(value: string): number {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
+
+function isFilled(value: unknown): boolean {
+  return value !== undefined && value !== null && String(value).trim() !== '';
+}
+
+function validateTransactionHeaderBusinessRules(payload: CrudRecord): string | null {
+  const type = String(payload.tipo_transaccion ?? '');
+
+  if (type === 'COSTO' && !isFilled(payload.id_centro_costo_mapa)) {
+    return 'Una transacción de costo debe estar asociada a un mapa de centro de costo.';
+  }
+
+  if (type === 'BIEN' && !isFilled(payload.id_bien) && !isFilled(payload.id_movimiento_detalle)) {
+    return 'Una transacción de bien debe estar asociada a un bien o a un movimiento de inventario.';
+  }
+
+  if (type === 'DEUDA' && !isFilled(payload.id_deuda) && !isFilled(payload.id_pago_deuda)) {
+    return 'Una transacción de deuda debe estar asociada a una deuda o a un pago de deuda.';
+  }
+
+  return null;
+}
+
+function validateMovementBusinessRules(movements: MovementDraft[]): string | null {
+  const seen = new Set<string>();
+
+  for (const movement of movements) {
+    const amount = toMoney(movement.monto);
+    if (!movement.cuentaId || Number(movement.cuentaId) <= 0) {
+      return 'Todos los movimientos deben tener una cuenta válida.';
+    }
+    if (amount <= 0) {
+      return 'Todos los movimientos deben tener un monto mayor a cero.';
+    }
+
+    const key = `${movement.cuentaId}:${movement.tipoMovimiento}`;
+    if (seen.has(key)) {
+      return 'No repitas la misma cuenta en el mismo lado del asiento. Agrupa el monto en una sola línea.';
+    }
+    seen.add(key);
+  }
+
+  return null;
+}
+
 function getMovementPayload(movement: MovementDraft): CrudRecord {
   const amount = toMoney(movement.monto);
   return {
@@ -153,8 +198,20 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
       return;
     }
 
+    const headerBusinessError = validateTransactionHeaderBusinessRules(headerPayload);
+    if (headerBusinessError) {
+      setError(headerBusinessError);
+      return;
+    }
+
     if (movements.length < 2) {
       setError('Una transacción contable debe tener al menos dos movimientos.');
+      return;
+    }
+
+    const movementBusinessError = validateMovementBusinessRules(movements);
+    if (movementBusinessError) {
+      setError(movementBusinessError);
       return;
     }
 

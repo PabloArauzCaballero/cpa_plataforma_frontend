@@ -4,16 +4,55 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function normalizeListResponse(response: unknown): CrudRecord[] {
-  if (Array.isArray(response)) return response as CrudRecord[];
+function isCrudRecordArray(value: unknown): value is CrudRecord[] {
+  return Array.isArray(value);
+}
 
-  if (isRecord(response)) {
-    const data = response.data;
-    if (Array.isArray(data)) return data as CrudRecord[];
-    if (isRecord(data) && Array.isArray(data.items)) return data.items as CrudRecord[];
-    if (Array.isArray(response.items)) return response.items as CrudRecord[];
-    if (Array.isArray(response.rows)) return response.rows as CrudRecord[];
-    if (Array.isArray(response.results)) return response.results as CrudRecord[];
+/**
+ * Normaliza las respuestas reales del backend CPA.
+ *
+ * El backend puede devolver listas de varias formas según el recurso/función SQL:
+ * - []
+ * - { rows: [] }
+ * - { items: [] }
+ * - { results: [] }
+ * - { data: [] }
+ * - { data: { rows: [], count, limit, offset } }
+ * - { data: { items: [], count, limit, offset } }
+ *
+ * El caso { success, message, data: { rows } } es el formato principal de los
+ * endpoints CRUD del backend NestJS, por eso debe tener prioridad explícita.
+ */
+export function normalizeListResponse(response: unknown): CrudRecord[] {
+  if (isCrudRecordArray(response)) return response;
+
+  if (!isRecord(response)) return [];
+
+  const directCandidates = [
+    response.rows,
+    response.items,
+    response.results,
+    response.records,
+    response.data,
+  ];
+
+  for (const candidate of directCandidates) {
+    if (isCrudRecordArray(candidate)) return candidate;
+  }
+
+  const data = response.data;
+  if (isRecord(data)) {
+    const nestedCandidates = [
+      data.rows,
+      data.items,
+      data.results,
+      data.records,
+      data.detalle,
+    ];
+
+    for (const candidate of nestedCandidates) {
+      if (isCrudRecordArray(candidate)) return candidate;
+    }
   }
 
   return [];

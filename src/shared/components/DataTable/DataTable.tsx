@@ -1,4 +1,6 @@
 import styles from './DataTable.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export type TableRecord = Record<string, unknown>;
 
@@ -40,8 +42,16 @@ export function DataTable({ records, columns, primaryKey, onEdit, onDisable, can
                 ))}
                 <td>
                   <div className={styles.actions}>
-                    {onEdit ? <button onClick={() => onEdit(record)}>Editar</button> : null}
-                    {onDisable && (!canDisable || canDisable(record)) ? <button onClick={() => onDisable(record)}>Inhabilitar</button> : null}
+                    {onEdit ? (
+                      <button type="button" onClick={() => onEdit(record)}>
+                        <FontAwesomeIcon icon={faPen} />
+                      </button>
+                    ) : null}
+                    {onDisable && (!canDisable || canDisable(record)) ? (
+                      <button type="button" onClick={() => onDisable(record)}>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    ) : null}
                   </div>
                 </td>
               </tr>

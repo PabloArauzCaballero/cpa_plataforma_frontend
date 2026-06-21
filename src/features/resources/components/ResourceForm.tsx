@@ -2,6 +2,7 @@ import { Button } from '@/shared/components/Button';
 import { FormField } from '@/shared/components/FormField';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
+import { CloudinaryUploadField } from './CloudinaryUploadField';
 import styles from './ResourceForm.module.css';
 
 function humanizeFieldName(name: string): string {
@@ -19,9 +20,18 @@ interface ResourceFormProps {
   onCancel: () => void;
 }
 
+function isCloudinaryArchivoTransaccionField(resource: CrudResourceDefinition, fieldName: string): boolean {
+  return resource.key === 'archivos-transaccion' && fieldName === 'link_achivo';
+}
+
+function shouldHideTechnicalMirrorField(resource: CrudResourceDefinition, fieldName: string): boolean {
+  return resource.key === 'archivos-transaccion' && fieldName === 'link_archivo';
+}
+
 export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }: ResourceFormProps) {
   const viewModel = useResourceFormViewModel(resource, record);
   const isJsonMode = resource.fields.length === 0;
+  const visibleFields = resource.fields.filter((field) => !shouldHideTechnicalMirrorField(resource, field.name));
 
   return (
     <form
@@ -45,21 +55,43 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
         </label>
       ) : (
         <div className={styles.grid}>
-          {resource.fields.map((field) => (
-            <FormField
-              key={field.name}
-              id={field.name}
-              label={field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name)}
-              type={field.type}
-              value={viewModel.payload[field.name] as string | number | boolean}
-              error={viewModel.errors[field.name]}
-              required={field.required}
-              options={viewModel.getFieldOptions(field)}
-              helpText={field.helpText}
-              isLoadingOptions={viewModel.isLoadingFieldOptions(field)}
-              onChange={(value) => viewModel.setField(field.name, value)}
-            />
-          ))}
+          {visibleFields.map((field) => {
+            const label = field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name);
+
+            if (isCloudinaryArchivoTransaccionField(resource, field.name)) {
+              return (
+                <CloudinaryUploadField
+                  key={field.name}
+                  id={field.name}
+                  label="Imagen del comprobante"
+                  value={String(viewModel.payload.link_achivo ?? viewModel.payload.link_archivo ?? '')}
+                  error={viewModel.errors[field.name]}
+                  required={field.required}
+                  folder="cpa/archivos-transaccion"
+                  onUploaded={(url) => {
+                    viewModel.setField('link_achivo', url);
+                    viewModel.setField('link_archivo', url);
+                  }}
+                />
+              );
+            }
+
+            return (
+              <FormField
+                key={field.name}
+                id={field.name}
+                label={label}
+                type={field.type}
+                value={viewModel.payload[field.name] as string | number | boolean}
+                error={viewModel.errors[field.name]}
+                required={field.required}
+                options={viewModel.getFieldOptions(field)}
+                helpText={field.helpText}
+                isLoadingOptions={viewModel.isLoadingFieldOptions(field)}
+                onChange={(value) => viewModel.setField(field.name, value)}
+              />
+            );
+          })}
         </div>
       )}
 

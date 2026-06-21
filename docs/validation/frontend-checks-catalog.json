@@ -332,6 +332,45 @@
         "if tipo = ACTIVO_FIJO then valor_origen, vida_util_meses and metodo_depreciacion are required",
         "inventory flags must respect business XOR rule by tipo"
       ]
+    },
+    "accountingBusinessRules": {
+      "grupoCuenta": [
+        "tipo BALANCE solo admite sub_tipo ACTIVO|PASIVO|PATRIMONIO",
+        "tipo RESULTADOS, usado para Estado de Resultado, solo admite sub_tipo INGRESO|GASTO",
+        "sub_tipo ACTIVO|PASIVO solo admite sub_grupo CORRIENTE|NO_CORRIENTE",
+        "sub_tipo PATRIMONIO solo admite sub_grupo CAPITAL|RESERVAS|RESULTADOS_ACUMULADOS",
+        "sub_tipo INGRESO solo admite sub_grupo OPERATIVO|NO_OPERATIVO",
+        "sub_tipo GASTO solo admite sub_grupo ADMINISTRATIVO|VENTAS|FINANCIERO|OPERATIVO|NO_OPERATIVO",
+        "id_parent no puede ser igual al id_grupo_cuenta del mismo registro",
+        "orden_reporte debe ser entero positivo cuando se informe"
+      ],
+      "cuenta": [
+        "codigo no debe estar vacío ni contener espacios innecesarios",
+        "id_grupo_cuenta obligatorio"
+      ],
+      "centroCosto": [
+        "id_cuenta_ingreso e id_cuenta_costo no deben ser iguales cuando ambos existen"
+      ],
+      "centroCostoMapa": [
+        "Debe asociar al menos una entidad operativa: deuda, bien, sucursal, tienda, empleado, posicion o departamento",
+        "Advertir/bloquear cuando existan demasiadas entidades simultáneas"
+      ],
+      "cuentaAsignacion": [
+        "entidad_tipo determina exactamente qué FK debe ser obligatoria",
+        "solo una entidad principal debe estar informada"
+      ],
+      "pagoTutor": [
+        "total debe ser subtotal + ajustes",
+        "fecha_pago >= fecha_aprobacion si ambas existen"
+      ],
+      "deuda": [
+        "monto_inicial > 0",
+        "plazo_meses entero positivo",
+        "componentes monetarios no negativos"
+      ],
+      "pagoDeuda": [
+        "la suma de componentes del pago debe ser mayor a cero"
+      ]
     }
   },
   "enums": {
@@ -536,8 +575,14 @@
       "CADA MES"
     ],
     "contabilidad.concepto_costo_tipo": [
-      "BIEN",
+      "MANO_OBRA",
+      "MATERIAL",
       "SERVICIO",
+      "INFRAESTRUCTURA",
+      "ADMINISTRATIVO",
+      "COMERCIAL",
+      "FINANCIERO",
+      "BIEN",
       "OTRO"
     ],
     "contabilidad.grupo_cuenta_tipo": [
@@ -554,14 +599,22 @@
     "contabilidad.grupo_cuenta_sub_grupo": [
       "CORRIENTE",
       "NO_CORRIENTE",
-      "ORDINARIO",
-      "EXTRAORDINARIO"
+      "CAPITAL",
+      "RESERVAS",
+      "RESULTADOS_ACUMULADOS",
+      "OPERATIVO",
+      "NO_OPERATIVO",
+      "ADMINISTRATIVO",
+      "VENTAS",
+      "FINANCIERO"
     ],
     "contabilidad.pago_tutor_estado_pago": [
       "BORRADOR",
+      "PENDIENTE",
       "APROBADO",
       "PAGADO",
-      "ANULADO"
+      "ANULADO",
+      "OBSERVADO"
     ],
     "deuda.tipo_tasa": [
       "SIMPLE",
@@ -601,12 +654,12 @@
     "negocio.unidad_medida": [
       "UNIDAD",
       "HORA",
+      "DIA",
+      "MES",
       "CLASE",
       "SESION",
-      "ESTUDIANTE",
       "PAQUETE",
-      "MES",
-      "DIA",
+      "ESTUDIANTE",
       "PORCENTAJE",
       "BOB",
       "USD"
@@ -748,6 +801,57 @@
       "UNIVERSITARIO",
       "INICIAL",
       "COLEGIAL"
+    ],
+    "contabilidad.grupo_cuenta_sub_tipo_balance": [
+      "ACTIVO",
+      "PASIVO",
+      "PATRIMONIO"
+    ],
+    "contabilidad.grupo_cuenta_sub_tipo_resultados": [
+      "INGRESO",
+      "GASTO"
+    ],
+    "contabilidad.tipo_tasa_deuda": [
+      "FIJA",
+      "VARIABLE"
+    ],
+    "contabilidad.capitalizacion_deuda": [
+      "MENSUAL",
+      "TRIMESTRAL",
+      "SEMESTRAL",
+      "ANUAL",
+      "SIN_CAPITALIZACION"
+    ],
+    "contabilidad.tipo_calculo_cuotas": [
+      "FRANCES",
+      "ALEMAN",
+      "AMERICANO",
+      "MANUAL"
+    ],
+    "contabilidad.frecuencia_cuotas": [
+      "MENSUAL",
+      "QUINCENAL",
+      "SEMANAL",
+      "TRIMESTRAL",
+      "SEMESTRAL",
+      "ANUAL"
+    ],
+    "contabilidad.tipo_pago_deuda": [
+      "EFECTIVO",
+      "TRANSFERENCIA",
+      "CHEQUE",
+      "TARJETA",
+      "OTRO"
+    ],
+    "contabilidad.tipo_primer_pago_deuda": [
+      "INMEDIATO",
+      "DIFERIDO",
+      "FIN_DE_PERIODO"
+    ],
+    "contabilidad.archivo_dominios_permitidos": [
+      "https://drive.google.com",
+      "https://docs.google.com",
+      "https://storage.googleapis.com"
     ]
   },
   "resourceFieldDefinitions": {
@@ -949,7 +1053,7 @@
         "enumRef": "contabilidad.concepto_costo_tipo",
         "ui": "select",
         "message": "Seleccione el tipo de concepto de costo.",
-        "source": "ddl_check"
+        "source": "business"
       },
       "unidad_medida": {
         "type": "enum",
@@ -966,6 +1070,96 @@
         "ui": "select",
         "message": "Seleccione la entidad a la que se asigna la cuenta.",
         "source": "business"
+      },
+      "id_empleado": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "EMPLEADO"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea EMPLEADO."
+      },
+      "id_persona_estudiante": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "ESTUDIANTE"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea ESTUDIANTE."
+      },
+      "id_persona_tutor": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "TUTOR"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea TUTOR."
+      },
+      "id_sucursal": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "SUCURSAL"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea SUCURSAL."
+      },
+      "id_edificio": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "EDIFICIO"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea EDIFICIO."
+      },
+      "id_tienda": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "TIENDA"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea TIENDA."
+      },
+      "id_bien": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "BIEN"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea BIEN."
+      },
+      "id_deuda": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "DEUDA"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea DEUDA."
+      },
+      "id_proveedor": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "PROVEEDOR"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea PROVEEDOR."
+      },
+      "id_departamento": {
+        "check": "positiveInteger",
+        "requiredWhen": {
+          "entidad_tipo": "DEPARTAMENTO"
+        },
+        "exclusiveGroup": "cuenta_asignacion_entidad",
+        "message": "Seleccione el registro relacionado cuando entidad_tipo sea DEPARTAMENTO."
+      },
+      "id_cuenta": {
+        "check": "positiveInteger",
+        "message": "Seleccione la cuenta contable a asignar."
+      },
+      "prioridad": {
+        "check": "positiveInteger",
+        "min": 1,
+        "max": 99,
+        "message": "La prioridad debe ser un entero positivo."
       }
     },
     "grupo-cuenta": {
@@ -973,22 +1167,97 @@
         "type": "enum",
         "enumRef": "contabilidad.grupo_cuenta_tipo",
         "ui": "select",
-        "message": "Seleccione el tipo de grupo contable.",
-        "source": "ddl_check"
+        "message": "Seleccione Balance o Resultados. Resultados corresponde al Estado de Resultado.",
+        "source": "business"
       },
       "sub_tipo": {
         "type": "enum",
         "enumRef": "contabilidad.grupo_cuenta_sub_tipo",
         "ui": "select",
-        "message": "Seleccione el subtipo contable compatible.",
-        "source": "ddl_check"
+        "message": "Si el tipo es Balance use Activo, Pasivo o Patrimonio. Si es Resultados use Ingreso o Gasto.",
+        "source": "business",
+        "conditionalOptions": {
+          "dependsOn": "tipo",
+          "valuesByControllerValue": {
+            "BALANCE": [
+              "ACTIVO",
+              "PASIVO",
+              "PATRIMONIO"
+            ],
+            "RESULTADOS": [
+              "INGRESO",
+              "GASTO"
+            ],
+            "ESTADO_RESULTADO": [
+              "INGRESO",
+              "GASTO"
+            ],
+            "ESTADO_DE_RESULTADO": [
+              "INGRESO",
+              "GASTO"
+            ],
+            "ESTADO_DE_RESULTADOS": [
+              "INGRESO",
+              "GASTO"
+            ]
+          }
+        }
       },
       "sub_grupo": {
         "type": "enum",
         "enumRef": "contabilidad.grupo_cuenta_sub_grupo",
         "ui": "select",
-        "message": "Seleccione el subgrupo de reporte.",
-        "source": "ddl_check"
+        "message": "Seleccione un subgrupo coherente con el subtipo contable.",
+        "source": "business",
+        "conditionalOptions": {
+          "dependsOn": "sub_tipo",
+          "valuesByControllerValue": {
+            "ACTIVO": [
+              "CORRIENTE",
+              "NO_CORRIENTE"
+            ],
+            "PASIVO": [
+              "CORRIENTE",
+              "NO_CORRIENTE"
+            ],
+            "PATRIMONIO": [
+              "CAPITAL",
+              "RESERVAS",
+              "RESULTADOS_ACUMULADOS"
+            ],
+            "INGRESO": [
+              "OPERATIVO",
+              "NO_OPERATIVO"
+            ],
+            "GASTO": [
+              "ADMINISTRATIVO",
+              "VENTAS",
+              "FINANCIERO",
+              "OPERATIVO",
+              "NO_OPERATIVO"
+            ]
+          }
+        }
+      },
+      "codigo": {
+        "check": "trimmedCode",
+        "maxLength": 30,
+        "message": "Use un código contable claro, por ejemplo 1.1.01 o ACT-001."
+      },
+      "nombre": {
+        "check": "trimmedText",
+        "maxLength": 150,
+        "message": "Evite nombres genéricos como “varios” u “otros” si no corresponden."
+      },
+      "id_parent": {
+        "check": "positiveInteger",
+        "message": "El grupo padre debe ser distinto al grupo actual."
+      },
+      "orden_reporte": {
+        "check": "positiveInteger",
+        "min": 1,
+        "max": 999,
+        "message": "El orden de reporte debe ser un entero mayor a cero."
       }
     },
     "pago-tutor": {
@@ -997,7 +1266,24 @@
         "enumRef": "contabilidad.pago_tutor_estado_pago",
         "ui": "select",
         "message": "Seleccione el estado del pago al tutor.",
-        "source": "ddl_check"
+        "source": "business"
+      },
+      "subtotal": {
+        "type": "money",
+        "check": "nonNegativeDecimal",
+        "min": 0,
+        "message": "No puede ser negativo."
+      },
+      "total": {
+        "type": "money",
+        "check": "nonNegativeDecimal",
+        "min": 0,
+        "message": "No puede ser negativo."
+      },
+      "ajustes": {
+        "type": "number",
+        "check": "decimal",
+        "message": "Ajustes puede ser positivo o negativo según política interna."
       }
     },
     "transaccion": {
@@ -1005,52 +1291,51 @@
         "type": "enum",
         "enumRef": "contabilidad.sub_tipo_transaccion",
         "ui": "select",
-        "message": "Seleccione el subtipo de transacción para clasificación contable.",
+        "message": "Seleccione el subtipo para clasificar la transacción.",
         "source": "business"
+      },
+      "glosa": {
+        "check": "trimmedText",
+        "maxLength": 300,
+        "message": "Describa brevemente la razón del asiento contable."
       }
     },
     "deuda": {
       "tipo_tasa": {
         "type": "enum",
-        "enumRef": "deuda.tipo_tasa",
+        "enumRef": "contabilidad.tipo_tasa_deuda",
         "ui": "select",
-        "message": "Seleccione el tipo de tasa.",
-        "source": "ddl_check"
+        "message": "Seleccione tipo de tasa."
       },
       "capitalizacion": {
         "type": "enum",
-        "enumRef": "deuda.capitalizacion",
+        "enumRef": "contabilidad.capitalizacion_deuda",
         "ui": "select",
-        "message": "Seleccione la capitalización cuando la tasa sea compuesta.",
-        "source": "ddl_check"
+        "message": "Seleccione capitalización."
       },
       "tipo_calculo_cuotas": {
         "type": "enum",
-        "enumRef": "deuda.tipo_calculo_cuotas",
+        "enumRef": "contabilidad.tipo_calculo_cuotas",
         "ui": "select",
-        "message": "Seleccione el método de cálculo de cuotas.",
-        "source": "ddl_check"
+        "message": "Seleccione método de cálculo de cuotas."
       },
       "frecuencia_cuotas": {
         "type": "enum",
-        "enumRef": "deuda.frecuencia_cuotas",
+        "enumRef": "contabilidad.frecuencia_cuotas",
         "ui": "select",
-        "message": "Seleccione la frecuencia de cuotas.",
-        "source": "ddl_check"
+        "message": "Seleccione frecuencia de cuotas."
       },
       "tipo_pago": {
         "type": "enum",
-        "enumRef": "deuda.tipo_pago",
+        "enumRef": "contabilidad.tipo_pago_deuda",
         "ui": "select",
-        "message": "Seleccione si las cuotas son vencidas o anticipadas.",
-        "source": "ddl_check"
+        "message": "Seleccione tipo de pago."
       },
       "tipo_primer_pago": {
         "type": "enum",
-        "enumRef": "deuda.tipo_primer_pago",
+        "enumRef": "contabilidad.tipo_primer_pago_deuda",
         "ui": "select",
-        "message": "Seleccione el tipo del primer pago.",
-        "source": "ddl_check"
+        "message": "Seleccione política de primer pago."
       }
     },
     "bien": {
@@ -1108,6 +1393,102 @@
         "ui": "select",
         "message": "Seleccione el módulo del permiso.",
         "source": "business"
+      }
+    },
+    "cuenta": {
+      "codigo": {
+        "check": "accountingCode",
+        "maxLength": 40,
+        "message": "Use un código contable jerárquico o institucional, sin espacios innecesarios."
+      },
+      "nombre_cuenta": {
+        "check": "trimmedText",
+        "maxLength": 180,
+        "message": "Nombre claro de la cuenta contable."
+      },
+      "id_grupo_cuenta": {
+        "check": "positiveInteger",
+        "message": "Seleccione un grupo contable válido."
+      }
+    },
+    "centro-costo": {
+      "codigo": {
+        "check": "costCenterCode",
+        "maxLength": 40,
+        "message": "Use un código de centro de costo claro, por ejemplo CC-ADM o CC-ACADEMICO."
+      },
+      "nombre": {
+        "check": "trimmedText",
+        "maxLength": 150,
+        "message": "Nombre claro del centro de costo."
+      },
+      "id_cuenta_ingreso": {
+        "check": "positiveInteger",
+        "message": "Seleccione cuenta de ingreso cuando aplique."
+      },
+      "id_cuenta_costo": {
+        "check": "positiveInteger",
+        "message": "Seleccione cuenta de costo cuando aplique; no debe ser igual a la cuenta de ingreso."
+      }
+    },
+    "centro-costo-mapa": {
+      "id_centro_costo": {
+        "check": "positiveInteger",
+        "message": "Seleccione el centro de costo."
+      },
+      "tipo": {
+        "type": "enum",
+        "enumRef": "contabilidad.tipo_costo",
+        "ui": "select",
+        "message": "Seleccione si el costo es directo o indirecto."
+      },
+      "naturaleza": {
+        "type": "enum",
+        "enumRef": "contabilidad.naturaleza_costo",
+        "ui": "select",
+        "message": "Seleccione si el costo es fijo o variable."
+      },
+      "id_deuda": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_bien": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_sucursal": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_tienda": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_empleado": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_posicion": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      },
+      "id_departamento": {
+        "check": "positiveInteger",
+        "message": "Seleccione una entidad relacionada si corresponde."
+      }
+    },
+    "archivos-transaccion": {
+      "link_achivo": {
+        "type": "url",
+        "ui": "cloudinaryImageUpload",
+        "check": "url",
+        "message": "Sube una imagen del comprobante; el sistema enviará el enlace generado por Cloudinary."
+      },
+      "link_archivo": {
+        "type": "url",
+        "ui": "hiddenMirror",
+        "check": "url",
+        "message": "Campo espejo interno para compatibilidad con backend."
       }
     }
   }

@@ -905,3 +905,55 @@ Aunque las rutas existan internamente en servicios, la UI no debe mostrar:
 - rutas internas consultadas.
 
 La UI debe usar textos funcionales: `Cargando opciones`, `Validando información`, `Procesando registro`, etc.
+
+### Regla obligatoria adicional para contabilidad
+
+Para todo recurso del módulo `contabilidad` y para recursos financieros relacionados (`deuda`, `pago`, inventario que genere transacciones), el frontend debe aplicar validaciones de negocio antes de enviar el payload:
+
+1. Las transacciones contables deben tener al menos dos movimientos.
+2. Cada movimiento debe tener cuenta seleccionada, monto mayor a cero y solo un lado: Debe o Haber.
+3. No se debe permitir Debe y Haber positivos en la misma línea, ni una línea en cero.
+4. La suma del Debe debe ser igual a la suma del Haber, con tolerancia decimal mínima.
+5. Si `tipo_transaccion = COSTO`, debe existir una referencia de centro de costo cuando el payload lo permita.
+6. Si `tipo_transaccion = BIEN`, debe existir referencia a bien o movimiento de inventario cuando el payload lo permita.
+7. Si `tipo_transaccion = DEUDA`, debe existir referencia a deuda o pago de deuda cuando el payload lo permita.
+8. `grupo_cuenta.tipo` y `grupo_cuenta.sub_tipo` deben ser compatibles: `BALANCE` solo admite `ACTIVO`, `PASIVO`, `PATRIMONIO`; `RESULTADOS` solo admite `INGRESO`, `GASTO`.
+9. `cuenta_asignacion.entidad_tipo` determina qué FK debe ser obligatoria y solo una entidad principal debe estar seleccionada.
+10. `centro_costo.id_cuenta_ingreso` y `centro_costo.id_cuenta_costo` no deben ser iguales cuando ambos existan.
+11. `centro_costo_mapa` debe estar asociado al menos a una entidad operativa y no debe mezclar demasiadas entidades a la vez.
+12. `pago_tutor.total` debe coincidir con `subtotal + ajustes` cuando esos campos están presentes.
+13. En deuda, `monto_inicial` debe ser mayor a cero, `plazo_meses` entero positivo y los componentes monetarios no deben ser negativos.
+14. En pago de deuda, la suma de capital, interés, seguro y recargos debe ser mayor a cero.
+15. Los catálogos contables como tipo de grupo, subtipo, entidad asignada, estado de pago, tipo de concepto, unidad de medida, tipo de tasa, capitalización y frecuencia de cuotas deben ser `select`, no texto libre.
+
+---
+
+## Regla adicional V12: validaciones pequeñas de contabilidad
+
+Para formularios del módulo de contabilidad, especialmente `grupo-cuenta`, el frontend debe aplicar validaciones de coherencia de negocio antes de enviar el payload:
+
+- Si `tipo = BALANCE`, entonces `sub_tipo` debe limitarse a `ACTIVO`, `PASIVO` o `PATRIMONIO`.
+- Si `tipo = RESULTADOS` o se refiere al Estado de Resultado, entonces `sub_tipo` debe limitarse a `INGRESO` o `GASTO`.
+- `sub_grupo` debe depender de `sub_tipo` y no debe quedar como texto libre cuando el catálogo exista.
+- `id_parent` no puede apuntar al mismo `id_grupo_cuenta` del registro actual.
+- `orden_reporte`, si existe, debe ser entero mayor a cero.
+- Estas reglas deben salir primero de `docs/validation/frontend-checks-catalog.json` y luego de validadores compartidos en `src/shared/validation`.
+
+## Regla adicional: subida de comprobantes a Cloudinary
+
+Para el recurso `contabilidad.archivos_transaccion` / pantalla **Archivos Transacción**, el frontend no debe pedir al usuario que escriba manualmente `link_achivo` o `link_archivo` como texto plano.
+
+Flujo obligatorio:
+
+1. Mostrar un input de archivo para seleccionar una imagen del comprobante.
+2. Subir la imagen a Cloudinary desde el frontend usando:
+   - `VITE_CLOUDINARY_CLOUD_NAME`
+   - `VITE_CLOUDINARY_UPLOAD_PRESET`
+   - `VITE_CLOUDINARY_FOLDER` opcional.
+3. Validar que el archivo sea imagen y que no supere 10 MB.
+4. Tomar `secure_url` devuelto por Cloudinary.
+5. Enviar ese link en el payload del backend como `link_achivo` y, por compatibilidad, también como `link_archivo` cuando el campo exista.
+6. Mostrar errores amigables si faltan variables de entorno, si Cloudinary rechaza la subida o si hay problema de red.
+7. No exponer configuración sensible. El upload preset debe ser unsigned y restringido desde Cloudinary.
+
+El usuario final no debe ver rutas técnicas ni detalles internos de Cloudinary; solo debe ver el estado funcional de la carga.

@@ -38,9 +38,25 @@ function normalizeFieldValue(field: ResourceFieldDefinition, value: unknown): un
   return value;
 }
 
+function normalizeResourceSpecificPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
+  if (resource.key !== 'archivos-transaccion') return payload;
+
+  const link = payload.link_achivo ?? payload.link_archivo;
+  if (!link) return payload;
+
+  return {
+    ...payload,
+    link_achivo: link,
+    link_archivo: link,
+  };
+}
+
 function buildCleanPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
+  const normalizedPayload = normalizeResourceSpecificPayload(resource, payload);
+
   return resource.fields.reduce<CrudRecord>((clean, field) => {
-    const normalized = normalizeFieldValue(field, payload[field.name]);
+    const sourcePayload = normalizedPayload;
+    const normalized = normalizeFieldValue(field, sourcePayload[field.name]);
     if (normalized === undefined || normalized === null) return clean;
     clean[field.name] = normalized;
     return clean;
@@ -53,6 +69,12 @@ function mergeOptions(
 ): Array<string | SelectOption> {
   if (dynamicOptions.length) return dynamicOptions;
   return staticOptions;
+}
+
+function resolveConditionalOptions(field: ResourceFieldDefinition, payload: CrudRecord): Array<string | SelectOption> | undefined {
+  if (!field.conditionalOptions) return undefined;
+  const controllerValue = String(payload[field.conditionalOptions.dependsOn] ?? '');
+  return field.conditionalOptions.valuesByControllerValue[controllerValue];
 }
 
 export function useResourceFormViewModel(resource: CrudResourceDefinition, record: CrudRecord | null) {
@@ -112,7 +134,8 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
   }
 
   function getFieldOptions(field: ResourceFieldDefinition): Array<string | SelectOption> {
-    return mergeOptions(field.options, relationOptions[field.name]);
+    const conditionalOptions = resolveConditionalOptions(field, payload);
+    return mergeOptions(conditionalOptions ?? field.options, relationOptions[field.name]);
   }
 
   function isLoadingFieldOptions(field: ResourceFieldDefinition): boolean {
@@ -131,9 +154,10 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
       }
     }
 
-    const nextErrors = validateResourcePayload(resource.fields, payload);
+    const normalizedPayload = normalizeResourceSpecificPayload(resource, payload);
+    const nextErrors = validateResourcePayload(resource.fields, normalizedPayload, resource.key);
     setErrors(nextErrors);
-    return Object.keys(nextErrors).length ? null : buildCleanPayload(resource, payload);
+    return Object.keys(nextErrors).length ? null : buildCleanPayload(resource, normalizedPayload);
   }
 
   return {
