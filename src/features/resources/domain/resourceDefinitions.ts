@@ -1,6 +1,7 @@
 import type { CrudResourceDefinition } from './CrudResource';
+import { applyResourceFieldCatalog } from './resourceFieldCatalog';
 
-export const resourceDefinitions: CrudResourceDefinition[] = [
+const baseResourceDefinitions: CrudResourceDefinition[] = [
   {
     key: "departamento", module: "administracion", moduleLabel: "Administración", label: "Departamento",
     table: "administracion.departamento", primaryKey: "id_departamento",
@@ -394,6 +395,8 @@ export const resourceDefinitions: CrudResourceDefinition[] = [
     fields: [{ name: "id_persona", label: "id_persona", type: "number", required: true }, { name: "id_rol", label: "id_rol", type: "number", required: true }],
   },
 ];
+
+export const resourceDefinitions = applyResourceFieldCatalog(baseResourceDefinitions);
 
 export const resourceModules = Object.values(
   resourceDefinitions.reduce<Record<string, { key: string; label: string; resources: CrudResourceDefinition[] }>>((acc, resource) => {

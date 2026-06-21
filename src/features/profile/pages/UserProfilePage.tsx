@@ -287,7 +287,7 @@ export function UserProfilePage() {
             </div>
 
             <div className={styles.activityList}>
-              <Activity icon="fa-solid fa-right-to-bracket" title="Inicio de sesión" detail="Ingreso correcto con sesión privada usando token interno." date="Hace 5 min" />
+              <Activity icon="fa-solid fa-right-to-bracket" title="Inicio de sesión" detail="Ingreso correcto con sesión privada del sistema." date="Hace 5 min" />
               <Activity icon="fa-solid fa-list-check" title="Smoke test ejecutado" detail="Validación E2E completada con pruebas aprobadas." date="Hoy" />
               <Activity icon="fa-solid fa-user-shield" title="Permisos verificados" detail="Acceso de super usuario validado para módulos CRUD." date="Hoy" />
             </div>

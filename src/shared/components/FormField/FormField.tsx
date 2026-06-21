@@ -1,6 +1,11 @@
 import styles from './FormField.module.css';
 
-export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox' | 'select';
+export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox' | 'select' | 'url' | 'tel';
+
+export interface FormFieldOption {
+  value: string | number;
+  label: string;
+}
 
 interface FormFieldProps {
   id: string;
@@ -10,8 +15,15 @@ interface FormFieldProps {
   error?: string;
   placeholder?: string;
   required?: boolean;
-  options?: string[];
+  options?: Array<string | FormFieldOption>;
+  helpText?: string;
+  disabled?: boolean;
+  isLoadingOptions?: boolean;
   onChange: (value: string | number | boolean) => void;
+}
+
+function normalizeOption(option: string | FormFieldOption): FormFieldOption {
+  return typeof option === 'string' ? { value: option, label: option } : option;
 }
 
 export function FormField({
@@ -23,37 +35,50 @@ export function FormField({
   placeholder,
   required = false,
   options = [],
+  helpText,
+  disabled = false,
+  isLoadingOptions = false,
   onChange,
 }: FormFieldProps) {
   if (type === 'checkbox') {
     return (
-      <label className={styles.checkboxField} htmlFor={id}>
+      <label className={styles.checkboxField} htmlFor={id} aria-disabled={disabled}>
         <input
           id={id}
           type="checkbox"
           checked={Boolean(value)}
+          disabled={disabled}
           onChange={(event) => onChange(event.target.checked)}
         />
         <span>{label}</span>
+        {helpText ? <small>{helpText}</small> : null}
+        {error ? <small className={styles.error}>{error}</small> : null}
       </label>
     );
   }
 
-
   if (type === 'select') {
+    const normalizedOptions = options.map(normalizeOption);
+
     return (
       <label className={styles.field} htmlFor={id}>
         <span>
           {label}
           {required ? <strong> *</strong> : null}
         </span>
-        <select id={id} value={String(value ?? '')} onChange={(event) => onChange(event.target.value)}>
-          <option value="">Seleccionar</option>
-          {options.map((option) => (
-            <option key={option} value={option}>{option}</option>
+        <select
+          id={id}
+          value={String(value ?? '')}
+          disabled={disabled || isLoadingOptions}
+          onChange={(event) => onChange(event.target.value)}
+        >
+          <option value="">{isLoadingOptions ? 'Cargando opciones...' : 'Seleccionar'}</option>
+          {normalizedOptions.map((option) => (
+            <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
           ))}
         </select>
-        {error ? <small>{error}</small> : null}
+        {helpText ? <small>{helpText}</small> : null}
+        {error ? <small className={styles.error}>{error}</small> : null}
       </label>
     );
   }
@@ -69,6 +94,7 @@ export function FormField({
           id={id}
           value={String(value ?? '')}
           placeholder={placeholder}
+          disabled={disabled}
           onChange={(event) => onChange(event.target.value)}
           rows={4}
         />
@@ -78,10 +104,12 @@ export function FormField({
           type={type}
           value={String(value ?? '')}
           placeholder={placeholder}
+          disabled={disabled}
           onChange={(event) => onChange(type === 'number' ? (event.target.value === '' ? '' : Number(event.target.value)) : event.target.value)}
         />
       )}
-      {error ? <small>{error}</small> : null}
+      {helpText ? <small>{helpText}</small> : null}
+      {error ? <small className={styles.error}>{error}</small> : null}
     </label>
   );
 }

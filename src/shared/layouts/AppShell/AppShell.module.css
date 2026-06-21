@@ -6,7 +6,19 @@
     radial-gradient(circle at 82% 0%, rgba(32, 160, 197, 0.08), transparent 28rem),
     var(--color-surface-soft);
 }
+.logo {
+  width: clamp(4.5rem, 8vw, 5.7rem);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
 
+.logo:hover {
+  transform: scale(1.04);
+  opacity: 0.9;
+}
 .sidebar {
   position: sticky;
   top: 0;

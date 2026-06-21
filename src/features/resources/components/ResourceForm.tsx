@@ -49,12 +49,14 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
             <FormField
               key={field.name}
               id={field.name}
-              label={humanizeFieldName(field.name)}
+              label={field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name)}
               type={field.type}
               value={viewModel.payload[field.name] as string | number | boolean}
               error={viewModel.errors[field.name]}
               required={field.required}
-              options={field.options}
+              options={viewModel.getFieldOptions(field)}
+              helpText={field.helpText}
+              isLoadingOptions={viewModel.isLoadingFieldOptions(field)}
               onChange={(value) => viewModel.setField(field.name, value)}
             />
           ))}

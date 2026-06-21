@@ -70,3 +70,20 @@
   height: 1.05rem;
   accent-color: var(--color-secondary);
 }
+
+.field input:disabled,
+.field textarea:disabled,
+.field select:disabled {
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--color-neutral-light) 32%, var(--color-white));
+  color: var(--color-neutral-muted);
+}
+
+.field .error,
+.checkboxField .error {
+  color: #b42318;
+}
+
+.checkboxField[aria-disabled='true'] {
+  opacity: 0.72;
+}

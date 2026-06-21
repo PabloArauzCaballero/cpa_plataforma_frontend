@@ -17,12 +17,14 @@ export function AppShell({ children }: AppShellProps) {
     window.localStorage.removeItem('cpa.userEmail');
     navigate('/login', { replace: true });
   }
-
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <strong>CPA</strong>
+          <img 
+            src="/../../public/logo.png" alt="CPA" 
+            className={styles.logo}
+            />
           <span>Centro de Preparación Académica</span>
         </div>
         <nav className={styles.nav} aria-label="Navegación principal">

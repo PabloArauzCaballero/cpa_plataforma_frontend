@@ -1,8 +1,11 @@
 import type { FormEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/shared/components/Button';
 import { FormField } from '@/shared/components/FormField';
-import type { CrudRecord, CrudResourceDefinition, ResourceFieldDefinition } from '../domain/CrudResource';
+import type { CrudRecord, CrudResourceDefinition, SelectOption } from '../domain/CrudResource';
+import { accountMovementRelation } from '../domain/resourceFieldCatalog';
+import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
+import { listLookupOptions } from '../services/lookupApi';
 import styles from './TransactionForm.module.css';
 
 interface TransactionFormProps {
@@ -27,25 +30,12 @@ const emptyMovement: MovementDraft = {
   descripcion: '',
 };
 
-function stringifyValue(value: unknown): string | number | boolean {
-  if (typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') return value;
-  if (value === null || value === undefined) return '';
-  return String(value);
-}
-
 function humanizeFieldName(name: string): string {
   return name
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/[_-]/g, ' ')
     .replace(/\b(id|url|uuid|nit)\b/gi, (value) => value.toUpperCase())
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function buildHeaderPayload(resource: CrudResourceDefinition, record: CrudRecord | null): CrudRecord {
-  return resource.fields.reduce<CrudRecord>((payload, field) => {
-    payload[field.name] = stringifyValue(record?.[field.name]);
-    return payload;
-  }, {});
 }
 
 function getRecordMovements(record: CrudRecord | null): MovementDraft[] {
@@ -81,24 +71,6 @@ function toMoney(value: string): number {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
-function normalizeFieldValue(field: ResourceFieldDefinition, value: unknown): unknown {
-  if (value === '') return undefined;
-  if (field.type === 'number') {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : value;
-  }
-  return value;
-}
-
-function buildCleanHeaderPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
-  return resource.fields.reduce<CrudRecord>((clean, field) => {
-    const normalized = normalizeFieldValue(field, payload[field.name]);
-    if (normalized === undefined || normalized === null) return clean;
-    clean[field.name] = normalized;
-    return clean;
-  }, {});
-}
-
 function getMovementPayload(movement: MovementDraft): CrudRecord {
   const amount = toMoney(movement.monto);
   return {
@@ -108,13 +80,39 @@ function getMovementPayload(movement: MovementDraft): CrudRecord {
   };
 }
 
+function getOptionLabel(options: SelectOption[], value: string): string {
+  const option = options.find((item) => String(item.value) === value);
+  return option?.label ?? value;
+}
+
 export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel }: TransactionFormProps) {
-  const initialHeader = useMemo(() => buildHeaderPayload(resource, record), [resource, record]);
-  const [headerPayload, setHeaderPayload] = useState<CrudRecord>(initialHeader);
+  const headerViewModel = useResourceFormViewModel(resource, record);
   const [movements, setMovements] = useState<MovementDraft[]>(() => getRecordMovements(record));
   const [movementDraft, setMovementDraft] = useState<MovementDraft>(emptyMovement);
+  const [accountOptions, setAccountOptions] = useState<SelectOption[]>([]);
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [headerErrors, setHeaderErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!accountMovementRelation) return undefined;
+
+    setIsLoadingAccounts(true);
+    listLookupOptions(accountMovementRelation)
+      .then((options) => {
+        if (isMounted) setAccountOptions(options);
+      })
+      .catch(() => {
+        if (isMounted) setAccountOptions([]);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingAccounts(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const totals = useMemo(() => {
     const debe = movements.filter((movement) => movement.tipoMovimiento === 'DEBE').reduce((sum, movement) => sum + toMoney(movement.monto), 0);
@@ -122,17 +120,13 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     return { debe, haber, diferencia: Number((debe - haber).toFixed(2)) };
   }, [movements]);
 
-  function setHeaderField(name: string, value: unknown) {
-    setHeaderPayload((current) => ({ ...current, [name]: value }));
-  }
-
   function setMovementField(name: keyof MovementDraft, value: string) {
     setMovementDraft((current) => ({ ...current, [name]: value }));
   }
 
   function addMovement() {
-    if (!movementDraft.cuentaId.trim() || !Number.isFinite(Number(movementDraft.cuentaId))) {
-      setError('Debes indicar un ID de cuenta válido.');
+    if (!movementDraft.cuentaId.trim() || !Number.isFinite(Number(movementDraft.cuentaId)) || Number(movementDraft.cuentaId) <= 0) {
+      setError('Debes seleccionar una cuenta válida.');
       return;
     }
 
@@ -153,16 +147,8 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextHeaderErrors: Record<string, string> = {};
-    for (const field of resource.fields) {
-      const value = headerPayload[field.name];
-      if (field.required && (value === undefined || value === null || String(value).trim() === '')) {
-        nextHeaderErrors[field.name] = 'Campo obligatorio.';
-      }
-    }
-
-    setHeaderErrors(nextHeaderErrors);
-    if (Object.keys(nextHeaderErrors).length) {
+    const headerPayload = headerViewModel.getPayload();
+    if (!headerPayload) {
       setError('Completa los campos obligatorios de la transacción.');
       return;
     }
@@ -179,7 +165,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
     setError(null);
     onSubmit({
-      ...buildCleanHeaderPayload(resource, headerPayload),
+      ...headerPayload,
       movimientos: movements.map(getMovementPayload),
     });
   }
@@ -198,13 +184,15 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             <FormField
               key={field.name}
               id={field.name}
-              label={humanizeFieldName(field.name)}
+              label={field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name)}
               type={field.type}
-              value={headerPayload[field.name] as string | number | boolean}
-              error={headerErrors[field.name]}
+              value={headerViewModel.payload[field.name] as string | number | boolean}
+              error={headerViewModel.errors[field.name]}
               required={field.required}
-              options={field.options}
-              onChange={(value) => setHeaderField(field.name, value)}
+              options={headerViewModel.getFieldOptions(field)}
+              helpText={field.helpText}
+              isLoadingOptions={headerViewModel.isLoadingFieldOptions(field)}
+              onChange={(value) => headerViewModel.setField(field.name, value)}
             />
           ))}
         </div>
@@ -225,8 +213,17 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
         <div className={styles.movementGrid}>
           <label>
-            <span>Cuenta / ID cuenta</span>
-            <input value={movementDraft.cuentaId} onChange={(event) => setMovementField('cuentaId', event.target.value)} placeholder="Ej. id_cuenta o código" />
+            <span>Cuenta</span>
+            <select
+              value={movementDraft.cuentaId}
+              disabled={isLoadingAccounts}
+              onChange={(event) => setMovementField('cuentaId', event.target.value)}
+            >
+              <option value="">{isLoadingAccounts ? 'Cargando cuentas...' : 'Seleccionar cuenta'}</option>
+              {accountOptions.map((option) => (
+                <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
+              ))}
+            </select>
           </label>
           <label>
             <span>Tipo</span>
@@ -237,7 +234,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
           </label>
           <label>
             <span>Monto</span>
-            <input type="number" step="0.01" value={movementDraft.monto} onChange={(event) => setMovementField('monto', event.target.value)} placeholder="0.00" />
+            <input type="number" step="0.01" min="0" value={movementDraft.monto} onChange={(event) => setMovementField('monto', event.target.value)} placeholder="0.00" />
           </label>
           <label>
             <span>Descripción</span>
@@ -260,7 +257,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             <tbody>
               {movements.length ? movements.map((movement, index) => (
                 <tr key={`${movement.cuentaId}-${movement.tipoMovimiento}-${index}`}>
-                  <td>{movement.cuentaId}</td>
+                  <td>{getOptionLabel(accountOptions, movement.cuentaId)}</td>
                   <td>{movement.tipoMovimiento === 'DEBE' ? 'Debe' : 'Haber'}</td>
                   <td>{toMoney(movement.monto).toFixed(2)}</td>
                   <td>{movement.descripcion || '—'}</td>

@@ -1,0 +1,894 @@
+{
+  "generatedFrom": [
+    "docs/endpoints/endpoints.md",
+    "docs/db/ddl.sql",
+    "docs/validation/frontend-checks-catalog.json"
+  ],
+  "note": "Catálogo de campos enriquecido. resourceFieldDefinitions tiene prioridad sobre fieldDefinitions globales para campos ambiguos.",
+  "resourceFieldDefinitions": {
+    "empleado-posicion-pago": {
+      "moneda": {
+        "type": "enum",
+        "enumRef": "negocio.moneda",
+        "ui": "select",
+        "message": "Seleccione la moneda de pago.",
+        "source": "business"
+      },
+      "tipo_comisionable": {
+        "type": "enum",
+        "enumRef": "administracion.tipo_comisionable",
+        "ui": "select",
+        "message": "Seleccione si la comisión es fija o variable.",
+        "source": "ddl_intent"
+      },
+      "tipo_calculo_comisionable": {
+        "type": "enum",
+        "enumRef": "administracion.tipo_calculo_comisionable",
+        "ui": "select",
+        "message": "Seleccione si el cálculo es directo o indirecto.",
+        "source": "ddl_intent"
+      }
+    },
+    "kpi": {
+      "frecuencia": {
+        "type": "enum",
+        "enumRef": "administracion.frecuencia_kpi",
+        "ui": "select",
+        "message": "Seleccione la frecuencia del KPI.",
+        "source": "ddl_enum"
+      },
+      "unidad_medida": {
+        "type": "enum",
+        "enumRef": "negocio.unidad_medida",
+        "ui": "select",
+        "message": "Seleccione la unidad en la que se mide el KPI.",
+        "source": "business"
+      }
+    },
+    "estudiante": {
+      "tipo": {
+        "type": "enum",
+        "enumRef": "persona.tipo_estudiante",
+        "ui": "select",
+        "message": "Seleccione el tipo de estudiante permitido por el backend.",
+        "source": "ddl_check"
+      },
+      "nivel_actual": {
+        "type": "enum",
+        "enumRef": "academico.nivel_escolar",
+        "ui": "select",
+        "message": "Seleccione el nivel académico actual.",
+        "source": "ddl_check"
+      },
+      "curso_actual": {
+        "type": "enum",
+        "enumRef": "academico.curso",
+        "ui": "select",
+        "message": "Seleccione el curso actual.",
+        "source": "ddl_check"
+      },
+      "turno_actual": {
+        "type": "enum",
+        "enumRef": "persona.turno_actual",
+        "ui": "select",
+        "message": "Seleccione el turno actual.",
+        "source": "ddl_check"
+      }
+    },
+    "tutor": {
+      "nivel_experiencia": {
+        "type": "enum",
+        "enumRef": "persona.nivel_experiencia_tutor",
+        "ui": "select",
+        "message": "Seleccione el nivel de experiencia del tutor.",
+        "source": "ddl_check"
+      },
+      "tipo_estudiante_especialidad": {
+        "type": "enum",
+        "enumRef": "persona.tipo_estudiante",
+        "ui": "select",
+        "message": "Seleccione el tipo de estudiante que atiende el tutor.",
+        "source": "ddl_check"
+      },
+      "nivel_estudiante_especialidad": {
+        "type": "enum",
+        "enumRef": "academico.nivel_escolar",
+        "ui": "select",
+        "message": "Seleccione el nivel de especialidad del tutor.",
+        "source": "ddl_check"
+      },
+      "curso": {
+        "type": "enum",
+        "enumRef": "academico.curso",
+        "ui": "select",
+        "message": "Seleccione el curso de especialidad cuando aplique.",
+        "source": "business"
+      }
+    },
+    "unidad-educativa": {
+      "categoria": {
+        "type": "enum",
+        "enumRef": "persona.unidad_educativa_categoria",
+        "ui": "select",
+        "message": "Seleccione la categoría real de la unidad educativa.",
+        "source": "ddl_check"
+      }
+    },
+    "proveedor": {
+      "categoria": {
+        "type": "enum",
+        "enumRef": "personas.proveedor_categoria",
+        "ui": "select",
+        "message": "Seleccione una categoría de proveedor útil para compras y reportes.",
+        "source": "business"
+      }
+    },
+    "usuario": {
+      "tipo_usuario": {
+        "type": "enum",
+        "enumRef": "personas.tipo_usuario",
+        "ui": "select",
+        "message": "Seleccione el tipo funcional del usuario.",
+        "source": "business"
+      }
+    },
+    "asistencia-clase-curso": {
+      "estado_asistencia": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.estado_asistencia",
+        "ui": "select",
+        "message": "Seleccione el estado de asistencia.",
+        "source": "ddl_check"
+      }
+    },
+    "clase-curso": {
+      "estado": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.clase_curso_estado",
+        "ui": "select",
+        "message": "Seleccione el estado operativo de la clase.",
+        "source": "ddl_check"
+      },
+      "modalidad": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.clase_curso_modalidad",
+        "ui": "select",
+        "message": "Seleccione la modalidad de clase.",
+        "source": "ddl_check"
+      }
+    },
+    "clase-por-hora": {
+      "estado_operativo": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.clase_por_hora_estado_operativo",
+        "ui": "select",
+        "message": "Seleccione el estado operativo.",
+        "source": "ddl_check"
+      },
+      "modalidad": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.clase_por_hora_modalidad",
+        "ui": "select",
+        "message": "Seleccione la modalidad.",
+        "source": "ddl_check"
+      },
+      "motivo": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.clase_por_hora_motivo",
+        "ui": "select",
+        "message": "Seleccione el motivo de la clase por hora.",
+        "source": "ddl_check"
+      }
+    },
+    "horarios": {
+      "repeticion": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.horario_repeticion",
+        "ui": "select",
+        "message": "Seleccione la frecuencia de repetición del horario.",
+        "source": "ddl_check"
+      }
+    },
+    "producto-educativo": {
+      "tipo_producto": {
+        "type": "enum",
+        "enumRef": "servicios_educativos.tipo_producto_educativo",
+        "ui": "select",
+        "message": "Seleccione el tipo de producto educativo.",
+        "source": "business"
+      }
+    },
+    "concepto-costo": {
+      "tipo_concepto": {
+        "type": "enum",
+        "enumRef": "contabilidad.concepto_costo_tipo",
+        "ui": "select",
+        "message": "Seleccione el tipo de concepto de costo.",
+        "source": "ddl_check"
+      },
+      "unidad_medida": {
+        "type": "enum",
+        "enumRef": "negocio.unidad_medida",
+        "ui": "select",
+        "message": "Seleccione una unidad de medida contable.",
+        "source": "business"
+      }
+    },
+    "cuenta-asignacion": {
+      "entidad_tipo": {
+        "type": "enum",
+        "enumRef": "contabilidad.entidad_tipo_asignacion",
+        "ui": "select",
+        "message": "Seleccione la entidad a la que se asigna la cuenta.",
+        "source": "business"
+      }
+    },
+    "grupo-cuenta": {
+      "tipo": {
+        "type": "enum",
+        "enumRef": "contabilidad.grupo_cuenta_tipo",
+        "ui": "select",
+        "message": "Seleccione el tipo de grupo contable.",
+        "source": "ddl_check"
+      },
+      "sub_tipo": {
+        "type": "enum",
+        "enumRef": "contabilidad.grupo_cuenta_sub_tipo",
+        "ui": "select",
+        "message": "Seleccione el subtipo contable compatible.",
+        "source": "ddl_check"
+      },
+      "sub_grupo": {
+        "type": "enum",
+        "enumRef": "contabilidad.grupo_cuenta_sub_grupo",
+        "ui": "select",
+        "message": "Seleccione el subgrupo de reporte.",
+        "source": "ddl_check"
+      }
+    },
+    "pago-tutor": {
+      "estado_pago": {
+        "type": "enum",
+        "enumRef": "contabilidad.pago_tutor_estado_pago",
+        "ui": "select",
+        "message": "Seleccione el estado del pago al tutor.",
+        "source": "ddl_check"
+      }
+    },
+    "transaccion": {
+      "sub_tipo_transaccion": {
+        "type": "enum",
+        "enumRef": "contabilidad.sub_tipo_transaccion",
+        "ui": "select",
+        "message": "Seleccione el subtipo de transacción para clasificación contable.",
+        "source": "business"
+      }
+    },
+    "deuda": {
+      "tipo_tasa": {
+        "type": "enum",
+        "enumRef": "deuda.tipo_tasa",
+        "ui": "select",
+        "message": "Seleccione el tipo de tasa.",
+        "source": "ddl_check"
+      },
+      "capitalizacion": {
+        "type": "enum",
+        "enumRef": "deuda.capitalizacion",
+        "ui": "select",
+        "message": "Seleccione la capitalización cuando la tasa sea compuesta.",
+        "source": "ddl_check"
+      },
+      "tipo_calculo_cuotas": {
+        "type": "enum",
+        "enumRef": "deuda.tipo_calculo_cuotas",
+        "ui": "select",
+        "message": "Seleccione el método de cálculo de cuotas.",
+        "source": "ddl_check"
+      },
+      "frecuencia_cuotas": {
+        "type": "enum",
+        "enumRef": "deuda.frecuencia_cuotas",
+        "ui": "select",
+        "message": "Seleccione la frecuencia de cuotas.",
+        "source": "ddl_check"
+      },
+      "tipo_pago": {
+        "type": "enum",
+        "enumRef": "deuda.tipo_pago",
+        "ui": "select",
+        "message": "Seleccione si las cuotas son vencidas o anticipadas.",
+        "source": "ddl_check"
+      },
+      "tipo_primer_pago": {
+        "type": "enum",
+        "enumRef": "deuda.tipo_primer_pago",
+        "ui": "select",
+        "message": "Seleccione el tipo del primer pago.",
+        "source": "ddl_check"
+      }
+    },
+    "bien": {
+      "categoria": {
+        "type": "enum",
+        "enumRef": "inventario.bien_categoria",
+        "ui": "select",
+        "message": "Seleccione una categoría de inventario útil para reportes.",
+        "source": "business"
+      },
+      "subcategoria": {
+        "type": "enum",
+        "enumRef": "inventario.bien_subcategoria",
+        "ui": "select",
+        "message": "Seleccione una subcategoría de inventario.",
+        "source": "business"
+      },
+      "unidad_compra": {
+        "type": "enum",
+        "enumRef": "inventario.unidad",
+        "ui": "select",
+        "message": "Seleccione la unidad de compra.",
+        "source": "business"
+      },
+      "unidad_venta": {
+        "type": "enum",
+        "enumRef": "inventario.unidad",
+        "ui": "select",
+        "message": "Seleccione la unidad de venta.",
+        "source": "business"
+      }
+    },
+    "clase-titulo": {
+      "sub_tipo": {
+        "type": "enum",
+        "enumRef": "societario.clase_titulo_sub_tipo",
+        "ui": "select",
+        "message": "Seleccione el subtipo de título societario.",
+        "source": "business"
+      }
+    },
+    "transferencia-titulo": {
+      "motivo": {
+        "type": "enum",
+        "enumRef": "societario.transferencia_motivo",
+        "ui": "select",
+        "message": "Seleccione el motivo de transferencia.",
+        "source": "business"
+      }
+    },
+    "permiso": {
+      "modulo": {
+        "type": "enum",
+        "enumRef": "seguridad.modulo",
+        "ui": "select",
+        "message": "Seleccione el módulo del permiso.",
+        "source": "business"
+      }
+    }
+  },
+  "globalFieldDefinitions": {
+    "curso": {
+      "type": "enum",
+      "enumRef": "academico.curso",
+      "ui": "select",
+      "message": "Seleccione el curso.",
+      "source": "business"
+    },
+    "grado": {
+      "type": "enum",
+      "enumRef": "academico.curso",
+      "ui": "select",
+      "message": "Seleccione el grado.",
+      "source": "business"
+    },
+    "nivel": {
+      "type": "enum",
+      "enumRef": "academico.nivel_general",
+      "ui": "select",
+      "values": [
+        "PRIMARIA",
+        "SECUNDARIA",
+        "UNIVERSIDAD"
+      ],
+      "message": "Seleccione el nivel académico."
+    },
+    "nivel_academico": {
+      "type": "enum",
+      "enumRef": "academico.nivel_general",
+      "ui": "select",
+      "values": [
+        "PRIMARIA",
+        "SECUNDARIA",
+        "UNIVERSIDAD"
+      ],
+      "message": "Seleccione el nivel académico."
+    },
+    "nivel_estudiante_especialidad": {
+      "type": "enum",
+      "enumRef": "academico.nivel",
+      "ui": "select",
+      "values": [
+        "PRIMARIA",
+        "SECUNDARIA",
+        "UNIVERSIDAD"
+      ],
+      "message": "Seleccione el nivel del estudiante."
+    },
+    "tipo_estudiante": {
+      "type": "enum",
+      "enumRef": "persona.tipo_estudiante",
+      "ui": "select",
+      "message": "Seleccione el tipo de estudiante permitido por el backend.",
+      "source": "ddl_check"
+    },
+    "tipo_estudiante_especialidad": {
+      "type": "enum",
+      "enumRef": "persona.tipo_estudiante",
+      "ui": "select",
+      "message": "Seleccione el tipo de estudiante permitido por el backend.",
+      "source": "ddl_check"
+    },
+    "nivel_experiencia": {
+      "type": "enum",
+      "enumRef": "persona.nivel_experiencia_tutor",
+      "ui": "select",
+      "message": "Seleccione el nivel de experiencia del tutor.",
+      "source": "ddl_check"
+    },
+    "pago_por_hora": {
+      "type": "money",
+      "check": "nonNegativeDecimal",
+      "message": "El pago por hora no puede ser negativo."
+    },
+    "fecha_inicio": {
+      "type": "date",
+      "check": "startTemporal",
+      "message": "Seleccione una fecha de inicio válida."
+    },
+    "fecha_fin": {
+      "type": "date",
+      "check": "endTemporal",
+      "message": "La fecha de fin debe ser posterior o igual a la fecha de inicio."
+    },
+    "hora_inicio": {
+      "type": "time",
+      "check": "startTemporal",
+      "message": "Seleccione una hora de inicio válida."
+    },
+    "hora_fin": {
+      "type": "time",
+      "check": "endTemporal",
+      "message": "La hora de fin debe ser posterior a la hora de inicio."
+    },
+    "moneda": {
+      "type": "enum",
+      "enumRef": "negocio.moneda",
+      "ui": "select",
+      "message": "Seleccione la moneda de operación.",
+      "source": "business"
+    },
+    "unidad_medida": {
+      "type": "enum",
+      "enumRef": "negocio.unidad_medida",
+      "ui": "select",
+      "message": "Seleccione una unidad de medida estándar.",
+      "source": "business"
+    }
+  },
+  "enums": {
+    "academico.curso": [
+      "PRIMERO",
+      "SEGUNDO",
+      "TERCERO",
+      "CUARTO",
+      "QUINTO",
+      "SEXTO"
+    ],
+    "academico.nivel": [
+      "PRIMARIA",
+      "SECUNDARIA",
+      "UNIVERSIDAD"
+    ],
+    "persona.tipo_estudiante": [
+      "UNIVERSITARIO",
+      "COLEGIAL"
+    ],
+    "persona.nivel_experiencia_tutor": [
+      "RECLUTA",
+      "EXPERIMENTADO",
+      "SENIOR"
+    ],
+    "administracion.direccion_kpi": [
+      "ASC",
+      "DESC"
+    ],
+    "administracion.estado_okr": [
+      "PLANIFICADO",
+      "EN_PROGRESO",
+      "COMPLETADO",
+      "CANCELADO"
+    ],
+    "administracion.frecuencia_kpi": [
+      "DIARIA",
+      "SEMANAL",
+      "MENSUAL",
+      "TRIMESTRAL"
+    ],
+    "administracion.frecuencia_pago": [
+      "MENSUAL",
+      "QUINCENAL",
+      "SEMANAL"
+    ],
+    "administracion.jornada_laboral": [
+      "FULL_TIME",
+      "PART_TIME"
+    ],
+    "administracion.tipo_contrato": [
+      "INDEFINIDO",
+      "PLAZO_FIJO",
+      "HONORARIOS"
+    ],
+    "administracion.tipo_esquema_pago": [
+      "SUELDO",
+      "POR_HORA",
+      "COMISION",
+      "MIXTO"
+    ],
+    "administracion.tipo_kpi": [
+      "INPUT",
+      "OUTPUT",
+      "OUTCOME"
+    ],
+    "contabilidad.naturaleza_costo": [
+      "FIJO",
+      "VARIABLE"
+    ],
+    "contabilidad.tipo_costo": [
+      "DIRECTO",
+      "INDIRECTO"
+    ],
+    "contabilidad.tipo_transaccion": [
+      "GENERAL",
+      "COSTO",
+      "VENTA",
+      "BIEN",
+      "DEUDA"
+    ],
+    "infraestructura.categoria_sala": [
+      "OFICINA",
+      "CONFERENCIA",
+      "REUNION",
+      "ESPERA",
+      "TIENDA",
+      "OTRA"
+    ],
+    "infraestructura.tipo_aula": [
+      "TEORIA",
+      "LABORATORIO",
+      "COMPUTACION",
+      "MULTIUSO"
+    ],
+    "infraestructura.tipo_espacio": [
+      "AULA",
+      "SALA"
+    ],
+    "inventario.metodo_depreciacion": [
+      "LINEA_RECTA",
+      "SDD",
+      "UNIDADES"
+    ],
+    "inventario.metodo_valuacion": [
+      "PEPS",
+      "UEPS",
+      "PROM"
+    ],
+    "inventario.seguimiento_bien": [
+      "NINGUNO",
+      "LOTE",
+      "SERIE"
+    ],
+    "inventario.tipo_bien": [
+      "MERCADERIA",
+      "MATERIA_PRIMA",
+      "SUMINISTRO",
+      "SERVICIO",
+      "ACTIVO_FIJO"
+    ],
+    "societario.instrumento_emision": [
+      "AUMENTO_CAPITAL",
+      "CONVERSION",
+      "PLAN_OPCIONES",
+      "EMISION_SECUNDARIA",
+      "OTRO"
+    ],
+    "societario.tipo_origen_tenencia": [
+      "EMISION",
+      "TRANSFERENCIA",
+      "CONVERSION",
+      "EJERCICIO_OPCION",
+      "AJUSTE"
+    ],
+    "societario.tipo_ronda": [
+      "FOUNDERS",
+      "ANGEL",
+      "SEED",
+      "A",
+      "B",
+      "C",
+      "D",
+      "PUENTE",
+      "OTRA"
+    ],
+    "societario.tipo_titulo_societario": [
+      "ACCION",
+      "CUOTA",
+      "PARTICIPACION",
+      "BONO_CONVERTIBLE",
+      "SAFE",
+      "WARRANT",
+      "OPCION"
+    ],
+    "persona.turno_actual": [
+      "MAÑANA",
+      "TARDE",
+      "NOCHE"
+    ],
+    "persona.unidad_educativa_categoria": [
+      "privada",
+      "convenio",
+      "fiscal"
+    ],
+    "servicios_educativos.estado_asistencia": [
+      "Asistió",
+      "Tardanza",
+      "Falta",
+      "Justificado",
+      "En línea"
+    ],
+    "servicios_educativos.clase_curso_estado": [
+      "Programada",
+      "En curso",
+      "Dictada",
+      "Reprogramada",
+      "Cancelada"
+    ],
+    "servicios_educativos.clase_curso_modalidad": [
+      "Presencial",
+      "Online",
+      "Híbrido"
+    ],
+    "servicios_educativos.clase_por_hora_estado_operativo": [
+      "ABIERTA",
+      "CERRADA",
+      "ANULADA"
+    ],
+    "servicios_educativos.clase_por_hora_modalidad": [
+      "PRESENCIAL",
+      "VIRTUAL"
+    ],
+    "servicios_educativos.clase_por_hora_motivo": [
+      "EXAMEN",
+      "NIVELACIÓN",
+      "PRÁCTICO"
+    ],
+    "servicios_educativos.horario_repeticion": [
+      "CADA SEMANA",
+      "CADA QUINCENA",
+      "CADA MES"
+    ],
+    "contabilidad.concepto_costo_tipo": [
+      "BIEN",
+      "SERVICIO",
+      "OTRO"
+    ],
+    "contabilidad.grupo_cuenta_tipo": [
+      "BALANCE",
+      "RESULTADOS"
+    ],
+    "contabilidad.grupo_cuenta_sub_tipo": [
+      "ACTIVO",
+      "PASIVO",
+      "PATRIMONIO",
+      "INGRESO",
+      "GASTO"
+    ],
+    "contabilidad.grupo_cuenta_sub_grupo": [
+      "CORRIENTE",
+      "NO_CORRIENTE",
+      "ORDINARIO",
+      "EXTRAORDINARIO"
+    ],
+    "contabilidad.pago_tutor_estado_pago": [
+      "BORRADOR",
+      "APROBADO",
+      "PAGADO",
+      "ANULADO"
+    ],
+    "deuda.tipo_tasa": [
+      "SIMPLE",
+      "COMPUESTA"
+    ],
+    "deuda.capitalizacion": [
+      "ANUAL",
+      "SEMESTRAL",
+      "TRIMESTRAL",
+      "BIMESTRAL",
+      "MENSUAL"
+    ],
+    "deuda.tipo_calculo_cuotas": [
+      "FRANCES",
+      "ALEMAN",
+      "AMERICANO"
+    ],
+    "deuda.frecuencia_cuotas": [
+      "ANUAL",
+      "SEMESTRAL",
+      "TRIMESTRAL",
+      "BIMESTRAL",
+      "MENSUAL"
+    ],
+    "deuda.tipo_pago": [
+      "VENCIDAS",
+      "ANTICIPADAS"
+    ],
+    "deuda.tipo_primer_pago": [
+      "INMEDIATA",
+      "DIFERIDA"
+    ],
+    "negocio.moneda": [
+      "BOB",
+      "USD"
+    ],
+    "negocio.unidad_medida": [
+      "UNIDAD",
+      "HORA",
+      "CLASE",
+      "SESION",
+      "ESTUDIANTE",
+      "PAQUETE",
+      "MES",
+      "DIA",
+      "PORCENTAJE",
+      "BOB",
+      "USD"
+    ],
+    "administracion.tipo_comisionable": [
+      "Fija",
+      "Variable"
+    ],
+    "administracion.tipo_calculo_comisionable": [
+      "Directa",
+      "Indirecta"
+    ],
+    "personas.proveedor_categoria": [
+      "MATERIAL_DIDACTICO",
+      "SERVICIOS_GENERALES",
+      "INFRAESTRUCTURA",
+      "TECNOLOGIA",
+      "LIMPIEZA",
+      "MARKETING",
+      "ALIMENTOS",
+      "OTRO"
+    ],
+    "personas.tipo_usuario": [
+      "ADMINISTRADOR",
+      "COORDINADOR",
+      "EMPLEADO",
+      "TUTOR",
+      "ESTUDIANTE",
+      "PADRE",
+      "PROVEEDOR"
+    ],
+    "servicios_educativos.tipo_producto_educativo": [
+      "CURSO_REGULAR",
+      "CLASE_POR_HORA",
+      "PAQUETE_HORAS",
+      "TALLER",
+      "NIVELACION",
+      "PREUNIVERSITARIO",
+      "MATERIAL_EDUCATIVO",
+      "OTRO"
+    ],
+    "contabilidad.entidad_tipo_asignacion": [
+      "EMPLEADO",
+      "ESTUDIANTE",
+      "TUTOR",
+      "SUCURSAL",
+      "EDIFICIO",
+      "TIENDA",
+      "BIEN",
+      "DEUDA",
+      "PROVEEDOR",
+      "DEPARTAMENTO"
+    ],
+    "contabilidad.sub_tipo_transaccion": [
+      "MATRICULA",
+      "CUOTA",
+      "PAGO_TUTOR",
+      "COMPRA_INVENTARIO",
+      "VENTA_PRODUCTO",
+      "DEPRECIACION",
+      "DEUDA",
+      "AJUSTE",
+      "OTRO"
+    ],
+    "inventario.bien_categoria": [
+      "MATERIAL_DIDACTICO",
+      "LIBRERIA",
+      "TECNOLOGIA",
+      "MOBILIARIO",
+      "EQUIPO_AULA",
+      "LIMPIEZA",
+      "ACTIVO_FIJO",
+      "SERVICIO",
+      "OTRO"
+    ],
+    "inventario.bien_subcategoria": [
+      "TEXTO",
+      "CUADERNO",
+      "IMPRESION",
+      "EQUIPO_COMPUTO",
+      "PROYECTOR",
+      "PUPITRE",
+      "ESCRITORIO",
+      "MANTENIMIENTO",
+      "CONSUMIBLE",
+      "OTRO"
+    ],
+    "inventario.unidad": [
+      "UNIDAD",
+      "PAQUETE",
+      "CAJA",
+      "DOCENA",
+      "HORA",
+      "SESION",
+      "METRO",
+      "LITRO",
+      "KILOGRAMO"
+    ],
+    "societario.clase_titulo_sub_tipo": [
+      "ORDINARIA",
+      "PREFERENTE",
+      "SERIE_A",
+      "SERIE_B",
+      "CONVERTIBLE",
+      "SIN_VOTO",
+      "CON_VOTO",
+      "OTRO"
+    ],
+    "societario.transferencia_motivo": [
+      "VENTA",
+      "DONACION",
+      "HERENCIA",
+      "RECOMPRA",
+      "CONVERSION",
+      "AJUSTE",
+      "OTRO"
+    ],
+    "seguridad.modulo": [
+      "ADMINISTRACION",
+      "PERSONAS",
+      "SERVICIOS_EDUCATIVOS",
+      "CONTABILIDAD",
+      "DEUDA",
+      "INFRAESTRUCTURA",
+      "INVENTARIO",
+      "SOCIETARIO",
+      "SEGURIDAD"
+    ],
+    "academico.nivel_general": [
+      "PRIMARIA",
+      "SECUNDARIA",
+      "UNIVERSIDAD"
+    ],
+    "academico.nivel_escolar": [
+      "PRIMARIA",
+      "SECUNDARIA"
+    ],
+    "persona.tipo_estudiante_general": [
+      "UNIVERSITARIO",
+      "INICIAL",
+      "COLEGIAL"
+    ]
+  }
+}

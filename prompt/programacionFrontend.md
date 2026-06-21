@@ -38,7 +38,6 @@ Antes de generar código, revisa estos insumos si están disponibles:
 
 ```txt
 /docs/theme/cpa-palette.json
-/docs/validation/frontend-checks-catalog.json
 /template
 /endpoints/endpoints.md
 /.env.example
@@ -110,83 +109,6 @@ La documentación de endpoints puede incluir:
 Si la documentación de endpoints está incompleta, no inventes contratos de API como si fueran definitivos. Indica claramente qué asumiste y qué debe confirmarse.
 
 ---
-
-
----
-
-## Regla obligatoria sobre catálogo de checks y validaciones de campos
-
-Además de endpoints, template y paleta, el frontend debe revisar obligatoriamente el catálogo de validaciones antes de generar cualquier formulario, DTO, hook de formulario o serializador de payload.
-
-Ubicaciones esperadas del catálogo:
-
-```txt
-docs/validation/frontend-checks-catalog.json
-docs/validation/frontend-checks-catalog.md
-docs/checks/frontend-checks-catalog.json
-docs/checks/frontend-checks-catalog.md
-```
-
-### Prioridad de fuentes para validar campos
-
-El frontend debe resolver los campos y checks con esta prioridad:
-
-1. `frontend-checks-catalog`: fuente obligatoria para reglas de validación, checks por patrón, enums, reglas condicionales y serialización.
-2. `endpoints.md`: fuente oficial para rutas, payloads mínimos, campos relevantes y obligatoriedad por recurso.
-3. DDL / dump SQL: fuente para `NOT NULL`, `DEFAULT`, `ENUM`, `CHECK`, longitudes y restricciones condicionales.
-4. Postman Collection: solo sirve para confirmar rutas y flujo de pruebas. No reemplaza el contrato cuando sus cuerpos son genéricos.
-
-### Reglas que el generador frontend debe cumplir
-
-- No puede crear inputs genéricos si existe un campo real documentado.
-- No puede enviar payloads con campos inventados.
-- No puede enviar números como string.
-- No puede enviar strings vacíos para campos opcionales.
-- No puede renderizar enums como input libre.
-- No puede ignorar `CHECK constraints`.
-- No puede ignorar reglas condicionales entre campos.
-- No puede mostrar endpoints, rutas, nombres de tabla, PK, token ni detalles técnicos en pantalla.
-- Debe generar un `FormSchema` por recurso desde el catálogo de checks.
-- Debe generar validadores reutilizables en `src/shared/validation`.
-- Debe aplicar los checks en el hook/ViewModel antes de enviar al servicio.
-- El backend sigue siendo la autoridad final, pero el frontend debe prevenir errores evidentes.
-
-### Estructura recomendada para validaciones
-
-```txt
-src/shared/validation/
-  fieldChecksCatalog.ts
-  validators.ts
-  formSchema.ts
-  payloadSerializer.ts
-```
-
-### Flujo obligatorio para formularios
-
-Antes de renderizar un formulario:
-
-1. Leer campos del recurso desde `endpoints.md`.
-2. Buscar reglas aplicables en `frontend-checks-catalog`.
-3. Resolver tipo visual del campo.
-4. Resolver required/optional.
-5. Resolver enum/select si aplica.
-6. Resolver reglas condicionales.
-7. Construir `FormSchema`.
-8. Validar en ViewModel.
-9. Serializar payload limpio.
-10. Enviar solo campos aceptados por el contrato.
-
-### Criterio de aceptación adicional
-
-Un formulario será rechazado si:
-
-- muestra campos que no existen en el payload real,
-- omite campos obligatorios,
-- no aplica checks del catálogo,
-- envía valores con tipo incorrecto,
-- expone endpoints o rutas técnicas en UI,
-- usa nombres genéricos como `campo`, `valor`, `name`, `description` sin existir en el contrato real.
-
 
 ## Regla fundamental sobre el template
 La carpeta template debe tratarse como una **guía estructural cruda**, no como implementación final.
@@ -894,3 +816,92 @@ Antes de escribir código, muestra:
 6. Qué estructura de carpetas usarás.
 
 Luego genera los archivos completos respetando todas las reglas anteriores.
+
+---
+
+## Regla obligatoria adicional: catálogo de checks, FK y catálogos visuales
+
+Antes de generar o modificar cualquier formulario, tabla editable, modal, batch import o payload de frontend, debes revisar obligatoriamente:
+
+```txt
+docs/validation/frontend-checks-catalog.md
+docs/validation/frontend-checks-catalog.json
+docs/db/ddl.sql
+docs/endpoints/endpoints.md
+```
+
+### Orden obligatorio para construir campos
+
+Los campos de un formulario deben resolverse en este orden:
+
+1. Reglas, catálogos manuales, `resourceFieldDefinitions` y `fieldDefinitions` de `docs/validation/frontend-checks-catalog.json`. Esta fuente manda incluso cuando el campo sea `varchar`, `text` o no exista como enum PostgreSQL.
+2. Payload y campos documentados en `docs/endpoints/endpoints.md`.
+3. Tipos, enums PostgreSQL, foreign keys, defaults y checks reales de `docs/db/ddl.sql`.
+4. Postman Collection solo como apoyo de rutas y pruebas, nunca como contrato definitivo si el body usa `{ "campo": "valor" }`.
+
+
+### Regla obligatoria para detectar valores posibles desde endpoints
+
+Al revisar `docs/endpoints/endpoints.md`, todo campo que aparezca como `character varying`, `text` o similar, pero que funcionalmente represente un conjunto finito de valores, debe catalogarse antes de generar UI. Ejemplos: estado de asistencia, estado de clase, modalidad, motivo, categoría de proveedor, tipo de producto educativo, entidad contable asignada, sub tipo de transacción, tipo de deuda, frecuencia de cuotas, moneda, unidad de medida y motivos societarios.
+
+Si el DDL define un `CHECK (... ANY ARRAY [...])`, esos valores son obligatorios y deben copiarse con el mismo texto/case/acento. Si el DDL no define CHECK pero el campo es claramente de negocio, se permite un catálogo recomendado, marcado como `source: "business"`, para evitar texto libre innecesario.
+
+### Foreign keys
+
+Todo campo que represente una FK, por ejemplo `id_sucursal`, `id_empleado`, `id_cuenta`, `id_bien`, `id_tutor`, etc., debe renderizarse como `select` o `AsyncSelect`, no como input numérico plano, siempre que exista un endpoint GET para consultar el recurso relacionado.
+
+La pantalla debe ejecutar el GET correspondiente mediante una capa de servicios/hook, nunca desde JSX directo. El usuario debe ver una etiqueta funcional, por ejemplo `codigo · nombre`, pero nunca la ruta técnica del endpoint.
+
+Si no existe endpoint documentado para una FK, se permite fallback controlado a input numérico, dejando comentario técnico en código o documentación interna.
+
+### Catálogos y enums
+
+Todo campo que tenga enum o catálogo detectado en DDL, endpoints o catálogo de checks debe renderizarse como `select`. Además, los catálogos manuales definidos en `resourceFieldDefinitions` o `fieldDefinitions` del JSON deben respetarse aunque esos valores no existan como `CREATE TYPE ... AS ENUM` en la base de datos; esto aplica a campos de negocio almacenados como `varchar` o `text`, por ejemplo categorías, modalidades, estados operativos, motivos, tipos de producto educativo, tipo de deuda, tipo de cuenta, niveles académicos, cursos, tipo de estudiante y experiencia del tutor.
+
+Cuando un mismo nombre de campo pueda significar cosas diferentes según el recurso —por ejemplo `tipo`, `categoria`, `estado`, `modalidad`, `motivo`, `sub_tipo`— debe usarse `resourceFieldDefinitions[resourceKey][fieldName]` y no una definición global que pueda contaminar otros módulos.
+
+No está permitido usar texto plano para valores finitos como:
+
+- `tipo_transaccion`
+- `tipo_contrato`
+- `jornada`
+- `tipo_esquema_pago`
+- `frecuencia_pago`
+- `tipo_costo`
+- `naturaleza`
+- `tipo_espacio`
+- `categoria_sala`
+- `tipo_aula`
+- `tipo_bien`
+- `metodo_valuacion`
+- `metodo_depreciacion`
+- `tipo_titulo_societario`
+- cualquier otro enum definido en `docs/db/ddl.sql`
+
+### Validación previa al envío
+
+Antes de serializar el payload, el frontend debe validar:
+
+- obligatorios,
+- enteros positivos para FK,
+- números no negativos o positivos según catálogo,
+- porcentajes y tasas,
+- latitud/longitud,
+- email,
+- URL,
+- fechas inicio/fin,
+- transacciones contables balanceadas,
+- exclusiones de campos vacíos opcionales.
+
+### Exposición técnica
+
+Aunque las rutas existan internamente en servicios, la UI no debe mostrar:
+
+- endpoints,
+- métodos HTTP,
+- nombres de tablas,
+- claves primarias técnicas,
+- token de sesión,
+- rutas internas consultadas.
+
+La UI debe usar textos funcionales: `Cargando opciones`, `Validando información`, `Procesando registro`, etc.

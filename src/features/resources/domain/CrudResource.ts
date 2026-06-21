@@ -1,11 +1,33 @@
 import type { FieldType } from '@/shared/components/FormField';
 
+export interface ResourceLookupRelation {
+  endpoint: string;
+  valueField: string;
+  labelFields: string[];
+  resourceKey?: string;
+}
+
+export interface SelectOption {
+  value: string | number;
+  label: string;
+}
+
+export type FieldValueKind = 'string' | 'number' | 'boolean';
+
 export interface ResourceFieldDefinition {
   name: string;
   label: string;
   type: FieldType;
   required?: boolean;
-  options?: string[];
+  options?: Array<string | SelectOption>;
+  relation?: ResourceLookupRelation;
+  selectSource?: 'enum' | 'catalog' | 'foreignKey';
+  valueKind?: FieldValueKind;
+  min?: number;
+  max?: number;
+  maxLength?: number;
+  checks?: string[];
+  helpText?: string;
 }
 
 export interface CrudResourceDefinition {
