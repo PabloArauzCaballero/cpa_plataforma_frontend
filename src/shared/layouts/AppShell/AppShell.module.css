@@ -1,8 +1,10 @@
 .shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 18rem 1fr;
-  background: var(--color-surface-soft);
+  grid-template-columns: 19.5rem 1fr;
+  background:
+    radial-gradient(circle at 82% 0%, rgba(32, 160, 197, 0.08), transparent 28rem),
+    var(--color-surface-soft);
 }
 
 .sidebar {
@@ -11,64 +13,144 @@
   height: 100vh;
   overflow: auto;
   padding: var(--space-5);
-  background: var(--color-primary-dark);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(32, 160, 197, 0.16), transparent 16rem),
+    var(--color-primary-dark);
   color: var(--color-text-primary);
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
 }
 
 .brand {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .brand strong {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3.7rem;
+  height: 3.7rem;
   display: grid;
   place-items: center;
-  border-radius: var(--radius-lg);
+  border-radius: 1.2rem;
   background: var(--color-secondary);
   color: var(--color-white);
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: var(--letter-spacing-brand);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
 }
 
 .brand span {
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.93rem;
+  line-height: 1.45;
+  font-weight: 700;
 }
 
 .nav {
   display: grid;
-  gap: var(--space-2);
+  gap: 0.65rem;
 }
 
 .nav a,
 .nav summary {
-  display: block;
   border-radius: var(--radius-md);
-  padding: 0.72rem 0.8rem;
   color: var(--color-text-secondary);
   cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.homeLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.85rem 0.9rem;
+  font-weight: 900;
+}
+
+.homeLink i {
+  color: var(--color-secondary);
 }
 
 .nav a:hover,
 .nav summary:hover,
 .nav a[aria-current='page'] {
   color: var(--color-white);
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+}
+
+.nav a:hover,
+.nav summary:hover {
+  transform: translateX(2px);
 }
 
 .nav details {
-  border-top: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
-  padding-top: var(--space-2);
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 56%, transparent);
+  padding-top: 0.65rem;
 }
 
-.nav details a {
-  margin-left: var(--space-3);
+.nav summary {
+  display: grid;
+  grid-template-columns: 2.3rem 1fr;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 0.78rem 0.82rem;
+  list-style: none;
+}
+
+.nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.moduleSummaryIcon {
+  width: 2.3rem;
+  height: 2.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: rgba(32, 160, 197, 0.14);
+  color: var(--color-secondary);
+}
+
+.moduleSummaryText {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.moduleSummaryText strong {
+  color: inherit;
   font-size: 0.92rem;
+}
+
+.moduleSummaryText small {
+  color: color-mix(in srgb, var(--color-text-secondary) 82%, transparent);
+  font-size: 0.73rem;
+  line-height: 1.25;
+}
+
+.moduleLinks {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+  padding-left: 3.15rem;
+}
+
+.moduleLinks a {
+  display: block;
+  padding: 0.56rem 0.7rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
 }
 
 .mainArea {
@@ -78,14 +160,18 @@
 }
 
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-5) var(--space-8);
-  background: var(--color-white);
+  padding: var(--space-5) clamp(1.5rem, 3vw, 2.5rem);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--color-primary);
   border-bottom: 1px solid var(--color-neutral-light);
+  backdrop-filter: blur(14px);
 }
 
 .header p,
@@ -95,14 +181,16 @@
 
 .header p {
   color: var(--color-accent);
-  font-weight: 700;
-  font-size: 0.82rem;
+  font-weight: 900;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
 }
 
 .header h1 {
+  margin-top: 0.18rem;
   font-size: 1.55rem;
+  letter-spacing: -0.025em;
 }
 
 .userBox {
@@ -111,23 +199,42 @@
   gap: var(--space-3);
 }
 
+.userBox a,
+.userBox button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  font-weight: 800;
+}
+
 .userBox a {
   color: var(--color-primary);
-  font-weight: 700;
+  padding: 0.65rem 0.8rem;
+}
+
+.userBox a:hover {
+  background: var(--color-surface-soft);
 }
 
 .userBox button {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   padding: 0.65rem 0.9rem;
   background: var(--color-white);
   color: var(--color-primary);
   cursor: pointer;
-  font-weight: 700;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.userBox button:hover {
+  background: var(--color-surface-soft);
+  transform: translateY(-1px);
 }
 
 .content {
-  padding: var(--space-8);
+  width: min(100%, 1500px);
+  justify-self: center;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
   min-width: 0;
 }
 
@@ -135,9 +242,9 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-5) var(--space-8);
+  padding: var(--space-5) clamp(1.5rem, 3vw, 2.5rem);
   color: var(--color-accent);
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.88);
   border-top: 1px solid var(--color-neutral-light);
 }
 
@@ -152,7 +259,7 @@
   }
 
   .nav {
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
 }
 
@@ -166,5 +273,9 @@
 
   .content {
     padding: var(--space-4);
+  }
+
+  .moduleLinks {
+    padding-left: 0.4rem;
   }
 }

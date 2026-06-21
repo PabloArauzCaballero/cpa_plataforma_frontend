@@ -4,11 +4,12 @@
   flex-direction: column;
   gap: var(--space-2);
   color: var(--color-primary);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .field span {
   font-size: 0.88rem;
+  line-height: 1.25;
 }
 
 .field strong {
@@ -19,13 +20,20 @@
 .field textarea,
 .field select {
   width: 100%;
+  min-height: 3rem;
   border: 1px solid var(--color-neutral-light);
   background: var(--color-white);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  padding: 0.82rem 0.9rem;
+  padding: 0.86rem 0.95rem;
   outline: none;
-  transition: border 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.field input:hover,
+.field textarea:hover,
+.field select:hover {
+  border-color: color-mix(in srgb, var(--color-secondary) 30%, var(--color-neutral-light));
 }
 
 .field input:focus,
@@ -36,24 +44,29 @@
 }
 
 .field textarea {
+  min-height: 7rem;
   resize: vertical;
 }
 
 .field small {
   color: var(--color-primary-dark);
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .checkboxField {
   flex-direction: row;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
+  min-height: 3rem;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
+  background: var(--color-white);
 }
 
 .checkboxField input {
-  width: 1rem;
-  height: 1rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--color-secondary);
 }

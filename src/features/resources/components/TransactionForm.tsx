@@ -33,6 +33,14 @@ function stringifyValue(value: unknown): string | number | boolean {
   return String(value);
 }
 
+function humanizeFieldName(name: string): string {
+  return name
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]/g, ' ')
+    .replace(/\b(id|url|uuid|nit)\b/gi, (value) => value.toUpperCase())
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 function buildHeaderPayload(resource: CrudResourceDefinition, record: CrudRecord | null): CrudRecord {
   return resource.fields.reduce<CrudRecord>((payload, field) => {
     payload[field.name] = stringifyValue(record?.[field.name]);
@@ -156,7 +164,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             <FormField
               key={field.name}
               id={field.name}
-              label={field.label}
+              label={humanizeFieldName(field.name)}
               type={field.type}
               value={headerPayload[field.name] as string | number | boolean}
               required={field.required}

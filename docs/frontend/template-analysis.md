@@ -20,3 +20,10 @@ La carpeta `docs/template` se usó como guía estructural, no como fuente de imp
 - La UI queda preparada para datos reales del backend mediante servicios y ViewModels.
 - Se incorporó el patrón del componente compartido `GeneralFormAndTableBody` como referencia de tabla/formulario/modal, pero la implementación final está normalizada en React + TypeScript.
 - `contabilidad/transaccion` deja de comportarse como CRUD plano y usa formulario compuesto con movimientos de cuenta fusionados.
+
+## Ajuste aplicado en v3
+
+- `UserProfilePage` fue reconstruido tomando como referencia directa `docs/template/userProfileBody.html`.
+- El modal de formularios fue ampliado para evitar scroll horizontal innecesario en pantallas de escritorio.
+- `TransactionForm` ahora tiene padding interno, separación entre campos, grilla responsive para movimientos y labels humanizados como `Referencia Origen`.
+- El botón `Cerrar` del modal ya no queda con apariencia deshabilitada sobre fondo blanco.

@@ -1,6 +1,7 @@
 .page {
   display: grid;
-  gap: var(--space-5);
+  gap: clamp(1.25rem, 2vw, 1.8rem);
+  animation: pageIn 0.28s ease both;
 }
 
 .header {
@@ -12,10 +13,10 @@
 
 .header span {
   color: var(--color-secondary-dark);
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .header h2,
@@ -26,48 +27,67 @@
 .header h2 {
   color: var(--color-primary);
   font-size: clamp(1.7rem, 4vw, 2.5rem);
+  letter-spacing: -0.03em;
 }
 
 .header p {
   color: var(--color-accent);
   margin-top: var(--space-2);
-  max-width: 52rem;
+  max-width: 58rem;
+  line-height: 1.62;
 }
 
 .header a {
-  padding: 0.75rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.82rem 1rem;
   border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-white);
-  font-weight: 800;
+  font-weight: 900;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header a:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
 }
 
 .card,
 .resultCard {
-  padding: var(--space-5);
+  padding: clamp(1.25rem, 2.4vw, 1.75rem);
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .uploadGrid {
   display: grid;
   grid-template-columns: minmax(18rem, 1.4fr) minmax(14rem, 0.8fr);
-  gap: var(--space-4);
+  gap: clamp(1rem, 2vw, 1.5rem);
 }
 
 .fileBox {
-  min-height: 11rem;
-  border: 2px dashed rgba(38, 79, 137, 0.35);
+  min-height: 12rem;
+  border: 2px dashed rgba(38, 79, 137, 0.34);
   border-radius: var(--radius-lg);
   display: grid;
   align-content: center;
   justify-items: center;
   gap: var(--space-2);
-  padding: var(--space-5);
+  padding: var(--space-6);
   text-align: center;
   color: var(--color-primary);
-  background: linear-gradient(180deg, var(--color-white), var(--color-surface-soft));
+  background:
+    radial-gradient(circle at 50% 0%, rgba(32, 160, 197, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--color-white), var(--color-surface-soft));
   cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fileBox:hover {
+  border-color: var(--color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 37, 95, 0.1);
 }
 
 .fileBox input {
@@ -79,12 +99,14 @@
 }
 
 .fileBox strong {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
 }
 
 .fileBox span {
   color: var(--color-accent);
   font-weight: 700;
+  line-height: 1.45;
 }
 
 .settings {
@@ -97,16 +119,23 @@
   display: grid;
   gap: var(--space-2);
   color: var(--color-primary);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .settings select {
+  min-height: 3rem;
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   padding: 0.85rem 1rem;
   color: var(--color-primary);
   background: var(--color-white);
   font-weight: 700;
+  outline: none;
+}
+
+.settings select:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 18%, transparent);
 }
 
 .templateButton {
@@ -114,9 +143,15 @@
   border-radius: var(--radius-md);
   background: var(--color-white);
   color: var(--color-primary);
-  padding: 0.85rem 1rem;
-  font-weight: 800;
+  padding: 0.9rem 1rem;
+  font-weight: 900;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.templateButton:hover {
+  background: var(--color-surface-soft);
+  transform: translateY(-1px);
 }
 
 .endpointBox {
@@ -128,7 +163,7 @@
 .endpointBox div {
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
-  padding: var(--space-3);
+  padding: var(--space-4);
   background: var(--color-surface-soft);
   display: grid;
   gap: var(--space-2);
@@ -142,6 +177,7 @@
   color: var(--color-accent);
   white-space: normal;
   overflow-wrap: anywhere;
+  line-height: 1.45;
 }
 
 .error {
@@ -178,18 +214,19 @@
 
 .stats span {
   color: var(--color-accent);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .stats strong {
   color: var(--color-primary);
-  font-size: 1.4rem;
+  font-size: 1.45rem;
 }
 
 .tableWrap {
   overflow: auto;
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-lg);
+  background: var(--color-white);
 }
 
 .table {
@@ -200,7 +237,7 @@
 
 .table th,
 .table td {
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--color-neutral-light);
   vertical-align: top;
@@ -214,11 +251,15 @@
   letter-spacing: 0.08em;
 }
 
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-surface-soft) 72%, transparent);
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 0.25rem 0.6rem;
+  padding: 0.28rem 0.65rem;
   font-weight: 900;
   font-size: 0.78rem;
 }
@@ -247,11 +288,25 @@
 
 .resultCard h3 {
   color: var(--color-primary);
+  font-size: 1.18rem;
 }
 
 .resultCard p {
   color: var(--color-accent);
   font-weight: 700;
+  line-height: 1.55;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 840px) {

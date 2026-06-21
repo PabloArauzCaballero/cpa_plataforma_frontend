@@ -34,9 +34,13 @@
 }
 
 .ghost {
-  background: transparent;
-  color: var(--color-text-secondary);
+  background: var(--color-white);
+  color: var(--color-primary);
   border-color: var(--color-border);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--color-surface-soft);
 }
 
 .danger {
