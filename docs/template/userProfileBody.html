@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile Body - Sistema CPA</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #1f4f8f;
+      --primary-dark: #173b6b;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --muted-light: #94a3b8;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --info-bg: #dbeafe;
+      --info-text: #1d4ed8;
+      --radius: 14px;
+      --shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .profile-page {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      min-height: 40px;
+      border-radius: 10px;
+      padding: 0 15px;
+      font-size: 14px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-light {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .btn-light:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .profile-summary {
+      position: sticky;
+      top: 24px;
+    }
+
+    .profile-cover {
+      height: 88px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(31, 79, 143, 0.96), rgba(23, 59, 107, 0.88)),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 34%);
+      margin-bottom: -36px;
+    }
+
+    .avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 999px;
+      background: var(--primary);
+      border: 5px solid white;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+    }
+
+    .profile-name {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .profile-name h2 {
+      font-size: 21px;
+      margin-bottom: 5px;
+    }
+
+    .profile-name p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge-success {
+      background: var(--success-bg);
+      color: #166534;
+    }
+
+    .badge-info {
+      background: var(--info-bg);
+      color: var(--info-text);
+    }
+
+    .badge-warning {
+      background: var(--warning-bg);
+      color: #92400e;
+    }
+
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+
+    .summary-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .summary-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: #f1f5f9;
+      color: var(--primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .summary-item small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .summary-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .content-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card-header h2 {
+      font-size: 19px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-header p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(31, 79, 143, 0.12);
+    }
+
+    input:disabled {
+      background: #f8fafc;
+      color: #64748b;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .preferences-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .preference-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .preference-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: var(--primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .preference-content {
+      flex: 1;
+    }
+
+    .preference-content strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .preference-content span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #cbd5e1;
+      transition: 0.2s;
+      border-radius: 999px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      transition: 0.2s;
+      border-radius: 999px;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--primary);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .activity-item {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #ffffff;
+    }
+
+    .activity-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: #f1f5f9;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .activity-info strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .activity-info span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .activity-date {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .permission-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      background: white;
+    }
+
+    thead {
+      background: #f8fafc;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    th {
+      color: #475569;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .module-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1040px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-summary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 20px;
+      }
+
+      .page-header {
+        flex-direction: column;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+
+      .form-grid,
+      .preferences-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: span 1;
+      }
+
+      .activity-item {
+        grid-template-columns: 42px 1fr;
+      }
+
+      .activity-date {
+        grid-column: 2;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="profile-page">
+
+    <section class="page-header">
+      <div>
+        <h1>Perfil de Usuario</h1>
+        <p>Consulta y actualiza la información general del usuario autenticado dentro del sistema CPA.</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-light" onclick="resetProfileForm()">
+          <i class="fa-solid fa-rotate-left"></i>
+          Restaurar
+        </button>
+
+        <button class="btn btn-primary" onclick="saveProfile()">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Guardar cambios
+        </button>
+      </div>
+    </section>
+
+    <section class="profile-grid">
+
+      <aside class="card profile-summary">
+        <div class="profile-cover"></div>
+
+        <div class="avatar-wrap">
+          <div class="avatar">AD</div>
+        </div>
+
+        <div class="profile-name">
+          <h2>Admin Demo</h2>
+          <p>admin.demo@cpa.test</p>
+        </div>
+
+        <div class="badge-row">
+          <span class="badge badge-success">
+            <i class="fa-solid fa-circle-check"></i>
+            Activo
+          </span>
+
+          <span class="badge badge-info">
+            <i class="fa-solid fa-shield-halved"></i>
+            Super usuario
+          </span>
+        </div>
+
+        <div class="summary-list">
+          <div class="summary-item">
+            <div class="summary-icon">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+              <small>Nombre de usuario</small>
+              <strong>admin.demo</strong>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+              <small>ID Persona</small>
+              <strong>900001</strong>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div>
+              <small>Rol principal</small>
+              <strong>Administrador del sistema</strong>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <small>Último acceso</small>
+              <strong>20/06/2026 12:30</strong>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="content-stack">
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Información personal</h2>
+              <p>Datos principales visibles para administración, auditoría y operación interna.</p>
+            </div>
+
+            <span class="badge badge-warning">
+              <i class="fa-solid fa-database"></i>
+              Mockup
+            </span>
+          </div>
+
+          <form id="profileForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName">Nombres</label>
+                <input id="firstName" type="text" value="Admin" />
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Apellidos</label>
+                <input id="lastName" type="text" value="Demo" />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input id="email" type="email" value="admin.demo@cpa.test" />
+              </div>
+
+              <div class="form-group">
+                <label for="username">Nombre de usuario</label>
+                <input id="username" type="text" value="admin.demo" disabled />
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Teléfono</label>
+                <input id="phone" type="text" value="+591 70000000" />
+              </div>
+
+              <div class="form-group">
+                <label for="document">Documento</label>
+                <input id="document" type="text" value="900001-SC" />
+              </div>
+
+              <div class="form-group">
+                <label for="role">Tipo de usuario</label>
+                <select id="role">
+                  <option selected>Super usuario</option>
+                  <option>Administrador</option>
+                  <option>Operador</option>
+                  <option>Consulta</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="status">Estado</label>
+                <select id="status">
+                  <option selected>Activo</option>
+                  <option>Inactivo</option>
+                  <option>Bloqueado</option>
+                </select>
+              </div>
+
+              <div class="form-group full">
+                <label for="notes">Notas internas</label>
+                <textarea id="notes">Usuario demo para pruebas internas del sistema CPA.</textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-light" onclick="resetProfileForm()">
+                Limpiar cambios
+              </button>
+
+              <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                Actualizar perfil
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Preferencias</h2>
+              <p>Configuraciones generales del usuario dentro del panel administrativo.</p>
+            </div>
+          </div>
+
+          <div class="preferences-grid">
+            <div class="preference-item">
+              <div class="preference-icon">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+
+              <div class="preference-content">
+                <strong>Notificaciones internas</strong>
+                <span>Recibir avisos del sistema, alertas de operación y cambios importantes.</span>
+
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-icon">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
+
+              <div class="preference-content">
+                <strong>Resumen por correo</strong>
+                <span>Recibir resumen administrativo cuando existan cambios relevantes.</span>
+
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-icon">
+                <i class="fa-solid fa-table-columns"></i>
+              </div>
+
+              <div class="preference-content">
+                <strong>Vista compacta</strong>
+                <span>Mostrar tablas, filtros y formularios con menor separación visual.</span>
+
+                <label class="switch">
+                  <input type="checkbox" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="preference-item">
+              <div class="preference-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+
+              <div class="preference-content">
+                <strong>Confirmar acciones críticas</strong>
+                <span>Solicitar confirmación antes de inhabilitar o modificar registros sensibles.</span>
+
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Permisos principales</h2>
+              <p>Resumen visual de módulos habilitados para este usuario.</p>
+            </div>
+          </div>
+
+          <div class="permission-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Módulo</th>
+                  <th>Lectura</th>
+                  <th>Creación</th>
+                  <th>Edición</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="module-pill">
+                      <i class="fa-solid fa-building"></i>
+                      Administración
+                    </span>
+                  </td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-info">Activo</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="module-pill">
+                      <i class="fa-solid fa-file-invoice-dollar"></i>
+                      Contabilidad
+                    </span>
+                  </td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-info">Activo</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <span class="module-pill">
+                      <i class="fa-solid fa-shield-halved"></i>
+                      Seguridad
+                    </span>
+                  </td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-success">Permitido</span></td>
+                  <td><span class="badge badge-info">Activo</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Actividad reciente</h2>
+              <p>Últimas acciones realizadas por el usuario dentro del sistema.</p>
+            </div>
+          </div>
+
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fa-solid fa-right-to-bracket"></i>
+              </div>
+
+              <div class="activity-info">
+                <strong>Inicio de sesión</strong>
+                <span>Ingreso correcto con sesión privada usando token interno.</span>
+              </div>
+
+              <span class="activity-date">Hace 5 min</span>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+
+              <div class="activity-info">
+                <strong>Smoke test ejecutado</strong>
+                <span>Validación E2E completada con 61 pruebas aprobadas.</span>
+              </div>
+
+              <span class="activity-date">Hoy</span>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+
+              <div class="activity-info">
+                <strong>Permisos verificados</strong>
+                <span>Acceso de super usuario validado para módulos CRUD.</span>
+              </div>
+
+              <span class="activity-date">Hoy</span>
+            </div>
+          </div>
+        </section>
+
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const initialProfile = {
+      firstName: 'Admin',
+      lastName: 'Demo',
+      email: 'admin.demo@cpa.test',
+      phone: '+591 70000000',
+      document: '900001-SC',
+      role: 'Super usuario',
+      status: 'Activo',
+      notes: 'Usuario demo para pruebas internas del sistema CPA.'
+    };
+
+    function resetProfileForm() {
+      document.getElementById('firstName').value = initialProfile.firstName;
+      document.getElementById('lastName').value = initialProfile.lastName;
+      document.getElementById('email').value = initialProfile.email;
+      document.getElementById('phone').value = initialProfile.phone;
+      document.getElementById('document').value = initialProfile.document;
+      document.getElementById('role').value = initialProfile.role;
+      document.getElementById('status').value = initialProfile.status;
+      document.getElementById('notes').value = initialProfile.notes;
+    }
+
+    function saveProfile() {
+      alert('Perfil actualizado correctamente como mockup.');
+    }
+  </script>
+</body>
+</html>

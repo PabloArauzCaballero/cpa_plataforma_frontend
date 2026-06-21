@@ -1,0 +1,15 @@
+.card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.light {
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.dark {
+  background: var(--gradient-card-dark);
+  color: var(--color-text-primary);
+}

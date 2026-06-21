@@ -1,0 +1,48 @@
+@startuml
+
+title Diagrama de Secuencia - Pago de cliente y programacion de clase
+
+actor Administrativo
+participant "API Gateway" as APIGW
+participant "Servicio Personas" as Personas
+participant "Servicio Cobranza" as Cobranza
+participant "Servicio Pagos" as Pagos
+participant "Servicio Programacion" as Programacion
+participant "Servicio Infraestructura" as Infra
+participant "Servicio Auditoria" as Auditoria
+participant "Outbox Worker" as Worker
+queue "Broker de Eventos" as Broker
+
+Administrativo -> APIGW : POST /estudiantes
+APIGW -> Personas : crearEstudiante(datos)
+Personas --> APIGW : estudianteCreado
+APIGW --> Administrativo : 201 Created
+
+Administrativo -> APIGW : POST /deudas
+APIGW -> Cobranza : generarDeuda(servicio,responsable)
+Cobranza -> Auditoria : registrarAccion("DeudaGenerada")
+Cobranza --> APIGW : deudaCreada
+APIGW --> Administrativo : 201 Created
+
+Administrativo -> APIGW : POST /pagos
+APIGW -> Pagos : registrarPago(monto,metodo)
+Pagos -> Cobranza : aplicarPago(deuda,pago)
+Cobranza --> Pagos : deudaActualizada
+Pagos -> Auditoria : registrarAccion("PagoRegistrado")
+Pagos --> APIGW : pagoAplicado
+APIGW --> Administrativo : 201 Created
+
+Administrativo -> APIGW : POST /clases/personalizadas
+APIGW -> Programacion : programarClase(estudiante,tutor,horario)
+Programacion -> Infra : validarDisponibilidadAula(horario,aula)
+Infra --> Programacion : disponible
+Programacion -> Auditoria : registrarAccion("ClaseProgramada")
+Programacion --> APIGW : claseConfirmada
+APIGW --> Administrativo : 201 Created
+
+Pagos -> Worker : insertar evento PagoRegistrado en outbox
+Programacion -> Worker : insertar evento ClaseProgramada en outbox
+Worker -> Broker : publicar(PagoRegistrado)
+Worker -> Broker : publicar(ClaseProgramada)
+
+@enduml

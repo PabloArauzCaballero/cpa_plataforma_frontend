@@ -1,0 +1,46 @@
+@startuml
+left to right direction
+
+title Diagrama de Despliegue - Vista Logica
+
+node "Usuarios" {
+  node "Browser / Web App" as Browser
+}
+
+node "Capa de Acceso" {
+  node "Reverse Proxy / Load Balancer" as LB
+  node "API Gateway" as GW
+}
+
+node "Cluster de Aplicacion" {
+  node "NestJS App Instance 1" as APP1
+  node "NestJS App Instance 2" as APP2
+  node "Worker de Outbox" as WORKER
+  node "Worker de Notificaciones" as WORKER2
+}
+
+node "Mensajeria" {
+  queue "RabbitMQ / NATS" as MQ
+}
+
+node "Datos" {
+  database "PostgreSQL" as PG
+  node "Object Storage" as OS
+}
+
+Browser --> LB
+LB --> GW
+GW --> APP1
+GW --> APP2
+APP1 --> PG
+APP2 --> PG
+APP1 --> OS
+APP2 --> OS
+APP1 --> MQ
+APP2 --> MQ
+WORKER --> PG
+WORKER --> MQ
+WORKER2 --> MQ
+WORKER2 --> PG
+
+@enduml

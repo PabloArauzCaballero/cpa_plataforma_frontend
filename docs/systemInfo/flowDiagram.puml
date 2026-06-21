@@ -1,0 +1,185 @@
+@startuml
+title Flujo de navegación CPA - Login, Home, módulos, submódulos y GeneralBody
+
+autonumber
+
+actor "Usuario" as Usuario
+
+boundary "Frontend Web\nReact / HTML UI" as Frontend
+control "AuthGuard\nSessionStore" as AuthGuard
+control "Router\nApp Navigation" as Router
+
+participant "Auth API" as AuthAPI
+participant "User API" as UserAPI
+participant "Clases API" as ClasesAPI
+participant "Permisos API" as PermisosAPI
+participant "Módulos API" as ModulosAPI
+participant "Submódulos API" as SubmodulosAPI
+participant "Acciones API" as AccionesAPI
+participant "GeneralBody Resolver" as BodyResolver
+participant "Data API\nRegistros del módulo" as DataAPI
+
+== 1. Login ==
+
+Usuario -> Frontend: Ingresa usuario y contraseña
+Frontend -> AuthAPI: POST /auth/login\n{ usuario, password }
+
+alt Credenciales válidas
+    AuthAPI --> Frontend: 200 OK\n{ accessToken, refreshToken, userId }
+
+    Frontend -> AuthGuard: Guardar sesión/token
+    AuthGuard --> Frontend: Sesión activa
+
+    Frontend -> Router: Redirigir a Home Page
+else Credenciales inválidas
+    AuthAPI --> Frontend: 401 Unauthorized
+    Frontend --> Usuario: Mostrar error\n"Credenciales incorrectas"
+end
+
+== 2. Home Page ==
+
+Router -> Frontend: Cargar Home Page
+
+Frontend -> UserAPI: GET /users/me\nAuthorization: Bearer token
+UserAPI --> Frontend: Datos del usuario\n{ id, nombre, rol, estado }
+
+Frontend -> ClasesAPI: GET /users/{userId}/clases-registradas
+ClasesAPI --> Frontend: Lista de clases registradas
+
+Frontend -> PermisosAPI: GET /users/{userId}/permissions
+PermisosAPI --> Frontend: Permisos del usuario
+
+Frontend -> ModulosAPI: GET /modules/available\nsegún permisos
+ModulosAPI --> Frontend: Módulos disponibles
+
+Frontend --> Usuario: Renderizar Home Page\n+ clases registradas\n+ módulos disponibles
+
+== 2.1 Header y Footer dinámicos ==
+
+Frontend -> Frontend: Construir Header con módulos permitidos
+Frontend -> Frontend: Construir Footer con módulos permitidos
+Frontend --> Usuario: Mostrar navegación según permisos
+
+alt Usuario sin clases registradas
+    Frontend --> Usuario: Mostrar estado vacío\n"No tienes clases registradas"
+else Usuario con clases registradas
+    Frontend --> Usuario: Mostrar cards/lista de clases
+end
+
+== 3. Módulo seleccionado ==
+
+Usuario -> Frontend: Selecciona un módulo
+Frontend -> Router: Navegar a /modulo/{moduleKey}
+
+Router -> AuthGuard: Validar sesión activa
+AuthGuard --> Router: Sesión válida
+
+Router -> PermisosAPI: Validar permiso de acceso al módulo
+PermisosAPI --> Router: Permiso concedido
+
+Router -> SubmodulosAPI: GET /modules/{moduleKey}/submodules\nsegún permisos
+SubmodulosAPI --> Router: Submódulos disponibles
+
+Router --> Frontend: Renderizar pantalla del módulo
+Frontend --> Usuario: Mostrar submódulos disponibles
+
+alt Sin permiso al módulo
+    PermisosAPI --> Router: Permiso denegado
+    Router --> Frontend: Bloquear navegación
+    Frontend --> Usuario: Mostrar mensaje\n"No tienes permiso para este módulo"
+end
+
+== 4. Submódulo seleccionado ==
+
+Usuario -> Frontend: Selecciona un submódulo
+Frontend -> Router: Navegar a /modulo/{moduleKey}/{submoduleKey}
+
+Router -> PermisosAPI: Validar permiso de acceso al submódulo
+PermisosAPI --> Router: Permiso concedido
+
+== 2.2 Acciones disponibles según permisos ==
+
+Router -> AccionesAPI: GET /permissions/actions\n?module={moduleKey}&submodule={submoduleKey}
+AccionesAPI --> Router: Acciones permitidas\n{ crear, editar, eliminar, exportar, batch }
+
+Router -> BodyResolver: Resolver tipo de body\nsegún módulo, submódulo y acciones
+
+alt Submódulo normal CRUD
+    BodyResolver --> Router: generalBody.html\nFormulario + Tabla
+else Submódulo batch
+    BodyResolver --> Router: generalBodyBatch.html\nCarga y edición masiva
+else Submódulo solo lectura
+    BodyResolver --> Router: generalBody.html\nTabla sin acciones de escritura
+end
+
+== 2.3 Mostrar GeneralBody correspondiente ==
+
+Router -> DataAPI: GET /{moduleKey}/{submoduleKey}/records\ncon filtros iniciales
+DataAPI --> Router: Registros del submódulo
+
+Router --> Frontend: Enviar configuración de pantalla\n{ bodyType, acciones, columnas, filtros, registros }
+
+Frontend -> Frontend: Renderizar Header/Footer\nsegún permisos
+Frontend -> Frontend: Renderizar acciones disponibles
+Frontend -> Frontend: Renderizar GeneralBody correspondiente
+
+Frontend --> Usuario: Mostrar pantalla final\nGeneralBody + datos + acciones permitidas
+
+== Interacciones dentro del GeneralBody ==
+
+Usuario -> Frontend: Buscar / filtrar registros
+Frontend -> DataAPI: GET registros filtrados
+DataAPI --> Frontend: Resultados filtrados
+Frontend --> Usuario: Actualizar tabla
+
+alt Acción crear permitida
+    Usuario -> Frontend: Crear registro
+    Frontend -> DataAPI: POST nuevo registro
+    DataAPI --> Frontend: Registro creado
+    Frontend --> Usuario: Mostrar éxito
+end
+
+alt Acción editar permitida
+    Usuario -> Frontend: Editar registro
+    Frontend -> DataAPI: PUT/PATCH registro
+    DataAPI --> Frontend: Registro actualizado
+    Frontend --> Usuario: Mostrar éxito
+end
+
+alt Acción eliminar permitida
+    Usuario -> Frontend: Eliminar registro
+    Frontend -> DataAPI: DELETE registro
+    DataAPI --> Frontend: Registro eliminado
+    Frontend --> Usuario: Actualizar tabla
+end
+
+alt Acción batch permitida
+    Usuario -> Frontend: Cargar lote / editar registros batch
+    Frontend -> DataAPI: POST /batch/validate
+    DataAPI --> Frontend: Resultado de validación
+
+    alt Lote válido
+        Frontend -> DataAPI: POST /batch/process
+        DataAPI --> Frontend: Lote procesado
+        Frontend --> Usuario: Mostrar éxito batch
+    else Lote con errores
+        DataAPI --> Frontend: Errores por fila
+        Frontend --> Usuario: Mostrar errores en generalBodyBatch
+    end
+end
+
+== Casos globales ==
+
+alt Token expirado
+    DataAPI --> Frontend: 401 Token expirado
+    Frontend -> AuthAPI: POST /auth/refresh
+    AuthAPI --> Frontend: Nuevo accessToken
+    Frontend -> DataAPI: Reintentar solicitud original
+end
+
+alt Error del servidor
+    DataAPI --> Frontend: 500 Error interno
+    Frontend --> Usuario: Mostrar estado de error\n"No se pudo cargar la información"
+end
+
+@enduml

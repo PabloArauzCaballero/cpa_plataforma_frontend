@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Footer - Sistema CPA</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #1f4f8f;
+      --primary-dark: #173b6b;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --muted-light: #94a3b8;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --footer-bg: #0f172a;
+      --footer-border: rgba(255, 255, 255, 0.08);
+      --radius: 14px;
+      --shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .page-placeholder {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: auto;
+      padding: 32px;
+    }
+
+    .placeholder-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .placeholder-card h1 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .placeholder-card p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* =========================
+       GENERAL FOOTER
+    ========================= */
+
+    .general-footer {
+      background: var(--footer-bg);
+      color: #cbd5e1;
+      border-top: 1px solid var(--footer-border);
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 30px 32px 22px;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: 28px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--footer-border);
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .footer-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 18px rgba(31, 79, 143, 0.32);
+    }
+
+    .footer-brand-title strong {
+      display: block;
+      color: white;
+      font-size: 15px;
+      line-height: 1.1;
+    }
+
+    .footer-brand-title small {
+      display: block;
+      color: var(--muted-light);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .footer-description {
+      color: var(--muted-light);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 360px;
+    }
+
+    .footer-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .status-pill.success {
+      background: rgba(22, 163, 74, 0.16);
+      color: #86efac;
+    }
+
+    .status-pill.info {
+      background: rgba(31, 79, 143, 0.32);
+      color: #bfdbfe;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .footer-column h3 {
+      color: white;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: var(--muted-light);
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      transition: 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: white;
+      transform: translateX(2px);
+    }
+
+    .footer-links i {
+      width: 16px;
+      display: inline-flex;
+      justify-content: center;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .support-card {
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--footer-border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .support-card strong {
+      color: white;
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .support-card p {
+      color: var(--muted-light);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .support-button {
+      width: 100%;
+      min-height: 38px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s ease;
+    }
+
+    .support-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .footer-bottom {
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted-light);
+      font-size: 12px;
+    }
+
+    .footer-bottom-left,
+    .footer-bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-bottom a {
+      color: var(--muted-light);
+      transition: 0.2s ease;
+    }
+
+    .footer-bottom a:hover {
+      color: white;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      font-weight: 800;
+    }
+
+    .footer-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--footer-border);
+    }
+
+    @media (max-width: 1020px) {
+      .footer-main {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page-placeholder {
+        padding: 22px;
+      }
+
+      .footer-container {
+        padding: 26px 22px 20px;
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-bottom-left,
+      .footer-bottom-right {
+        gap: 10px;
+      }
+
+      .footer-divider {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-placeholder">
+    <section class="placeholder-card">
+      <h1>General Footer</h1>
+      <p>
+        Este archivo contiene un footer general para el sistema CPA. Está pensado para usarse
+        en todas las pantallas administrativas junto al header/sidebar general.
+      </p>
+    </section>
+  </main>
+
+  <footer class="general-footer">
+    <div class="footer-container">
+      <div class="footer-main">
+
+        <section class="footer-brand">
+          <div class="footer-brand-header">
+            <div class="footer-logo">CPA</div>
+
+            <div class="footer-brand-title">
+              <strong>Sistema CPA</strong>
+              <small>Centro de nivelación · Gestión interna</small>
+            </div>
+          </div>
+
+          <p class="footer-description">
+            Plataforma privada para administración de estudiantes, tutores, clases,
+            pagos, infraestructura, inventario, seguridad y reportes internos.
+          </p>
+
+          <div class="footer-status-row">
+            <span class="status-pill success">
+              <span class="status-dot"></span>
+              Sistema operativo
+            </span>
+
+            <span class="status-pill info">
+              <i class="fa-solid fa-lock"></i>
+              Acceso privado
+            </span>
+          </div>
+        </section>
+
+        <section class="footer-column">
+          <h3>Módulos principales</h3>
+
+          <div class="footer-links">
+            <a href="#"><i class="fa-solid fa-building"></i> Administración</a>
+            <a href="#"><i class="fa-solid fa-users"></i> Personas</a>
+            <a href="#"><i class="fa-solid fa-graduation-cap"></i> Servicios Educativos</a>
+            <a href="#"><i class="fa-solid fa-file-invoice-dollar"></i> Contabilidad</a>
+            <a href="#"><i class="fa-solid fa-credit-card"></i> Deuda</a>
+          </div>
+        </section>
+
+        <section class="footer-column">
+          <h3>Operación</h3>
+
+          <div class="footer-links">
+            <a href="#"><i class="fa-solid fa-school"></i> Infraestructura</a>
+            <a href="#"><i class="fa-solid fa-boxes-stacked"></i> Inventario</a>
+            <a href="#"><i class="fa-solid fa-scale-balanced"></i> Societario</a>
+            <a href="#"><i class="fa-solid fa-shield-halved"></i> Seguridad</a>
+            <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+          </div>
+        </section>
+
+        <section class="footer-column">
+          <h3>Soporte interno</h3>
+
+          <div class="support-card">
+            <strong>¿Necesitas ayuda?</strong>
+            <p>
+              Reporta problemas de acceso, errores de módulos o inconsistencias en registros internos.
+            </p>
+
+            <button class="support-button">
+              <i class="fa-solid fa-headset"></i>
+              Contactar soporte
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-bottom-left">
+          <span>© 2026 Sistema CPA. Uso interno.</span>
+          <span class="footer-divider"></span>
+          <a href="#">Políticas internas</a>
+          <a href="#">Seguridad</a>
+          <a href="#">Auditoría</a>
+        </div>
+
+        <div class="footer-bottom-right">
+          <span class="version-badge">
+            <i class="fa-solid fa-code-branch"></i>
+            v2.0.0
+          </span>
+
+          <span>
+            Última sincronización: 20/06/2026 12:30
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelector('.support-button').addEventListener('click', function () {
+      alert('Solicitud de soporte interno registrada como mockup.');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.header span {
+  color: var(--color-secondary-dark);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-brand);
+  font-size: 0.8rem;
+}
+
+.header h2,
+.header p {
+  margin: 0;
+}
+
+.header h2 {
+  color: var(--color-primary);
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+}
+
+.header p {
+  color: var(--color-accent);
+  margin-top: var(--space-2);
+}
+
+.card {
+  padding: var(--space-6);
+}
+
+.card dl {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.card div {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-neutral-light);
+}
+
+.card div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.card dt {
+  color: var(--color-accent);
+  font-weight: 800;
+}
+
+.card dd {
+  margin: 0;
+}

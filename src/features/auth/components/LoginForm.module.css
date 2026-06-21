@@ -1,0 +1,47 @@
+.form {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  background: var(--color-white);
+  color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-strong);
+}
+
+.heading {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.heading span {
+  color: var(--color-secondary-dark);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-brand);
+  font-size: 0.8rem;
+}
+
+.heading h1,
+.heading p {
+  margin: 0;
+}
+
+.heading h1 {
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+}
+
+.heading p {
+  color: var(--color-accent);
+  line-height: 1.5;
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-soft);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}

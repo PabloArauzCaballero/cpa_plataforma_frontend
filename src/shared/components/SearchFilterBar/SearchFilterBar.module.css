@@ -1,0 +1,58 @@
+.bar {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) minmax(12rem, 0.45fr) auto;
+  gap: var(--space-4);
+  align-items: end;
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.bar label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.bar span {
+  font-size: 0.85rem;
+  color: var(--color-accent);
+}
+
+.bar input,
+.bar select {
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  padding: 0.78rem 0.9rem;
+  color: var(--color-primary);
+  background: var(--color-white);
+  outline: none;
+}
+
+.bar input:focus,
+.bar select:focus {
+  border-color: var(--color-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .bar {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

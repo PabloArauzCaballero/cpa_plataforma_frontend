@@ -1,0 +1,87 @@
+{
+  "brand": {
+    "name": "CPA Centro de Preparación Académica",
+    "style": "minimalista, académico, tecnológico, sobrio"
+  },
+  "colors": {
+    "primary": {
+      "name": "Azul institucional profundo",
+      "hex": "#012B65",
+      "usage": "Fondos principales, navbar, sidebar, hero"
+    },
+    "primaryDark": {
+      "name": "Azul noche",
+      "hex": "#00255F",
+      "usage": "Fondos oscuros, estados hover, footer"
+    },
+    "primarySoft": {
+      "name": "Azul medio",
+      "hex": "#0E3E74",
+      "usage": "Tarjetas oscuras, bordes suaves, contenedores secundarios"
+    },
+    "secondary": {
+      "name": "Celeste CPA",
+      "hex": "#20A0C5",
+      "usage": "Botones principales, íconos, enlaces activos, acentos"
+    },
+    "secondaryDark": {
+      "name": "Celeste profundo",
+      "hex": "#1A7BA6",
+      "usage": "Hover de botones, badges, detalles gráficos"
+    },
+    "accent": {
+      "name": "Azul luminoso",
+      "hex": "#195687",
+      "usage": "Gradientes, resaltados, bordes activos"
+    },
+    "neutralLight": {
+      "name": "Gris claro",
+      "hex": "#DEDFE1",
+      "usage": "Texto claro, fondos suaves, bordes claros"
+    },
+    "neutralMuted": {
+      "name": "Gris azulado",
+      "hex": "#9AA9BB",
+      "usage": "Placeholders, texto deshabilitado, ayudas visuales"
+    },
+    "white": {
+      "name": "Blanco",
+      "hex": "#FFFFFF",
+      "usage": "Texto sobre fondos oscuros, cards, espacios limpios"
+    }
+  },
+  "semantic": {
+    "background": "#012B65",
+    "surface": "#0E3E74",
+    "surfaceSoft": "#F5F8FA",
+    "textPrimary": "#FFFFFF",
+    "textSecondary": "#DEDFE1",
+    "textMuted": "#9AA9BB",
+    "buttonPrimary": "#20A0C5",
+    "buttonPrimaryHover": "#1A7BA6",
+    "border": "#195687",
+    "link": "#20A0C5"
+  },
+  "gradients": {
+    "hero": "linear-gradient(135deg, #00255F 0%, #012B65 45%, #20A0C5 100%)",
+    "cardDark": "linear-gradient(180deg, #0E3E74 0%, #012B65 100%)",
+    "accentGlow": "radial-gradient(circle, rgba(32,160,197,0.35) 0%, rgba(1,43,101,0) 70%)"
+  },
+  "typography": {
+    "recommendedFont": "Inter, system-ui, sans-serif",
+    "headingWeight": 700,
+    "bodyWeight": 400,
+    "letterSpacing": "0.04em"
+  },
+  "ui": {
+    "borderRadius": {
+      "sm": "6px",
+      "md": "12px",
+      "lg": "20px"
+    },
+    "shadow": {
+      "soft": "0 8px 24px rgba(0, 37, 95, 0.18)",
+      "strong": "0 16px 40px rgba(0, 37, 95, 0.28)"
+    }
+  }
+}

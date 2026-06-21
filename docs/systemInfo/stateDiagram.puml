@@ -1,0 +1,35 @@
+@startuml
+hide empty description
+
+title Diagrama de Estados - Ciclo de Vida de Clase
+
+[*] --> BORRADOR
+BORRADOR --> PROGRAMADA : programar()
+PROGRAMADA --> CONFIRMADA : confirmarTutorYAula()
+PROGRAMADA --> CANCELADA : cancelar()
+PROGRAMADA --> REPROGRAMADA : reprogramar()
+REPROGRAMADA --> PROGRAMADA : nuevaFechaConfirmada()
+CONFIRMADA --> EN_CURSO : iniciarClase()
+CONFIRMADA --> CANCELADA : cancelar()
+EN_CURSO --> DICTADA : registrarClaseDictada()
+DICTADA --> ASISTIDA : registrarAsistenciaPresente()
+DICTADA --> NO_ASISTIDA : registrarAusencia()
+ASISTIDA --> VALIDADA_PARA_PAGO : validarParaPagoTutor()
+NO_ASISTIDA --> CERRADA : cerrarSinPago()
+VALIDADA_PARA_PAGO --> CERRADA : cerrar()
+CANCELADA --> [*]
+CERRADA --> [*]
+
+state DICTADA {
+  [*] --> RegistroOperativo
+  RegistroOperativo --> EvidenciaOpcional
+  EvidenciaOpcional --> [*]
+}
+
+note right of VALIDADA_PARA_PAGO
+Una clase solo puede pasar aqui
+si fue dictada y validada
+segun la politica del centro.
+end note
+
+@enduml

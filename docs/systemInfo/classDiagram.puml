@@ -1,0 +1,298 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+left to right direction
+
+title Diagrama de Clases - Centro de Clases Personalizadas
+
+package "Personas" {
+  class Persona {
+    +id: UUID
+    +nombres: String
+    +apellidos: String
+    +documento: String
+    +telefono: String
+    +correo: String
+    +estado: EstadoPersona
+  }
+
+  class PersonaEstudiante {
+    +id: UUID
+    +codigoEstudiante: String
+    +fechaRegistro: DateTime
+    +estadoAcademico: EstadoAcademico
+  }
+
+  class PersonaPadre {
+    +id: UUID
+    +tipoResponsable: String
+    +esResponsablePago: Boolean
+  }
+
+  class PersonaTutor {
+    +id: UUID
+    +especialidad: String
+    +tarifaBaseHora: Decimal
+    +estadoTutor: EstadoTutor
+  }
+
+  class PersonaUsuario {
+    +id: UUID
+    +username: String
+    +passwordHash: String
+    +estado: EstadoUsuario
+  }
+
+  class Empleado {
+    +id: UUID
+    +codigoEmpleado: String
+    +fechaIngreso: Date
+    +estadoLaboral: EstadoEmpleado
+  }
+
+  class EstudiantePadre {
+    +id: UUID
+    +parentesco: String
+    +responsablePago: Boolean
+  }
+}
+
+package "Academico" {
+  class ProductoEducativo {
+    +id: UUID
+    +nombre: String
+    +tipoServicio: TipoServicio
+    +precioVenta: Decimal
+    +duracionMinutos: Integer
+    +activo: Boolean
+  }
+
+  class PaquetesProductoEducativo {
+    +id: UUID
+    +nombre: String
+    +cantidadHoras: Integer
+    +cantidadClases: Integer
+  }
+
+  class CursoVersion {
+    +id: UUID
+    +nombre: String
+    +fechaInicio: Date
+    +fechaFin: Date
+    +cupoMaximo: Integer
+    +estado: EstadoCursoVersion
+  }
+
+  class Horarios {
+    +id: UUID
+    +diaSemana: Integer
+    +horaInicio: Time
+    +horaFin: Time
+    +modalidad: ModalidadClase
+  }
+
+  class ClaseCurso {
+    +id: UUID
+    +tema: String
+    +fecha: Date
+    +horaInicio: Time
+    +horaFin: Time
+    +estado: EstadoClase
+  }
+
+  class ClasePorHora {
+    +id: UUID
+    +fecha: Date
+    +horaInicio: Time
+    +horaFin: Time
+    +estado: EstadoClase
+    +modalidad: ModalidadClase
+  }
+
+  class AsistenciaClaseCurso {
+    +id: UUID
+    +asistio: Boolean
+    +fechaRegistro: DateTime
+    +observacion: Text
+    +validadaParaPagoTutor: Boolean
+  }
+}
+
+package "Finanzas y Contabilidad" {
+  class Deuda {
+    +id: UUID
+    +concepto: String
+    +montoTotal: Decimal
+    +saldoPendiente: Decimal
+    +fechaVencimiento: Date
+    +estado: EstadoDeuda
+  }
+
+  class Pago {
+    +id: UUID
+    +monto: Decimal
+    +metodoPago: MetodoPago
+    +fechaPago: DateTime
+    +estado: EstadoPago
+    +referencia: String
+  }
+
+  class PagoTutor {
+    +id: UUID
+    +periodoInicio: Date
+    +periodoFin: Date
+    +montoTotal: Decimal
+    +estado: EstadoLiquidacionTutor
+  }
+
+  class PagoTutorDetalle {
+    +id: UUID
+    +montoClase: Decimal
+    +horasReconocidas: Decimal
+    +observacion: Text
+  }
+
+  class Cuenta {
+    +id: UUID
+    +codigo: String
+    +nombre: String
+    +naturaleza: NaturalezaCuenta
+    +estado: EstadoCuenta
+  }
+
+  class GrupoCuenta {
+    +id: UUID
+    +nombre: String
+    +codigo: String
+  }
+
+  class CentroCosto {
+    +id: UUID
+    +codigo: String
+    +nombre: String
+  }
+
+  class Transaccion {
+    +id: UUID
+    +fecha: DateTime
+    +concepto: String
+    +referenciaOrigen: String
+    +estado: EstadoTransaccion
+  }
+
+  class TransaccionMovimientoCuenta {
+    +id: UUID
+    +tipoMovimiento: TipoMovimientoContable
+    +monto: Decimal
+  }
+}
+
+package "Infraestructura" {
+  class Sucursal {
+    +id: UUID
+    +nombre: String
+    +direccion: String
+    +estado: EstadoSucursal
+  }
+
+  class Edificio {
+    +id: UUID
+    +nombre: String
+    +estado: EstadoEdificio
+  }
+
+  class Espacio {
+    +id: UUID
+    +nombre: String
+    +tipo: TipoEspacio
+    +capacidad: Integer
+    +estado: EstadoEspacio
+  }
+}
+
+package "Seguridad y Auditoria" {
+  class Rol {
+    +id: UUID
+    +nombre: String
+    +descripcion: String
+  }
+
+  class Permiso {
+    +id: UUID
+    +codigo: String
+    +descripcion: String
+  }
+
+  class Sesion {
+    +id: UUID
+    +tokenHash: String
+    +fechaExpiracion: DateTime
+    +estado: EstadoSesion
+    +ip: String
+    +userAgent: String
+  }
+
+  class ActionLog {
+    +id: UUID
+    +accion: String
+    +entidad: String
+    +entidadId: UUID
+    +resultado: String
+    +fechaHora: DateTime
+  }
+}
+
+Persona <|-- PersonaEstudiante
+Persona <|-- PersonaPadre
+Persona <|-- PersonaTutor
+Persona <|-- PersonaUsuario
+Persona <|-- Empleado
+
+PersonaEstudiante "1" -- "0..*" EstudiantePadre
+PersonaPadre "1" -- "0..*" EstudiantePadre
+
+ProductoEducativo "1" -- "0..*" PaquetesProductoEducativo
+ProductoEducativo "1" -- "0..*" CursoVersion
+CursoVersion "1" -- "0..*" ClaseCurso
+Horarios "1" -- "0..*" CursoVersion
+PersonaTutor "1" -- "0..*" ClaseCurso
+PersonaTutor "1" -- "0..*" ClasePorHora
+PersonaEstudiante "1" -- "0..*" ClasePorHora
+Espacio "1" -- "0..*" ClaseCurso
+Espacio "1" -- "0..*" ClasePorHora
+ClaseCurso "1" -- "0..*" AsistenciaClaseCurso
+PersonaEstudiante "1" -- "0..*" AsistenciaClaseCurso
+
+PersonaPadre "1" -- "0..*" Deuda
+PersonaEstudiante "1" -- "0..*" Deuda
+Deuda "1" -- "0..*" Pago
+PersonaTutor "1" -- "0..*" PagoTutor
+PagoTutor "1" -- "1..*" PagoTutorDetalle
+ClaseCurso "0..1" -- "0..*" PagoTutorDetalle
+ClasePorHora "0..1" -- "0..*" PagoTutorDetalle
+GrupoCuenta "1" -- "0..*" Cuenta
+CentroCosto "1" -- "0..*" Transaccion
+Transaccion "1" -- "2..*" TransaccionMovimientoCuenta
+Cuenta "1" -- "0..*" TransaccionMovimientoCuenta
+
+Sucursal "1" -- "0..*" Edificio
+Edificio "1" -- "0..*" Espacio
+PersonaUsuario "1" -- "0..*" Sesion
+PersonaUsuario "1" -- "0..*" ActionLog
+Rol "1" -- "0..*" PersonaUsuario : autorizado por
+Permiso "0..*" -- "0..*" Rol
+
+note right of Deuda
+PAGO REGISTRADO != DEUDA CONCILIADA
+Se requiere aplicacion de pagos
+para actualizar el saldo.
+end note
+
+note right of ClaseCurso
+CLASE VENDIDA != CLASE DICTADA
+Una clase debe pasar por estados
+operativos y de asistencia.
+end note
+
+@enduml

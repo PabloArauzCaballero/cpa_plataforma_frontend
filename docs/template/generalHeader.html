@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Header - Sistema CPA</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --primary: #1f4f8f;
+      --primary-dark: #173b6b;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: rgba(255, 255, 255, 0.08);
+      --sidebar-active: #1f4f8f;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --muted-light: #94a3b8;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --radius: 14px;
+      --shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .sidebar {
+      width: 292px;
+      min-width: 292px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      overflow-y: auto;
+      background: var(--sidebar-bg);
+      color: #ffffff;
+      transition: 0.25s ease;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+    }
+
+    .sidebar-header {
+      min-height: 78px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: white;
+      box-shadow: 0 8px 18px rgba(31, 79, 143, 0.28);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 15px;
+      color: white;
+      line-height: 1.1;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted-light);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: transparent;
+      color: white;
+      font-size: 24px;
+      padding: 6px;
+      border-radius: 10px;
+    }
+
+    .sidebar-close:hover {
+      background: var(--sidebar-hover);
+    }
+
+    .sidebar-menu {
+      padding: 14px;
+    }
+
+    .menu-section-label {
+      padding: 14px 14px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .menu-item,
+    .menu-group-title {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .menu-item:hover,
+    .menu-group-title:hover {
+      background: var(--sidebar-hover);
+      color: white;
+    }
+
+    .menu-item.active {
+      background: var(--sidebar-active);
+      color: white;
+    }
+
+    .menu-icon {
+      width: 22px;
+      min-width: 22px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+    }
+
+    .menu-group {
+      margin-top: 4px;
+    }
+
+    .menu-group-title {
+      justify-content: space-between;
+    }
+
+    .menu-group-title .menu-title-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chevron {
+      font-size: 12px;
+      color: var(--muted-light);
+      transition: 0.2s ease;
+    }
+
+    .menu-group.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .submenu {
+      display: none;
+      padding: 4px 0 8px 42px;
+    }
+
+    .menu-group.open .submenu {
+      display: block;
+    }
+
+    .submenu a {
+      display: block;
+      color: var(--muted-light);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 12px;
+      border-radius: 10px;
+      transition: 0.2s ease;
+    }
+
+    .submenu a:hover {
+      background: var(--sidebar-hover);
+      color: white;
+    }
+
+    .submenu a.active {
+      color: white;
+      background: rgba(31, 79, 143, 0.48);
+    }
+
+    .main-area {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 78px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .menu-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      background: #e2e8f0;
+    }
+
+    .topbar-title h3 {
+      font-size: 17px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .topbar-title p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .global-search {
+      position: relative;
+    }
+
+    .global-search i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .global-search input {
+      width: 320px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 16px 10px 38px;
+      font-size: 13px;
+      outline: none;
+      color: var(--text);
+      background: #ffffff;
+      transition: 0.2s ease;
+    }
+
+    .global-search input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(31, 79, 143, 0.12);
+    }
+
+    .topbar-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #334155;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s ease;
+      position: relative;
+    }
+
+    .topbar-icon:hover {
+      background: #e2e8f0;
+    }
+
+    .notification-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--danger);
+      border: 2px solid white;
+      position: absolute;
+      top: 9px;
+      right: 9px;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 8px;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .user-info strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .user-info small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .logout-button {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    .logout-button:hover {
+      background: #fecaca;
+    }
+
+    .page-placeholder {
+      max-width: 1280px;
+      margin: auto;
+      padding: 32px;
+    }
+
+    .placeholder-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .placeholder-card h1 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .placeholder-card p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1120px) {
+      .sidebar {
+        position: fixed;
+        left: -310px;
+        box-shadow: 20px 0 40px rgba(15, 23, 42, 0.18);
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .sidebar-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        z-index: 40;
+      }
+
+      .sidebar-backdrop.show {
+        display: block;
+      }
+
+      .global-search {
+        display: none;
+      }
+    }
+
+    @media (min-width: 1121px) {
+      .sidebar-backdrop {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .topbar-title p {
+        display: none;
+      }
+
+      .topbar-right {
+        gap: 8px;
+      }
+
+      .user-info,
+      .logout-button {
+        display: none;
+      }
+
+      .page-placeholder {
+        padding: 22px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar-title h3 {
+        font-size: 15px;
+      }
+
+      .user-menu {
+        padding-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-layout">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-logo">CPA</div>
+          <div>
+            <strong>Sistema CPA</strong>
+            <small>Gestión interna</small>
+          </div>
+        </div>
+
+        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Cerrar menú">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-section-label">Principal</div>
+
+        <a href="#" class="menu-item active">
+          <i class="fa-solid fa-house menu-icon"></i>
+          <span>Inicio</span>
+        </a>
+
+        <div class="menu-section-label">Módulos</div>
+
+        <div class="menu-group open">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-building menu-icon"></i>
+              Administración
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#" class="active">Departamentos</a>
+            <a href="#">Empleados</a>
+            <a href="#">Empleado Posición Pago</a>
+            <a href="#">Empleado Registro Pago</a>
+            <a href="#">Posiciones</a>
+            <a href="#">KPI</a>
+            <a href="#">Objetivos KPI</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-users menu-icon"></i>
+              Personas
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Estudiantes</a>
+            <a href="#">Estudiante Padre</a>
+            <a href="#">Padres</a>
+            <a href="#">Tutores</a>
+            <a href="#">Proveedores</a>
+            <a href="#">Usuarios</a>
+            <a href="#">Unidades Educativas</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-graduation-cap menu-icon"></i>
+              Servicios Educativos
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Productos Educativos</a>
+            <a href="#">Paquetes Producto Educativo</a>
+            <a href="#">Curso Versión</a>
+            <a href="#">Clase Curso</a>
+            <a href="#">Clase por Hora</a>
+            <a href="#">Asistencia Clase Curso</a>
+            <a href="#">Horarios</a>
+            <a href="#">Materia Tree</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-file-invoice-dollar menu-icon"></i>
+              Contabilidad
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Cuentas</a>
+            <a href="#">Cuenta Asignación</a>
+            <a href="#">Grupo Cuenta</a>
+            <a href="#">Centro Costo</a>
+            <a href="#">Centro Costo Mapa</a>
+            <a href="#">Concepto Costo</a>
+            <a href="#">Transacciones</a>
+            <a href="#">Movimiento Cuenta</a>
+            <a href="#">Pago Tutor</a>
+            <a href="#">Pago Tutor Detalle</a>
+            <a href="#">Archivos Transacción</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-credit-card menu-icon"></i>
+              Deuda
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Deudas</a>
+            <a href="#">Pagos</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-school menu-icon"></i>
+              Infraestructura
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Edificios</a>
+            <a href="#">Encargados</a>
+            <a href="#">Espacios</a>
+            <a href="#">Sucursales</a>
+            <a href="#">Tiendas</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-boxes-stacked menu-icon"></i>
+              Inventario
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Bienes</a>
+            <a href="#">Bien Instancia</a>
+            <a href="#">Bien Lote</a>
+            <a href="#">Movimiento Detalle</a>
+          </div>
+        </div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-scale-balanced menu-icon"></i>
+              Societario
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Clase Título</a>
+            <a href="#">Emisión Título</a>
+            <a href="#">Titulares</a>
+            <a href="#">Tenencia</a>
+            <a href="#">Dividendos</a>
+            <a href="#">Dividendo Pago</a>
+            <a href="#">Transferencia Título</a>
+          </div>
+        </div>
+
+        <div class="menu-section-label">Sistema</div>
+
+        <div class="menu-group">
+          <button class="menu-group-title" onclick="toggleMenuGroup(this)">
+            <span class="menu-title-left">
+              <i class="fa-solid fa-shield-halved menu-icon"></i>
+              Seguridad
+            </span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </button>
+          <div class="submenu">
+            <a href="#">Roles</a>
+            <a href="#">Permisos</a>
+            <a href="#">Rol Permiso</a>
+            <a href="#">Usuario Rol</a>
+            <a href="#">Usuario Permiso</a>
+          </div>
+        </div>
+
+        <a href="#" class="menu-item">
+          <i class="fa-solid fa-chart-line menu-icon"></i>
+          <span>Reportes</span>
+        </a>
+
+        <a href="#" class="menu-item">
+          <i class="fa-solid fa-gear menu-icon"></i>
+          <span>Configuración</span>
+        </a>
+      </nav>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Abrir menú">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="topbar-title">
+            <h3>Panel Administrativo</h3>
+            <p>Centro de nivelación · Sistema interno privado</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="global-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar módulo, estudiante, cuenta..." />
+          </div>
+
+          <button class="topbar-icon" aria-label="Notificaciones">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+
+          <div class="user-menu">
+            <div class="user-avatar">AD</div>
+            <div class="user-info">
+              <strong>Admin Demo</strong>
+              <small>Super usuario</small>
+            </div>
+          </div>
+
+          <button class="logout-button">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Salir
+          </button>
+        </div>
+      </header>
+
+      <main class="page-placeholder">
+        <section class="placeholder-card">
+          <h1>General Header</h1>
+          <p>
+            Este archivo contiene un header general de propósito administrativo:
+            sidebar por módulos, topbar, buscador global, perfil de usuario, botón de salida,
+            diseño responsive y uso exclusivo de íconos Font Awesome.
+          </p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+
+      sidebar.classList.toggle('open');
+      backdrop.classList.toggle('show');
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+    }
+
+    function toggleMenuGroup(button) {
+      const group = button.closest('.menu-group');
+      group.classList.toggle('open');
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeSidebar();
+      }
+    });
+  </script>
+</body>
+</html>

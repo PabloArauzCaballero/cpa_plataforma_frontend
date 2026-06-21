@@ -1,0 +1,57 @@
+@startuml
+start
+
+:Registrar persona base;
+:Crear estudiante;
+:Registrar responsable de pago;
+:Asociar estudiante con responsable;
+
+:Seleccionar producto educativo o paquete;
+:Registrar venta / inscripcion;
+:Generar deuda;
+
+if (Pago inmediato?) then (Si)
+  :Registrar pago;
+  :Aplicar pago a deuda;
+  if (Saldo = 0?) then (Si)
+    :Marcar deuda como pagada;
+  else (No)
+    :Mantener deuda parcialmente pagada;
+  endif
+else (No)
+  :Mantener deuda pendiente;
+endif
+
+:Programar clase;
+:Asignar tutor;
+:Asignar aula o modalidad;
+
+if (Hay choque de horario?) then (Si)
+  :Rechazar programacion;
+  stop
+else (No)
+  :Confirmar clase;
+endif
+
+:Dictar clase;
+:Registrar asistencia;
+
+if (Clase dictada y validada?) then (Si)
+  :Marcar clase validada para pago tutor;
+  :Generar liquidacion de tutor;
+  :Registrar pago a tutor;
+else (No)
+  :Dejar clase sin liquidar;
+endif
+
+:Generar transaccion contable;
+if (Asiento balanceado?) then (Si)
+  :Validar asiento contable;
+else (No)
+  :Marcar transaccion observada;
+endif
+
+:Registrar auditoria y publicar eventos;
+:Actualizar reportes;
+stop
+@enduml

@@ -1,0 +1,92 @@
+@startuml
+skinparam componentStyle rectangle
+left to right direction
+
+title Diagrama de Componentes - Backend Modular
+
+package "Clientes" {
+  [Portal Administrativo]
+  [Portal Tutor]
+  [Portal Estudiante / Padre]
+  [Panel Caja]
+  [Panel Contable]
+}
+
+package "Capa de Entrada" {
+  [API Gateway]
+}
+
+package "Backend NestJS Modular" {
+  [Seguridad]
+  [Personas]
+  [Administracion RRHH]
+  [Servicios Educativos]
+  [Programacion Academica]
+  [Asistencia]
+  [Cobranza Deuda]
+  [Pagos]
+  [Pago Tutores]
+  [Contabilidad]
+  [Infraestructura]
+  [Inventario]
+  [Notificaciones]
+  [Auditoria]
+  [Reportes]
+  [Outbox Worker]
+}
+
+package "Persistencia e Integracion" {
+  database "PostgreSQL" as PG
+  queue "RabbitMQ / NATS" as MQ
+  collections "Object Storage" as OS
+}
+
+[Portal Administrativo] --> [API Gateway]
+[Portal Tutor] --> [API Gateway]
+[Portal Estudiante / Padre] --> [API Gateway]
+[Panel Caja] --> [API Gateway]
+[Panel Contable] --> [API Gateway]
+
+[API Gateway] --> [Seguridad]
+[API Gateway] --> [Personas]
+[API Gateway] --> [Administracion RRHH]
+[API Gateway] --> [Servicios Educativos]
+[API Gateway] --> [Programacion Academica]
+[API Gateway] --> [Asistencia]
+[API Gateway] --> [Cobranza Deuda]
+[API Gateway] --> [Pagos]
+[API Gateway] --> [Pago Tutores]
+[API Gateway] --> [Contabilidad]
+[API Gateway] --> [Infraestructura]
+[API Gateway] --> [Inventario]
+[API Gateway] --> [Reportes]
+
+[Programacion Academica] --> [Infraestructura]
+[Asistencia] --> [Programacion Academica]
+[Cobranza Deuda] --> [Servicios Educativos]
+[Pagos] --> [Cobranza Deuda]
+[Pago Tutores] --> [Asistencia]
+[Pago Tutores] --> [Contabilidad]
+[Pagos] --> [Contabilidad]
+[Inventario] --> [Contabilidad]
+[Notificaciones] --> MQ
+[Auditoria] --> PG
+[Outbox Worker] --> MQ
+
+[Seguridad] --> PG
+[Personas] --> PG
+[Administracion RRHH] --> PG
+[Servicios Educativos] --> PG
+[Programacion Academica] --> PG
+[Asistencia] --> PG
+[Cobranza Deuda] --> PG
+[Pagos] --> PG
+[Pago Tutores] --> PG
+[Contabilidad] --> PG
+[Infraestructura] --> PG
+[Inventario] --> PG
+[Reportes] --> PG
+[Contabilidad] --> OS
+[Pagos] --> OS
+
+@enduml

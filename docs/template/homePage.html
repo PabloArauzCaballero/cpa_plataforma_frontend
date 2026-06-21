@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPA | Mis clases programadas</title>
+
+  <!-- FontAwesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <style>
+    :root {
+      --primary: #062f63;
+      --primary-dark: #021b3a;
+      --primary-light: #0b4f9c;
+      --accent: #23a8c4;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --info: #2563eb;
+      --bg: #f4f8fb;
+      --surface: #ffffff;
+      --text: #102033;
+      --muted: #64748b;
+      --border: #dbe4ef;
+      --soft-border: #edf2f7;
+      --shadow: 0 18px 50px rgba(15, 34, 66, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page-body {
+      width: 100%;
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .breadcrumb i {
+      color: var(--accent);
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+
+    .page-title p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 10px 22px rgba(6, 47, 99, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #f8fbff;
+      border-color: #b8c8dc;
+    }
+
+    /* STATS */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--soft-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stat-info span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat-info strong {
+      font-size: 28px;
+      color: var(--primary-dark);
+      letter-spacing: -0.04em;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: #eaf8fb;
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    /* TABLE CARD */
+
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--soft-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 22px;
+      border-bottom: 1px solid var(--soft-border);
+      display: grid;
+      grid-template-columns: 1.5fr repeat(4, 1fr) auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .input-icon {
+      position: relative;
+    }
+
+    .input-icon i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      background: white;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .input-icon input {
+      padding-left: 40px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(35, 168, 196, 0.14);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: #f8fbff;
+      border-color: #b8c8dc;
+    }
+
+    /* TABLE */
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    thead {
+      background: #f8fafc;
+    }
+
+    th {
+      padding: 16px 18px;
+      text-align: left;
+      font-size: 13px;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--soft-border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 18px;
+      border-bottom: 1px solid var(--soft-border);
+      font-size: 14px;
+      vertical-align: middle;
+      color: #1e293b;
+    }
+
+    tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .class-main {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .class-main strong {
+      color: var(--primary-dark);
+      font-size: 15px;
+    }
+
+    .class-main span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .teacher {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .badge-programada {
+      color: #1d4ed8;
+      background: #dbeafe;
+    }
+
+    .badge-en-curso {
+      color: #047857;
+      background: #d1fae5;
+    }
+
+    .badge-finalizada {
+      color: #475569;
+      background: #e2e8f0;
+    }
+
+    .badge-cancelada {
+      color: #b91c1c;
+      background: #fee2e2;
+    }
+
+    .modality {
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-action {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: 0.2s ease;
+    }
+
+    .table-action:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .table-footer {
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* EMPTY STATE */
+
+    .empty-state {
+      display: none;
+      padding: 54px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 42px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 8px;
+      color: var(--primary-dark);
+      font-size: 22px;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 1100px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .table-toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toolbar-actions {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-body {
+        padding: 18px;
+      }
+
+      .page-header {
+        flex-direction: column;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .table-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar-actions {
+        grid-column: span 1;
+      }
+
+      .btn-icon {
+        width: 100%;
+      }
+
+      .table-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-body">
+    <div class="container">
+
+      <header class="page-header">
+        <div class="page-title">
+          <div class="breadcrumb">
+            <i class="fa-solid fa-house"></i>
+            <span>Inicio</span>
+            <i class="fa-solid fa-chevron-right"></i>
+            <span>Mis clases</span>
+          </div>
+
+          <h1>Mis clases programadas</h1>
+          <p>
+            Consulta tus clases asignadas, revisa horarios, aulas, docentes y el estado actual de cada sesión.
+          </p>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn btn-secondary" type="button">
+            <i class="fa-regular fa-calendar"></i>
+            Ver calendario
+          </button>
+
+          <button class="btn btn-primary" type="button">
+            <i class="fa-solid fa-file-export"></i>
+            Exportar
+          </button>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-info">
+            <span>Total programadas</span>
+            <strong>12</strong>
+          </div>
+          <div class="stat-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-info">
+            <span>Clases de hoy</span>
+            <strong>3</strong>
+          </div>
+          <div class="stat-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-info">
+            <span>En curso</span>
+            <strong>1</strong>
+          </div>
+          <div class="stat-icon">
+            <i class="fa-solid fa-person-chalkboard"></i>
+          </div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-info">
+            <span>Finalizadas</span>
+            <strong>8</strong>
+          </div>
+          <div class="stat-icon">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </article>
+      </section>
+
+      <section class="table-card">
+        <div class="table-toolbar">
+          <div class="control-group">
+            <label for="searchInput">Buscar clase</label>
+            <div class="input-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Buscar por materia, docente, aula o grupo..."
+              />
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="filterMateria">Materia</label>
+            <select id="filterMateria">
+              <option value="">Todas</option>
+              <option value="Matemática">Matemática</option>
+              <option value="Física">Física</option>
+              <option value="Química">Química</option>
+              <option value="Lenguaje">Lenguaje</option>
+              <option value="Inglés">Inglés</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="filterEstado">Estado</label>
+            <select id="filterEstado">
+              <option value="">Todos</option>
+              <option value="Programada">Programada</option>
+              <option value="En curso">En curso</option>
+              <option value="Finalizada">Finalizada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="filterModalidad">Modalidad</label>
+            <select id="filterModalidad">
+              <option value="">Todas</option>
+              <option value="Presencial">Presencial</option>
+              <option value="Virtual">Virtual</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="filterFecha">Fecha</label>
+            <input id="filterFecha" type="date" />
+          </div>
+
+          <div class="toolbar-actions">
+            <button class="btn-icon" type="button" onclick="clearFilters()" title="Limpiar filtros">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Clase</th>
+                <th>Docente</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Aula</th>
+                <th>Modalidad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody id="classesTable">
+              <tr
+                data-materia="Matemática"
+                data-estado="Programada"
+                data-modalidad="Presencial"
+                data-fecha="2026-06-21"
+              >
+                <td>
+                  <div class="class-main">
+                    <strong>Matemática - Álgebra básica</strong>
+                    <span>Grupo A · Nivelación universitaria</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="teacher">
+                    <div class="avatar">MR</div>
+                    <span>María Rodríguez</span>
+                  </div>
+                </td>
+                <td>21/06/2026</td>
+                <td>08:00 - 10:00</td>
+                <td>Aula 201</td>
+                <td><span class="modality">Presencial</span></td>
+                <td>
+                  <span class="badge badge-programada">
+                    <i class="fa-regular fa-clock"></i>
+                    Programada
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="table-action" title="Ver detalle">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button class="table-action" title="Tomar asistencia">
+                      <i class="fa-solid fa-list-check"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                data-materia="Física"
+                data-estado="En curso"
+                data-modalidad="Presencial"
+                data-fecha="2026-06-20"
+              >
+                <td>
+                  <div class="class-main">
+                    <strong>Física - Cinemática</strong>
+                    <span>Grupo B · Preuniversitario</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="teacher">
+                    <div class="avatar">CL</div>
+                    <span>Carlos López</span>
+                  </div>
+                </td>
+                <td>20/06/2026</td>
+                <td>10:30 - 12:00</td>
+                <td>Aula 104</td>
+                <td><span class="modality">Presencial</span></td>
+                <td>
+                  <span class="badge badge-en-curso">
+                    <i class="fa-solid fa-circle-play"></i>
+                    En curso
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="table-action" title="Ver detalle">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button class="table-action" title="Tomar asistencia">
+                      <i class="fa-solid fa-list-check"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                data-materia="Química"
+                data-estado="Programada"
+                data-modalidad="Virtual"
+                data-fecha="2026-06-22"
+              >
+                <td>
+                  <div class="class-main">
+                    <strong>Química - Tabla periódica</strong>
+                    <span>Grupo C · Nivelación escolar</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="teacher">
+                    <div class="avatar">AV</div>
+                    <span>Ana Vargas</span>
+                  </div>
+                </td>
+                <td>22/06/2026</td>
+                <td>15:00 - 16:30</td>
+                <td>Google Meet</td>
+                <td><span class="modality">Virtual</span></td>
+                <td>
+                  <span class="badge badge-programada">
+                    <i class="fa-regular fa-clock"></i>
+                    Programada
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="table-action" title="Ver detalle">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button class="table-action" title="Ingresar a clase">
+                      <i class="fa-solid fa-video"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                data-materia="Lenguaje"
+                data-estado="Finalizada"
+                data-modalidad="Presencial"
+                data-fecha="2026-06-18"
+              >
+                <td>
+                  <div class="class-main">
+                    <strong>Lenguaje - Comprensión lectora</strong>
+                    <span>Grupo A · Regularización</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="teacher">
+                    <div class="avatar">JP</div>
+                    <span>Jorge Pérez</span>
+                  </div>
+                </td>
+                <td>18/06/2026</td>
+                <td>17:00 - 18:30</td>
+                <td>Aula 302</td>
+                <td><span class="modality">Presencial</span></td>
+                <td>
+                  <span class="badge badge-finalizada">
+                    <i class="fa-solid fa-check"></i>
+                    Finalizada
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="table-action" title="Ver detalle">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button class="table-action" title="Ver reporte">
+                      <i class="fa-regular fa-file-lines"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                data-materia="Inglés"
+                data-estado="Cancelada"
+                data-modalidad="Virtual"
+                data-fecha="2026-06-19"
+              >
+                <td>
+                  <div class="class-main">
+                    <strong>Inglés - Grammar practice</strong>
+                    <span>Grupo D · Refuerzo académico</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="teacher">
+                    <div class="avatar">LS</div>
+                    <span>Laura Suárez</span>
+                  </div>
+                </td>
+                <td>19/06/2026</td>
+                <td>19:00 - 20:00</td>
+                <td>Zoom</td>
+                <td><span class="modality">Virtual</span></td>
+                <td>
+                  <span class="badge badge-cancelada">
+                    <i class="fa-solid fa-ban"></i>
+                    Cancelada
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="table-action" title="Ver detalle">
+                      <i class="fa-regular fa-eye"></i>
+                    </button>
+                    <button class="table-action" title="Ver motivo">
+                      <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          <i class="fa-regular fa-calendar-xmark"></i>
+          <h3>No se encontraron clases</h3>
+          <p>Prueba cambiando los filtros o buscando con otro término.</p>
+        </div>
+
+        <div class="table-footer">
+          <span id="resultCount">Mostrando 5 clases programadas</span>
+
+          <div class="pagination">
+            <button class="page-btn">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const filterMateria = document.getElementById("filterMateria");
+    const filterEstado = document.getElementById("filterEstado");
+    const filterModalidad = document.getElementById("filterModalidad");
+    const filterFecha = document.getElementById("filterFecha");
+
+    const rows = Array.from(document.querySelectorAll("#classesTable tr"));
+    const tableWrapper = document.getElementById("tableWrapper");
+    const emptyState = document.getElementById("emptyState");
+    const resultCount = document.getElementById("resultCount");
+
+    function applyFilters() {
+      const search = searchInput.value.toLowerCase().trim();
+      const materia = filterMateria.value;
+      const estado = filterEstado.value;
+      const modalidad = filterModalidad.value;
+      const fecha = filterFecha.value;
+
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const rowText = row.innerText.toLowerCase();
+        const rowMateria = row.dataset.materia;
+        const rowEstado = row.dataset.estado;
+        const rowModalidad = row.dataset.modalidad;
+        const rowFecha = row.dataset.fecha;
+
+        const matchSearch = rowText.includes(search);
+        const matchMateria = !materia || rowMateria === materia;
+        const matchEstado = !estado || rowEstado === estado;
+        const matchModalidad = !modalidad || rowModalidad === modalidad;
+        const matchFecha = !fecha || rowFecha === fecha;
+
+        const isVisible =
+          matchSearch &&
+          matchMateria &&
+          matchEstado &&
+          matchModalidad &&
+          matchFecha;
+
+        row.style.display = isVisible ? "" : "none";
+
+        if (isVisible) visibleCount++;
+      });
+
+      tableWrapper.style.display = visibleCount > 0 ? "block" : "none";
+      emptyState.style.display = visibleCount > 0 ? "none" : "block";
+
+      resultCount.textContent =
+        visibleCount === 1
+          ? "Mostrando 1 clase programada"
+          : `Mostrando ${visibleCount} clases programadas`;
+    }
+
+    function clearFilters() {
+      searchInput.value = "";
+      filterMateria.value = "";
+      filterEstado.value = "";
+      filterModalidad.value = "";
+      filterFecha.value = "";
+      applyFilters();
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    filterMateria.addEventListener("change", applyFilters);
+    filterEstado.addEventListener("change", applyFilters);
+    filterModalidad.addEventListener("change", applyFilters);
+    filterFecha.addEventListener("change", applyFilters);
+  </script>
+</body>
+</html>

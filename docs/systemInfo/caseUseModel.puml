@@ -1,0 +1,90 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+title Diagrama de Casos de Uso - Centro de Clases Personalizadas
+
+actor Administrador
+actor Administrativo
+actor CoordinadorAcademico
+actor Tutor
+actor Estudiante
+actor PadreResponsable as Padre
+actor Cajero
+actor Contador
+actor Auditor
+actor "Sistema de Notificaciones" as Notificador
+
+rectangle "Centro de Clases Personalizadas" {
+  usecase "Registrar estudiante" as UC1
+  usecase "Registrar responsable" as UC2
+  usecase "Asociar estudiante\ncon responsable" as UC3
+  usecase "Crear producto educativo" as UC4
+  usecase "Vender servicio educativo" as UC5
+  usecase "Generar deuda" as UC6
+  usecase "Registrar pago" as UC7
+  usecase "Aplicar pago a deuda" as UC8
+  usecase "Programar clase" as UC9
+  usecase "Reprogramar clase" as UC10
+  usecase "Cancelar clase" as UC11
+  usecase "Asignar tutor y aula" as UC12
+  usecase "Registrar asistencia" as UC13
+  usecase "Validar clase para pago tutor" as UC14
+  usecase "Generar liquidacion de tutor" as UC15
+  usecase "Registrar pago a tutor" as UC16
+  usecase "Registrar transaccion contable" as UC17
+  usecase "Validar asiento contable" as UC18
+  usecase "Consultar agenda" as UC19
+  usecase "Consultar deuda y pagos" as UC20
+  usecase "Consultar reportes" as UC21
+  usecase "Gestionar usuarios, roles\ny permisos" as UC22
+  usecase "Consultar auditoria" as UC23
+  usecase "Enviar notificacion" as UC24
+}
+
+Administrador --> UC22
+Administrador --> UC21
+Administrador --> UC23
+Administrativo --> UC1
+Administrativo --> UC2
+Administrativo --> UC3
+Administrativo --> UC4
+Administrativo --> UC5
+Administrativo --> UC6
+Administrativo --> UC9
+Administrativo --> UC10
+Administrativo --> UC11
+Administrativo --> UC12
+Administrativo --> UC19
+CoordinadorAcademico --> UC9
+CoordinadorAcademico --> UC10
+CoordinadorAcademico --> UC11
+CoordinadorAcademico --> UC12
+CoordinadorAcademico --> UC13
+CoordinadorAcademico --> UC14
+CoordinadorAcademico --> UC21
+Tutor --> UC19
+Tutor --> UC13
+Estudiante --> UC19
+Estudiante --> UC20
+Padre --> UC20
+Cajero --> UC7
+Cajero --> UC8
+Cajero --> UC20
+Contador --> UC17
+Contador --> UC18
+Contador --> UC21
+Auditor --> UC23
+Auditor --> UC21
+Notificador --> UC24
+
+UC5 .> UC6 : <<include>>
+UC7 .> UC8 : <<extend>>
+UC9 .> UC12 : <<include>>
+UC14 .> UC15 : <<include>>
+UC7 .> UC24 : <<extend>>
+UC9 .> UC24 : <<extend>>
+UC10 .> UC24 : <<extend>>
+UC11 .> UC24 : <<extend>>
+
+@enduml

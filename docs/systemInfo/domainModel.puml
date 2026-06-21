@@ -1,0 +1,118 @@
+@startuml
+hide circle
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+left to right direction
+
+title Modelo de Dominio - Centro de Clases Personalizadas
+
+package "Personas" {
+  class Persona
+  class PersonaEstudiante
+  class PersonaPadre
+  class PersonaTutor
+  class PersonaUsuario
+  class Empleado
+  class EstudiantePadre
+}
+
+package "Servicios Educativos" {
+  class ProductoEducativo
+  class PaquetesProductoEducativo
+  class CursoVersion
+  class ClaseCurso
+  class ClasePorHora
+  class Horarios
+  class AsistenciaClaseCurso
+}
+
+package "Finanzas" {
+  class Deuda
+  class Pago
+  class PagoTutor
+  class PagoTutorDetalle
+  class Transaccion
+  class TransaccionMovimientoCuenta
+  class Cuenta
+  class GrupoCuenta
+  class CentroCosto
+}
+
+package "Infraestructura" {
+  class Sucursal
+  class Edificio
+  class Espacio
+}
+
+package "Inventario" {
+  class Bien
+  class BienInstancia
+  class BienLote
+  class MovimientoDetalle
+}
+
+package "Seguridad" {
+  class Rol
+  class Permiso
+  class UsuarioRol
+  class UsuarioPermiso
+  class Sesion
+  class ActionLog
+}
+
+Persona <|-- PersonaEstudiante
+Persona <|-- PersonaPadre
+Persona <|-- PersonaTutor
+Persona <|-- PersonaUsuario
+Persona <|-- Empleado
+
+PersonaEstudiante "1" -- "0..*" EstudiantePadre : estudiante
+PersonaPadre "1" -- "0..*" EstudiantePadre : responsable
+
+ProductoEducativo "1" -- "0..*" PaquetesProductoEducativo
+ProductoEducativo "1" -- "0..*" CursoVersion
+CursoVersion "1" -- "0..*" ClaseCurso
+Horarios "1" -- "0..*" CursoVersion
+PersonaTutor "1" -- "0..*" ClaseCurso : dicta
+PersonaTutor "1" -- "0..*" ClasePorHora : dicta
+PersonaEstudiante "1" -- "0..*" ClasePorHora : recibe
+ClaseCurso "1" -- "0..*" AsistenciaClaseCurso
+PersonaEstudiante "1" -- "0..*" AsistenciaClaseCurso
+
+PersonaPadre "1" -- "0..*" Deuda : responsable
+PersonaEstudiante "1" -- "0..*" Deuda
+Deuda "1" -- "0..*" Pago
+PersonaTutor "1" -- "0..*" PagoTutor
+PagoTutor "1" -- "1..*" PagoTutorDetalle
+ClasePorHora "0..1" -- "0..*" PagoTutorDetalle
+ClaseCurso "0..1" -- "0..*" PagoTutorDetalle
+
+GrupoCuenta "1" -- "0..*" Cuenta
+Cuenta "1" -- "0..*" TransaccionMovimientoCuenta
+Transaccion "1" -- "2..*" TransaccionMovimientoCuenta
+CentroCosto "1" -- "0..*" Transaccion
+
+Sucursal "1" -- "0..*" Edificio
+Edificio "1" -- "0..*" Espacio
+Espacio "1" -- "0..*" ClaseCurso : aula
+Espacio "1" -- "0..*" ClasePorHora : aula
+
+Bien "1" -- "0..*" BienInstancia
+Bien "1" -- "0..*" BienLote
+Bien "1" -- "0..*" MovimientoDetalle
+
+PersonaUsuario "1" -- "0..*" Sesion
+PersonaUsuario "1" -- "0..*" UsuarioRol
+Rol "1" -- "0..*" UsuarioRol
+PersonaUsuario "1" -- "0..*" UsuarioPermiso
+Permiso "1" -- "0..*" UsuarioPermiso
+Sesion "1" -- "0..*" ActionLog
+
+note bottom of ClasePorHora
+Regla central:
+una clase vendida o programada
+no equivale automaticamente
+a una clase dictada.
+end note
+
+@enduml

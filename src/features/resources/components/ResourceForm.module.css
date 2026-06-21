@@ -1,0 +1,62 @@
+.form {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+.notice {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  color: var(--color-primary);
+}
+
+.notice span {
+  color: var(--color-accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.jsonField {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.jsonField textarea {
+  width: 100%;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--color-primary);
+  background: var(--color-white);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.jsonField small {
+  color: var(--color-primary-dark);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
