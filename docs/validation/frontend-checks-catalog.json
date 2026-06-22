@@ -714,15 +714,35 @@
       "DEPARTAMENTO"
     ],
     "contabilidad.sub_tipo_transaccion": [
-      "MATRICULA",
-      "CUOTA",
-      "PAGO_TUTOR",
-      "COMPRA_INVENTARIO",
-      "VENTA_PRODUCTO",
-      "DEPRECIACION",
-      "DEUDA",
+      "ADMINISTRATIVO",
       "AJUSTE",
-      "OTRO"
+      "AJUSTE_INVENTARIO",
+      "APERTURA",
+      "BAJA",
+      "CIERRE",
+      "CLASE_POR_HORA",
+      "COMPRA",
+      "CURSO",
+      "DEPRECIACION",
+      "DESEMBOLSO",
+      "FINANCIERO",
+      "INFRAESTRUCTURA",
+      "INTERES",
+      "INVENTARIO",
+      "OTRO",
+      "PAGO_CAPITAL",
+      "PAQUETE",
+      "PERSONAL",
+      "PRODUCTO_EDUCATIVO",
+      "RECARGO",
+      "RECLASIFICACION",
+      "REGULARIZACION",
+      "SEGURO",
+      "SERVICIO",
+      "SOCIEDAD",
+      "TIENDA",
+      "TRASLADO",
+      "TUTOR"
     ],
     "inventario.bien_categoria": [
       "MATERIAL_DIDACTICO",
@@ -852,6 +872,49 @@
       "https://drive.google.com",
       "https://docs.google.com",
       "https://storage.googleapis.com"
+    ],
+    "contabilidad.sub_tipo_transaccion.general": [
+      "APERTURA",
+      "CIERRE",
+      "AJUSTE",
+      "RECLASIFICACION",
+      "REGULARIZACION",
+      "SOCIEDAD",
+      "OTRO"
+    ],
+    "contabilidad.sub_tipo_transaccion.costo": [
+      "PERSONAL",
+      "TUTOR",
+      "INFRAESTRUCTURA",
+      "INVENTARIO",
+      "SERVICIO",
+      "ADMINISTRATIVO",
+      "FINANCIERO",
+      "OTRO"
+    ],
+    "contabilidad.sub_tipo_transaccion.venta": [
+      "CLASE_POR_HORA",
+      "CURSO",
+      "PAQUETE",
+      "PRODUCTO_EDUCATIVO",
+      "TIENDA",
+      "OTRO"
+    ],
+    "contabilidad.sub_tipo_transaccion.bien": [
+      "COMPRA",
+      "BAJA",
+      "DEPRECIACION",
+      "AJUSTE_INVENTARIO",
+      "TRASLADO",
+      "OTRO"
+    ],
+    "contabilidad.sub_tipo_transaccion.deuda": [
+      "DESEMBOLSO",
+      "PAGO_CAPITAL",
+      "INTERES",
+      "SEGURO",
+      "RECARGO",
+      "OTRO"
     ]
   },
   "resourceFieldDefinitions": {
@@ -1289,15 +1352,119 @@
     "transaccion": {
       "sub_tipo_transaccion": {
         "type": "enum",
-        "enumRef": "contabilidad.sub_tipo_transaccion",
         "ui": "select",
-        "message": "Seleccione el subtipo para clasificar la transacción.",
-        "source": "business"
+        "message": "Seleccione el subtipo según el tipo de transacción elegido.",
+        "source": "business",
+        "conditionalOptions": {
+          "dependsOn": "tipo_transaccion",
+          "valuesByControllerValue": {
+            "GENERAL": [
+              "APERTURA",
+              "CIERRE",
+              "AJUSTE",
+              "RECLASIFICACION",
+              "REGULARIZACION",
+              "SOCIEDAD",
+              "OTRO"
+            ],
+            "COSTO": [
+              "PERSONAL",
+              "TUTOR",
+              "INFRAESTRUCTURA",
+              "INVENTARIO",
+              "SERVICIO",
+              "ADMINISTRATIVO",
+              "FINANCIERO",
+              "OTRO"
+            ],
+            "VENTA": [
+              "CLASE_POR_HORA",
+              "CURSO",
+              "PAQUETE",
+              "PRODUCTO_EDUCATIVO",
+              "TIENDA",
+              "OTRO"
+            ],
+            "BIEN": [
+              "COMPRA",
+              "BAJA",
+              "DEPRECIACION",
+              "AJUSTE_INVENTARIO",
+              "TRASLADO",
+              "OTRO"
+            ],
+            "DEUDA": [
+              "DESEMBOLSO",
+              "PAGO_CAPITAL",
+              "INTERES",
+              "SEGURO",
+              "RECARGO",
+              "OTRO"
+            ]
+          }
+        }
       },
       "glosa": {
         "check": "trimmedText",
         "maxLength": 300,
         "message": "Describa brevemente la razón del asiento contable."
+      },
+      "tipo_transaccion": {
+        "type": "enum",
+        "ui": "select",
+        "enumRef": "contabilidad.tipo_transaccion",
+        "message": "Elija el origen de negocio para mostrar solo los campos relacionados."
+      },
+      "__visibilityByTipoTransaccion": {
+        "type": "metadata",
+        "message": "El frontend debe ocultar campos FK no relacionados con el tipo de transacción.",
+        "values": [],
+        "conditionalOptions": {
+          "dependsOn": "tipo_transaccion",
+          "valuesByControllerValue": {
+            "GENERAL": [
+              "id_sucursal",
+              "id_tienda",
+              "id_departamento",
+              "id_empleado",
+              "id_dividendo_pago",
+              "id_emision_titulo"
+            ],
+            "COSTO": [
+              "id_centro_costo_mapa",
+              "id_empleado",
+              "id_empleado_pago",
+              "id_departamento",
+              "id_clase_por_hora",
+              "id_producto_educativo",
+              "id_curso_version",
+              "id_sucursal",
+              "id_tienda",
+              "id_proveedor",
+              "id_pago_tutor"
+            ],
+            "VENTA": [
+              "id_producto_educativo",
+              "id_curso_version",
+              "id_cliente",
+              "id_sucursal",
+              "id_tienda",
+              "id_clase_por_hora"
+            ],
+            "BIEN": [
+              "id_bien",
+              "id_movimiento_detalle",
+              "id_sucursal",
+              "id_tienda",
+              "id_proveedor"
+            ],
+            "DEUDA": [
+              "id_deuda",
+              "id_pago_deuda",
+              "id_proveedor"
+            ]
+          }
+        }
       }
     },
     "deuda": {

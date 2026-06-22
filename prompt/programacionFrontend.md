@@ -957,3 +957,21 @@ Flujo obligatorio:
 7. No exponer configuración sensible. El upload preset debe ser unsigned y restringido desde Cloudinary.
 
 El usuario final no debe ver rutas técnicas ni detalles internos de Cloudinary; solo debe ver el estado funcional de la carga.
+
+---
+
+## Regla obligatoria adicional: campos dinámicos en transacciones contables
+
+En el recurso `contabilidad.transaccion`, el formulario no debe mostrar todos los campos FK al mismo tiempo.
+
+Debe leer `tipo_transaccion` y mostrar únicamente los campos relacionados al origen de negocio seleccionado:
+
+- `GENERAL`: referencias generales, sucursal, tienda, departamento, empleado y referencias societarias.
+- `COSTO`: centro de costo, empleado, pago de empleado, departamento, clase, producto/curso, sucursal, tienda, proveedor y pago tutor.
+- `VENTA`: producto educativo, curso, cliente, sucursal, tienda o clase.
+- `BIEN`: bien, movimiento de inventario, sucursal, tienda o proveedor.
+- `DEUDA`: deuda, pago de deuda o proveedor.
+
+Los campos ocultos no deben enviarse en el payload. Si el usuario cambia `tipo_transaccion`, se deben limpiar las referencias que ya no correspondan al nuevo tipo.
+
+`sub_tipo_transaccion` debe renderizarse como `select` y sus opciones deben depender de `tipo_transaccion`.

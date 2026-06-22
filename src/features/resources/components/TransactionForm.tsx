@@ -30,6 +30,51 @@ const emptyMovement: MovementDraft = {
   descripcion: '',
 };
 
+const TRANSACTION_COMMON_FIELDS = ['fecha_transaccion', 'tipo_transaccion', 'sub_tipo_transaccion', 'glosa'];
+
+const TRANSACTION_FIELD_VISIBILITY: Record<string, string[]> = {
+  GENERAL: ['id_sucursal', 'id_tienda', 'id_departamento', 'id_empleado', 'id_dividendo_pago', 'id_emision_titulo'],
+  COSTO: [
+    'id_centro_costo_mapa',
+    'id_empleado',
+    'id_empleado_pago',
+    'id_departamento',
+    'id_clase_por_hora',
+    'id_producto_educativo',
+    'id_curso_version',
+    'id_sucursal',
+    'id_tienda',
+    'id_proveedor',
+    'id_pago_tutor',
+  ],
+  VENTA: ['id_producto_educativo', 'id_curso_version', 'id_cliente', 'id_sucursal', 'id_tienda', 'id_clase_por_hora'],
+  BIEN: ['id_bien', 'id_movimiento_detalle', 'id_sucursal', 'id_tienda', 'id_proveedor'],
+  DEUDA: ['id_deuda', 'id_pago_deuda', 'id_proveedor'],
+};
+
+const TRANSACTION_TYPE_HELP: Record<string, string> = {
+  GENERAL: 'Se muestran referencias generales y societarias para ajustes, apertura, cierre o reclasificaciones.',
+  COSTO: 'Se muestran centros de costo, empleados, tutores, cursos y referencias operativas asociadas al gasto o costo.',
+  VENTA: 'Se muestran referencias comerciales: producto educativo, curso, cliente, sucursal, tienda o clase.',
+  BIEN: 'Se muestran referencias de inventario: bien, movimiento, sucursal, tienda o proveedor.',
+  DEUDA: 'Se muestran referencias financieras: deuda, pago de deuda y proveedor.',
+};
+
+function getTransactionVisibleFieldNames(type: string): string[] {
+  return [...TRANSACTION_COMMON_FIELDS, ...(TRANSACTION_FIELD_VISIBILITY[type] ?? [])];
+}
+
+function getTransactionTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    GENERAL: 'General',
+    COSTO: 'Costo',
+    VENTA: 'Venta',
+    BIEN: 'Bien',
+    DEUDA: 'Deuda',
+  };
+  return labels[type] ?? 'Sin tipo seleccionado';
+}
+
 function humanizeFieldName(name: string): string {
   return name
     .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -81,6 +126,17 @@ function validateTransactionHeaderBusinessRules(payload: CrudRecord): string | n
 
   if (type === 'COSTO' && !isFilled(payload.id_centro_costo_mapa)) {
     return 'Una transacción de costo debe estar asociada a un mapa de centro de costo.';
+  }
+
+  if (
+    type === 'VENTA'
+    && !isFilled(payload.id_producto_educativo)
+    && !isFilled(payload.id_curso_version)
+    && !isFilled(payload.id_cliente)
+    && !isFilled(payload.id_tienda)
+    && !isFilled(payload.id_clase_por_hora)
+  ) {
+    return 'Una transacción de venta debe tener al menos una referencia comercial: producto, curso, cliente, tienda o clase.';
   }
 
   if (type === 'BIEN' && !isFilled(payload.id_bien) && !isFilled(payload.id_movimiento_detalle)) {
@@ -138,6 +194,18 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const transactionType = String(headerViewModel.payload.tipo_transaccion ?? '').toUpperCase();
+  const visibleFieldNames = useMemo(() => getTransactionVisibleFieldNames(transactionType), [transactionType]);
+  const visibleFieldNameSet = useMemo(() => new Set(visibleFieldNames), [visibleFieldNames]);
+  const commonFields = useMemo(
+    () => resource.fields.filter((field) => TRANSACTION_COMMON_FIELDS.includes(field.name)),
+    [resource.fields],
+  );
+  const contextualFields = useMemo(
+    () => resource.fields.filter((field) => !TRANSACTION_COMMON_FIELDS.includes(field.name) && visibleFieldNameSet.has(field.name)),
+    [resource.fields, visibleFieldNameSet],
+  );
+
   useEffect(() => {
     let isMounted = true;
     if (!accountMovementRelation) return undefined;
@@ -164,6 +232,28 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     const haber = movements.filter((movement) => movement.tipoMovimiento === 'HABER').reduce((sum, movement) => sum + toMoney(movement.monto), 0);
     return { debe, haber, diferencia: Number((debe - haber).toFixed(2)) };
   }, [movements]);
+
+  function handleHeaderFieldChange(fieldName: string, value: unknown) {
+    headerViewModel.setField(fieldName, value);
+
+    if (fieldName !== 'tipo_transaccion') return;
+
+    const nextType = String(value ?? '').toUpperCase();
+    const nextVisible = new Set(getTransactionVisibleFieldNames(nextType));
+    resource.fields.forEach((field) => {
+      if (!TRANSACTION_COMMON_FIELDS.includes(field.name) && !nextVisible.has(field.name)) {
+        headerViewModel.setField(field.name, '');
+      }
+    });
+  }
+
+  function cleanPayloadForSelectedTransactionType(payload: CrudRecord): CrudRecord {
+    return Object.entries(payload).reduce<CrudRecord>((clean, [key, value]) => {
+      if (!visibleFieldNameSet.has(key)) return clean;
+      clean[key] = value;
+      return clean;
+    }, {});
+  }
 
   function setMovementField(name: keyof MovementDraft, value: string) {
     setMovementDraft((current) => ({ ...current, [name]: value }));
@@ -192,12 +282,13 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const headerPayload = headerViewModel.getPayload();
-    if (!headerPayload) {
+    const rawHeaderPayload = headerViewModel.getPayload();
+    if (!rawHeaderPayload) {
       setError('Completa los campos obligatorios de la transacción.');
       return;
     }
 
+    const headerPayload = cleanPayloadForSelectedTransactionType(rawHeaderPayload);
     const headerBusinessError = validateTransactionHeaderBusinessRules(headerPayload);
     if (headerBusinessError) {
       setError(headerBusinessError);
@@ -237,7 +328,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
       <section className={styles.section}>
         <h3>Datos de la transacción</h3>
         <div className={styles.grid}>
-          {resource.fields.map((field) => (
+          {commonFields.map((field) => (
             <FormField
               key={field.name}
               id={field.name}
@@ -249,10 +340,35 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
               options={headerViewModel.getFieldOptions(field)}
               helpText={field.helpText}
               isLoadingOptions={headerViewModel.isLoadingFieldOptions(field)}
-              onChange={(value) => headerViewModel.setField(field.name, value)}
+              onChange={(value) => handleHeaderFieldChange(field.name, value)}
             />
           ))}
         </div>
+
+        <div className={styles.contextBox}>
+          <strong>{getTransactionTypeLabel(transactionType)}</strong>
+          <span>{TRANSACTION_TYPE_HELP[transactionType] ?? 'Elige un tipo de transacción para mostrar solo los campos relacionados.'}</span>
+        </div>
+
+        {contextualFields.length ? (
+          <div className={styles.grid}>
+            {contextualFields.map((field) => (
+              <FormField
+                key={field.name}
+                id={field.name}
+                label={field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name)}
+                type={field.type}
+                value={headerViewModel.payload[field.name] as string | number | boolean}
+                error={headerViewModel.errors[field.name]}
+                required={field.required}
+                options={headerViewModel.getFieldOptions(field)}
+                helpText={field.helpText}
+                isLoadingOptions={headerViewModel.isLoadingFieldOptions(field)}
+                onChange={(value) => handleHeaderFieldChange(field.name, value)}
+              />
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className={styles.section}>

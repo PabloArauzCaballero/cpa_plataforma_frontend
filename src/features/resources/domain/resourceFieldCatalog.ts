@@ -4275,6 +4275,107 @@ export const resourceFieldCatalog: Record<string, FieldCatalogPatch> = {
       "nonNegativeDecimal"
     ]
   },
+  "transaccion.id_producto_educativo": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/servicios_educativos/producto-educativo",
+      "valueField": "id_producto_educativo",
+      "labelFields": ["nombre", "tipo_producto", "descripcion", "codigo", "nombre_version"],
+      "resourceKey": "producto-educativo"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_curso_version": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/servicios_educativos/curso-version",
+      "valueField": "id_curso_version",
+      "labelFields": ["nombre_version", "descripcion_version", "nombre", "codigo"],
+      "resourceKey": "curso-version"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_sucursal": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/infraestructura/sucursal",
+      "valueField": "id_sucursal",
+      "labelFields": ["nombre", "codigo", "ciudad", "direccion_linea1"],
+      "resourceKey": "sucursal"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_tienda": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/infraestructura/tienda",
+      "valueField": "id_tienda",
+      "labelFields": ["nombre", "codigo", "horario_texto"],
+      "resourceKey": "tienda"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_proveedor": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/personas/proveedor",
+      "valueField": "id_proveedor",
+      "labelFields": ["nombre_proveedor", "categoria", "telefono", "nombre"],
+      "resourceKey": "proveedor"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_dividendo_pago": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/societario/dividendo-pago",
+      "valueField": "id_dividendo_pago",
+      "labelFields": ["monto_pagado", "fecha_pago_real", "estado_registro"],
+      "resourceKey": "dividendo-pago"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_emision_titulo": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/societario/emision-titulo",
+      "valueField": "id_emision",
+      "labelFields": ["serie", "ronda", "instrumento", "fecha_emision"],
+      "resourceKey": "emision-titulo"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_pago_tutor": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/contabilidad/pago-tutor",
+      "valueField": "id_pago_tutor",
+      "labelFields": ["id_tutor", "periodo_inicio", "estado_pago", "total"],
+      "resourceKey": "pago-tutor"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
+  "transaccion.id_cliente": {
+    "type": "number",
+    "valueKind": "number",
+    "checks": ["positiveInteger"]
+  },
   "transaccion.id_transaccion": {
     "valueKind": "number",
     "checks": [

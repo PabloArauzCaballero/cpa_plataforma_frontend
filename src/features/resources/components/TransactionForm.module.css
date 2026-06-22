@@ -263,3 +263,25 @@
     flex-direction: column-reverse;
   }
 }
+
+.contextBox {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 18%, var(--color-neutral-light));
+  background: color-mix(in srgb, var(--color-surface-soft) 78%, var(--color-white));
+  color: var(--color-primary);
+}
+
+.contextBox strong {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.contextBox span {
+  color: var(--color-accent);
+  font-weight: 700;
+  line-height: 1.45;
+}
