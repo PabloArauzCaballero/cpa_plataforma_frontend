@@ -36,7 +36,7 @@ function canDisable(record: CrudRecord): boolean {
 function buildDisablePayload(record: CrudRecord): CrudRecord {
   if ('activo' in record) return { activo: false };
   const stateKey = Object.keys(record).find((key) => key.toLowerCase().includes('estado'));
-  return stateKey ? { [stateKey]: 'INACTIVO' } : {};
+  return stateKey ? { [stateKey]: 'Inactivo' } : {};
 }
 
 function formatLabel(value: string): string {

@@ -4,7 +4,14 @@ import { normalizeListResponse } from './resourceMapper';
 
 function withPaging(path: string, limit = 100, offset = 0): string {
   const separator = path.includes('?') ? '&' : '?';
-  return `${path}${separator}limit=${limit}&offset=${offset}`;
+  const params = new URLSearchParams();
+  params.set('limit', String(limit));
+  params.set('offset', String(offset));
+  params.set('onlyActivos', 'false');
+  params.set('only_activos', 'false');
+  params.set('includeInactive', 'true');
+  params.set('include_inactive', 'true');
+  return `${path}${separator}${params.toString()}`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

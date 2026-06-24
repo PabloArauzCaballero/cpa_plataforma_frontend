@@ -10,12 +10,41 @@ import type {
 } from '../domain/CrudResource';
 import { normalizeListResult, normalizeRecordResponse } from './resourceMapper';
 
+function normalizeStatusValue(value: unknown): string {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function resolveOnlyActiveFilter(filters: ResourceListQuery['filters']): boolean {
+  const estadoRegistro = normalizeStatusValue(filters.estado_registro);
+  const estado = normalizeStatusValue(filters.estado);
+  const activo = normalizeStatusValue(filters.activo);
+  const esActivo = normalizeStatusValue(filters.es_activo);
+
+  return estadoRegistro === 'activo' || estado === 'activo' || activo === 'true' || esActivo === 'true';
+}
+
+function appendVisibilityParams(params: URLSearchParams, query: ResourceListQuery): void {
+  const onlyActive = resolveOnlyActiveFilter(query.filters);
+
+  // Muchas funciones del backend/DDL tienen p_only_activos DEFAULT true.
+  // Por eso, si el usuario no eligió explícitamente Activo, pedimos todos los estados.
+  params.set('onlyActivos', onlyActive ? 'true' : 'false');
+  params.set('only_activos', onlyActive ? 'true' : 'false');
+  params.set('includeInactive', onlyActive ? 'false' : 'true');
+  params.set('include_inactive', onlyActive ? 'false' : 'true');
+}
+
 function appendQuery(path: string, query: ResourceListQuery): string {
   const params = new URLSearchParams();
   params.set('page', String(query.page));
   params.set('limit', String(query.limit));
   params.set('offset', String(query.offset));
   params.set('orderDir', query.orderDir);
+  appendVisibilityParams(params, query);
 
   if (query.orderBy) params.set('orderBy', query.orderBy);
   if (query.search?.trim()) params.set('q', query.search.trim());
