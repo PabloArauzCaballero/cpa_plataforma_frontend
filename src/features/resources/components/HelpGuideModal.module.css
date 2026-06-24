@@ -141,6 +141,8 @@
 
 .steps li::before {
   content: counter(guide-step);
+  grid-column: 1;
+  grid-row: 1 / span 2;
   width: 2.35rem;
   height: 2.35rem;
   display: grid;
@@ -153,17 +155,22 @@
 
 .steps li strong {
   display: block;
+  grid-column: 2 / -1;
   margin-bottom: 0.3rem;
   color: var(--color-primary);
   font-weight: 900;
+  min-width: 0;
 }
 
 .steps li span {
   display: block;
+  grid-column: 2 / -1;
   color: var(--color-accent);
   line-height: 1.5;
   font-weight: 650;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  min-width: 0;
 }
 
 .fieldGrid {
@@ -210,6 +217,13 @@
 
   .steps li {
     grid-template-columns: 1fr;
+  }
+
+  .steps li::before,
+  .steps li strong,
+  .steps li span {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .steps li::before {

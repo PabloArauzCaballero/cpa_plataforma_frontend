@@ -1077,3 +1077,10 @@ La ayuda debe distinguir casos como:
 - Archivos transacción: carga posterior de comprobante a Cloudinary para una transacción existente.
 
 No se debe inventar venta detalle si el backend no tiene endpoint documentado. La ayuda debe explicar que el detalle de venta debe quedar separado cuando el backend lo exponga.
+
+## Regla visual v26 - Ayuda y título del shell
+
+- El modal de ayuda operativa debe mantener los pasos en formato horizontal limpio: número a la izquierda y texto completo a la derecha.
+- No debe permitir que las frases se quiebren letra por letra o palabra por palabra por errores de grid.
+- El sidebar y el header del shell deben usar título textual en la parte superior, no la imagen grande del logo CPA.
+- El logo gráfico puede mantenerse como archivo público para login u otros usos puntuales, pero no debe reemplazar el título principal del shell.

@@ -22,7 +22,7 @@ export function AppShell({ children }: AppShellProps) {
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <img src="/logo.png" alt="CPA Centro de Preparación Académica" className={styles.brandLogo} />
+          <span className={styles.brandTitle}>CPA Plataforma</span>
           <span>Centro de Preparación Académica</span>
         </div>
         <nav className={styles.nav} aria-label="Navegación principal">
@@ -63,7 +63,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className={styles.mainArea}>
         <header className={styles.header}>
           <div className={styles.headerBrand}>
-            <img src="/logo.png" alt="CPA" className={styles.headerLogo} />
+            <span className={styles.headerTitleMark}>CPA</span>
             <div>
               <p>Plataforma interna</p>
               <h1>Gestión CPA</h1>
