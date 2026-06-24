@@ -5,7 +5,7 @@ import { FormField } from '@/shared/components/FormField';
 import type { CrudRecord, CrudResourceDefinition, SelectOption } from '../domain/CrudResource';
 import { accountMovementRelation } from '../domain/resourceFieldCatalog';
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
-import { listLookupOptions } from '../services/lookupApi';
+import { listAllLookupOptions } from '../services/lookupApi';
 import styles from './TransactionForm.module.css';
 
 interface TransactionFormProps {
@@ -186,11 +186,34 @@ function getOptionLabel(options: SelectOption[], value: string): string {
   return option?.label ?? value;
 }
 
+function normalizeSearchText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function filterAccountOptions(options: SelectOption[], query: string): SelectOption[] {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return options.slice(0, 80);
+
+  return options
+    .filter((option) => normalizeSearchText(`${option.label} ${String(option.value)}`).includes(normalizedQuery))
+    .slice(0, 80);
+}
+
+function getSelectedAccountLabel(options: SelectOption[], value: string): string {
+  if (!value) return '';
+  return getOptionLabel(options, value);
+}
+
 export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel }: TransactionFormProps) {
   const headerViewModel = useResourceFormViewModel(resource, record);
   const [movements, setMovements] = useState<MovementDraft[]>(() => getRecordMovements(record));
   const [movementDraft, setMovementDraft] = useState<MovementDraft>(emptyMovement);
   const [accountOptions, setAccountOptions] = useState<SelectOption[]>([]);
+  const [accountSearch, setAccountSearch] = useState('');
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -211,7 +234,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     if (!accountMovementRelation) return undefined;
 
     setIsLoadingAccounts(true);
-    listLookupOptions(accountMovementRelation)
+    listAllLookupOptions(accountMovementRelation)
       .then((options) => {
         if (isMounted) setAccountOptions(options);
       })
@@ -226,6 +249,12 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
       isMounted = false;
     };
   }, []);
+
+  const filteredAccountOptions = useMemo(() => filterAccountOptions(accountOptions, accountSearch), [accountOptions, accountSearch]);
+  const selectedAccountLabel = useMemo(
+    () => getSelectedAccountLabel(accountOptions, movementDraft.cuentaId),
+    [accountOptions, movementDraft.cuentaId],
+  );
 
   const totals = useMemo(() => {
     const debe = movements.filter((movement) => movement.tipoMovimiento === 'DEBE').reduce((sum, movement) => sum + toMoney(movement.monto), 0);
@@ -259,6 +288,11 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     setMovementDraft((current) => ({ ...current, [name]: value }));
   }
 
+  function selectAccount(accountId: string) {
+    setMovementField('cuentaId', accountId);
+    setAccountSearch('');
+  }
+
   function addMovement() {
     if (!movementDraft.cuentaId.trim() || !Number.isFinite(Number(movementDraft.cuentaId)) || Number(movementDraft.cuentaId) <= 0) {
       setError('Debes seleccionar una cuenta válida.');
@@ -272,6 +306,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
     setMovements((current) => [...current, movementDraft]);
     setMovementDraft(emptyMovement);
+    setAccountSearch('');
     setError(null);
   }
 
@@ -385,18 +420,30 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
         </div>
 
         <div className={styles.movementGrid}>
-          <label>
+          <label className={styles.accountPicker}>
             <span>Cuenta</span>
+            <input
+              value={accountSearch}
+              disabled={isLoadingAccounts}
+              onChange={(event) => setAccountSearch(event.target.value)}
+              placeholder={isLoadingAccounts ? 'Cargando cuentas...' : 'Buscar por código o nombre de cuenta'}
+            />
             <select
               value={movementDraft.cuentaId}
               disabled={isLoadingAccounts}
-              onChange={(event) => setMovementField('cuentaId', event.target.value)}
+              size={Math.min(Math.max(filteredAccountOptions.length, 2), 6)}
+              onChange={(event) => selectAccount(event.target.value)}
             >
-              <option value="">{isLoadingAccounts ? 'Cargando cuentas...' : 'Seleccionar cuenta'}</option>
-              {accountOptions.map((option) => (
+              <option value="">Seleccionar cuenta</option>
+              {filteredAccountOptions.map((option) => (
                 <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
               ))}
             </select>
+            <small>
+              {selectedAccountLabel
+                ? `Seleccionada: ${selectedAccountLabel}`
+                : `${filteredAccountOptions.length} de ${accountOptions.length} cuentas disponibles`}
+            </small>
           </label>
           <label>
             <span>Tipo</span>

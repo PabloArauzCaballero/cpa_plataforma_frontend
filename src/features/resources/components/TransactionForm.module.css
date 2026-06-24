@@ -285,3 +285,26 @@
   font-weight: 700;
   line-height: 1.45;
 }
+
+.accountPicker {
+  align-self: stretch;
+}
+
+.accountPicker input {
+  margin-bottom: 0.45rem;
+}
+
+.accountPicker select {
+  min-height: 8.25rem;
+  padding: 0.45rem 0.65rem;
+}
+
+.accountPicker option {
+  padding: 0.45rem 0.5rem;
+}
+
+.accountPicker small {
+  color: var(--color-accent);
+  font-weight: 800;
+  line-height: 1.35;
+}

@@ -979,3 +979,13 @@ Los campos ocultos no deben enviarse en el payload. Si el usuario cambia `tipo_t
 ## Regla obligatoria adicional: perfil conectado al backend
 
 La pantalla de perfil no debe usar mockups ni construir datos desde `localStorage` salvo para mantener la sesión. Debe consumir el endpoint documentado de sesión actual (`privateAuth/me`) mediante un servicio/hook real. Si no existe endpoint documentado para actualizar perfil, la vista debe ser de solo lectura y mostrar un mensaje funcional; no se debe simular guardado local ni inventar actividad, permisos, preferencias o roles.
+
+## Regla adicional v17 - Cuentas contables buscables en Transacción
+
+En el formulario de `contabilidad.transaccion`, el campo `id_cuenta` de los movimientos contables no debe implementarse como un select simple limitado a la primera página. Debe:
+
+1. Cargar las cuentas por GET usando paginación hasta cubrir el catálogo disponible.
+2. Mostrar un cuadro de búsqueda por código o nombre de cuenta.
+3. Permitir seleccionar una cuenta exacta desde una lista filtrada.
+4. Mantener el payload técnico correcto: `id_cuenta` numérico, `debe` y `haber`.
+5. No exponer rutas ni detalles técnicos al usuario.
