@@ -1060,3 +1060,20 @@ Si el usuario intenta exportar sin búsqueda global y sin filtros activos, el si
 - Las vistas relacionadas a aula o clase por hora deben ordenarse visualmente por hora y mostrar color por bloque horario.
 - Cada tabla debe tener un botón de ayuda interactiva con flujos operativos reales.
 - No se deben inventar tablas o endpoints. Para ventas con varios productos/servicios, el detalle de venta debe manejarse aparte cuando el backend lo exponga/documente.
+
+## Regla v25 - Ayuda operativa por tabla real
+
+La ayuda no debe ser genérica. Al abrir Ayuda desde una tabla, el modal debe explicar la tabla actual: cómo registrarla, qué dependencias revisar antes, qué campos clave completar y cómo esa tabla se usa después en transacciones contables u operaciones relacionadas.
+
+El modal de ayuda debe ser visualmente estable: contenido con padding interno, scroll interno, pestañas legibles, sin desbordes horizontales y compatible con pantallas pequeñas.
+
+La ayuda debe distinguir casos como:
+
+- Bien, lote, instancia y movimiento de inventario: relación con transacción tipo BIEN.
+- Deuda y pago de deuda: relación con transacción tipo DEUDA.
+- Pago tutor y detalle: relación con transacción tipo COSTO.
+- Producto educativo y bienes vendibles: relación con transacción tipo VENTA.
+- Cuentas, grupos, asignaciones, centros de costo y conceptos: estructura previa para movimientos contables.
+- Archivos transacción: carga posterior de comprobante a Cloudinary para una transacción existente.
+
+No se debe inventar venta detalle si el backend no tiene endpoint documentado. La ayuda debe explicar que el detalle de venta debe quedar separado cuando el backend lo exponga.

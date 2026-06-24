@@ -1,20 +1,71 @@
-.guide {
+.guideBody {
   display: grid;
   gap: var(--space-4);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  max-height: calc(92vh - 7.5rem);
+  overflow-y: auto;
+  overflow-x: hidden;
   color: var(--color-primary);
 }
 
-.intro {
+.guideBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.guideBody::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary) 26%, transparent);
+  border-radius: 999px;
+}
+
+.summaryCard {
+  display: grid;
+  gap: 0.35rem;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 26%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(32, 160, 197, 0.08), rgba(255, 255, 255, 0.95));
+}
+
+.summaryCard span {
+  color: var(--color-secondary-dark);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+}
+
+.summaryCard h3,
+.summaryCard p {
   margin: 0;
+}
+
+.summaryCard h3 {
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  color: var(--color-primary);
+}
+
+.summaryCard p {
   color: var(--color-accent);
   line-height: 1.55;
-  font-weight: 700;
+  font-weight: 650;
+}
+
+.summaryCard strong {
+  color: var(--color-primary);
+  font-weight: 900;
 }
 
 .tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  padding: var(--space-2) 0;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--color-neutral-light);
+  backdrop-filter: blur(8px);
 }
 
 .tabs button {
@@ -23,21 +74,31 @@
   background: var(--color-white);
   color: var(--color-primary);
   font-weight: 900;
-  padding: 0.62rem 0.9rem;
+  padding: 0.62rem 0.95rem;
   cursor: pointer;
+  min-height: 2.65rem;
+}
+
+.tabs button:hover {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-dark);
 }
 
 .tabs button[aria-pressed='true'] {
   background: var(--color-primary);
   color: var(--color-white);
   border-color: var(--color-primary);
+  box-shadow: 0 10px 24px rgba(0, 43, 101, 0.18);
 }
 
 .panel {
+  display: grid;
+  gap: var(--space-3);
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: clamp(1rem, 2vw, 1.35rem);
   background: var(--color-surface-soft);
+  min-width: 0;
 }
 
 .panel h3,
@@ -46,8 +107,8 @@
 }
 
 .panel h3 {
-  font-size: 1.25rem;
-  margin-bottom: var(--space-2);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  color: var(--color-primary);
 }
 
 .panel p {
@@ -60,7 +121,7 @@
   counter-reset: guide-step;
   display: grid;
   gap: var(--space-3);
-  margin: var(--space-4) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -68,19 +129,20 @@
 .steps li {
   counter-increment: guide-step;
   display: grid;
-  grid-template-columns: 2.2rem 1fr;
+  grid-template-columns: 2.35rem minmax(0, 1fr);
   gap: var(--space-3);
   align-items: start;
   background: var(--color-white);
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   padding: var(--space-3);
+  min-width: 0;
 }
 
 .steps li::before {
   content: counter(guide-step);
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.35rem;
+  height: 2.35rem;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -89,12 +151,69 @@
   font-weight: 900;
 }
 
-.note {
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  border-left: 4px solid var(--color-secondary);
-  background: var(--color-white);
-  border-radius: var(--radius-sm);
+.steps li strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.steps li span {
+  display: block;
   color: var(--color-accent);
-  font-weight: 800;
+  line-height: 1.5;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-3);
+}
+
+.fieldCard {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.fieldCard strong {
+  color: var(--color-primary);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.fieldCard span {
+  color: var(--color-accent);
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+@media (max-width: 780px) {
+  .guideBody {
+    padding: var(--space-3);
+    max-height: calc(100vh - 8rem);
+  }
+
+  .tabs {
+    position: static;
+  }
+
+  .tabs button {
+    width: 100%;
+  }
+
+  .steps li {
+    grid-template-columns: 1fr;
+  }
+
+  .steps li::before {
+    width: 2rem;
+    height: 2rem;
+  }
 }
