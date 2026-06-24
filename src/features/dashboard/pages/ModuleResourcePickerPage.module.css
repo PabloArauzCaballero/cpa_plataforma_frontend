@@ -1,0 +1,269 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 90% 15%, rgba(32, 160, 197, 0.22), transparent 34%),
+    linear-gradient(135deg, var(--color-primary), var(--color-primary-soft));
+  color: var(--color-white);
+  overflow: hidden;
+  box-shadow: 0 18px 42px rgba(0, 37, 95, 0.18);
+}
+
+.heroIcon {
+  width: clamp(4rem, 7vw, 5.5rem);
+  height: clamp(4rem, 7vw, 5.5rem);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+}
+
+.heroCopy {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 58rem;
+}
+
+.heroCopy span {
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-brand);
+  color: color-mix(in srgb, var(--color-secondary) 64%, var(--color-white));
+}
+
+.heroCopy h2,
+.heroCopy p {
+  margin: 0;
+}
+
+.heroCopy h2 {
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  letter-spacing: -0.035em;
+}
+
+.heroCopy p {
+  max-width: 52rem;
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.65;
+}
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid color-mix(in srgb, var(--color-neutral-light) 88%, var(--color-secondary));
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: 0 10px 26px rgba(0, 37, 95, 0.07);
+}
+
+.toolbar div {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.toolbar span {
+  color: var(--color-secondary-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-brand);
+}
+
+.toolbar h3,
+.toolbar p {
+  margin: 0;
+}
+
+.toolbar h3 {
+  color: var(--color-primary);
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+}
+
+.toolbar p {
+  color: var(--color-accent);
+  line-height: 1.55;
+}
+
+.searchBox {
+  min-width: min(100%, 22rem);
+  display: grid;
+  gap: 0.45rem;
+  color: var(--color-primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: 0.82rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--color-neutral-muted) 42%, var(--color-neutral-light));
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  color: var(--color-primary);
+  font: inherit;
+  outline: none;
+}
+
+.searchBox input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 4px rgba(32, 160, 197, 0.14);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: clamp(1rem, 1.7vw, 1.35rem);
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-4);
+  min-height: 15rem;
+  padding: clamp(1rem, 2vw, 1.25rem);
+  border: 1px solid color-mix(in srgb, var(--color-neutral-light) 88%, var(--color-secondary));
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: 0 10px 28px rgba(0, 37, 95, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--color-secondary) 42%, var(--color-neutral-light));
+  box-shadow: 0 18px 38px rgba(0, 37, 95, 0.13);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardHeader div {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.cardHeader span {
+  max-width: 100%;
+  color: var(--color-secondary-dark);
+  font-size: 0.72rem;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardHeader h4 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+}
+
+.cardHeader i {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--color-secondary) 13%, var(--color-white));
+  color: var(--color-secondary-dark);
+}
+
+.cardBody {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.cardBody p {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chips span {
+  padding: 0.36rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-surface-soft);
+  color: var(--color-accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  font-weight: 900;
+}
+
+.primaryAction {
+  padding: 0.82rem 0.95rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.primaryAction:hover {
+  background: var(--color-primary-dark);
+}
+
+.secondaryAction {
+  padding: 0.78rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 32%, var(--color-neutral-light));
+  color: var(--color-secondary-dark);
+  background: var(--color-white);
+}
+
+.secondaryAction:hover {
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
+}
+
+@media (max-width: 720px) {
+  .hero,
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cardActions {
+    grid-template-columns: 1fr;
+  }
+}

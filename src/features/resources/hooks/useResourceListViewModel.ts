@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter } from '../domain/CrudResource';
-import { createResource, listResource, updateResource } from '../services/resourceApi';
+import { createResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
+import { exportRecords } from '../utils/exportRecords';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
@@ -105,10 +106,14 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [search, setSearchState] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFilters] = useState<Record<string, string | number | boolean>>({});
   const [editingRecord, setEditingRecord] = useState<CrudRecord | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const availableFilters = useMemo(() => buildFilters(resource), [resource]);
 
@@ -118,9 +123,18 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     offset: (page - 1) * pageSize,
     orderBy,
     orderDir,
-    search,
+    search: debouncedSearch,
     filters,
-  }), [page, pageSize, orderBy, orderDir, search, filters]);
+  }), [page, pageSize, orderBy, orderDir, debouncedSearch, filters]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(1);
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchInput]);
 
   const load = useCallback(async () => {
     try {
@@ -145,14 +159,15 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     setOrderBy(resource.primaryKey);
     setOrderDir('ASC');
     setFilters({});
-    setSearchState('');
+    setSearchInput('');
+    setDebouncedSearch('');
   }, [resource.key, resource.module, resource.primaryKey]);
 
   const visibleRecords = useMemo(() => {
     // Filtro cliente como respaldo cuando el backend ignora q. Los filtros por campo
     // se envían siempre como query params al backend.
-    return records.filter((record) => includesSearch(record, search));
-  }, [records, search]);
+    return records.filter((record) => includesSearch(record, debouncedSearch));
+  }, [records, debouncedSearch]);
 
   const columns = useMemo(() => {
     const priority = [resource.primaryKey, 'id', 'codigo', 'nombre', 'nombre_cuenta', 'concepto', 'fecha', 'estado', 'estado_registro', 'activo'];
@@ -171,8 +186,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const hasNextPage = page < totalPages;
 
   function setSearch(value: string) {
-    setSearchState(value);
-    setPage(1);
+    setSearchInput(value);
   }
 
   function setFilterValue(name: string, value: string) {
@@ -188,7 +202,8 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
 
   function clearFilters() {
     setFilters({});
-    setSearchState('');
+    setSearchInput('');
+    setDebouncedSearch('');
     setPage(1);
   }
 
@@ -258,11 +273,59 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     }
   }
 
+
+  function openExportModal() {
+    setExportError(null);
+    setIsExportModalOpen(true);
+  }
+
+  function closeExportModal() {
+    if (!isExporting) setIsExportModalOpen(false);
+  }
+
+  async function exportWithQuery(options: {
+    format: 'csv' | 'excel' | 'json';
+    search: string;
+    filters: Record<string, string | number | boolean>;
+  }) {
+    try {
+      setIsExporting(true);
+      setExportError(null);
+      const exportQuery: ResourceListQuery = {
+        page: 1,
+        limit: pageSize,
+        offset: 0,
+        orderBy,
+        orderDir,
+        search: options.search,
+        filters: options.filters,
+      };
+      const result = await listAllResource(resource, exportQuery);
+      if (result.records.length === 0) {
+        setExportError('No hay registros para exportar con la consulta seleccionada.');
+        return;
+      }
+      exportRecords({
+        records: result.records,
+        preferredColumns: columns,
+        resourceLabel: resource.label,
+        format: options.format,
+      });
+      setMessage(`Exportación generada con ${result.records.length} registro(s).`);
+      setIsExportModalOpen(false);
+    } catch (currentError) {
+      setExportError(currentError instanceof Error ? currentError.message : 'No se pudo exportar la consulta.');
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return {
     records,
     visibleRecords,
     columns,
-    search,
+    search: searchInput,
+    debouncedSearch,
     filters,
     availableFilters,
     totalRecords,
@@ -280,10 +343,16 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     message,
     editingRecord,
     isFormOpen,
+    isExportModalOpen,
+    isExporting,
+    exportError,
     canDisableRecord: canDisable,
     setSearch,
     setFilterValue,
     clearFilters,
+    openExportModal,
+    closeExportModal,
+    exportWithQuery,
     setPage,
     changePageSize,
     setOrderBy,

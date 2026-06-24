@@ -1036,3 +1036,13 @@ El frontend debe normalizar respuestas como:
   }
 }
 ```
+
+## Regla obligatoria de búsqueda y exportación de tablas
+
+En todas las tablas administrativas el buscador global no debe ejecutar la consulta en cada tecla. Debe usar debounce mínimo de 400 ms y recomendado de 500 ms para no dificultar la escritura.
+
+Toda tabla debe incluir una opción de exportación mediante modal de consulta. Ese modal debe permitir seleccionar formato CSV, Excel o JSON y debe permitir configurar búsqueda global y filtros por campos propios del recurso. La exportación debe respetar esos filtros y no limitarse únicamente a los registros visibles en la página actual. Si el backend pagina, el frontend debe consultar las páginas necesarias hasta traer los registros correspondientes a la consulta o hasta un límite seguro.
+
+## Regla de navegación v20
+
+Cuando el usuario seleccione un módulo desde el inicio, el frontend NO debe redirigir automáticamente a la primera tabla del módulo. Debe abrir un tablero intermedio en `/modulos/:module` donde el usuario pueda elegir la tabla o recurso correspondiente. Solo después de elegir una tabla debe abrirse `/modulos/:module/:resource`.

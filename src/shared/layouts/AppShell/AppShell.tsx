@@ -45,6 +45,10 @@ export function AppShell({ children }: AppShellProps) {
                   </span>
                 </summary>
                 <div className={styles.moduleLinks}>
+                  <NavLink to={`/modulos/${module.key}`} end className={styles.moduleBoardLink}>
+                    <i className="fa-solid fa-table-cells-large" aria-hidden="true" />
+                    Tablero del módulo
+                  </NavLink>
                   {module.resources.map((resource) => (
                     <NavLink to={`/modulos/${module.key}/${resource.key}`} key={resource.key}>
                       {resource.label}

@@ -1,0 +1,63 @@
+.form {
+  display: grid;
+  gap: var(--space-4);
+  color: var(--color-primary);
+}
+
+.help {
+  margin: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-weight: 800;
+}
+
+.field span {
+  font-size: 0.85rem;
+  color: var(--color-accent);
+}
+
+.field input,
+.field select {
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  padding: 0.78rem 0.9rem;
+  color: var(--color-primary);
+  background: var(--color-white);
+  outline: none;
+  min-height: 2.85rem;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--color-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.error {
+  margin: 0;
+  color: #8a1f11;
+  background: #fff4f1;
+  border: 1px solid #f6c8bf;
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-weight: 700;
+}

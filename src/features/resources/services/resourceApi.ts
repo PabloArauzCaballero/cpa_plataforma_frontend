@@ -34,6 +34,36 @@ export async function listResource(resource: CrudResourceDefinition, query: Reso
   return normalizeListResult(response, query.limit, query.offset);
 }
 
+export async function listAllResource(resource: CrudResourceDefinition, query: ResourceListQuery, maxRows = 10000): Promise<ResourceListResult> {
+  const pageSize = 500;
+  let offset = 0;
+  let count = 0;
+  const records: CrudRecord[] = [];
+
+  do {
+    const response = await listResource(resource, {
+      ...query,
+      page: Math.floor(offset / pageSize) + 1,
+      limit: pageSize,
+      offset,
+    });
+
+    records.push(...response.records);
+    count = response.count;
+
+    if (response.records.length === 0) break;
+    offset += pageSize;
+  } while (records.length < count && records.length < maxRows);
+
+  return {
+    records: records.slice(0, maxRows),
+    count,
+    limit: pageSize,
+    offset: 0,
+    page: 1,
+  };
+}
+
 export async function createResource(resource: CrudResourceDefinition, payload: CrudRecord): Promise<CrudRecord> {
   const response = await httpClient.post<unknown, CrudRecord>(resource.endpoints.create, payload);
   return normalizeRecordResponse(response);

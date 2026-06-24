@@ -3,6 +3,7 @@ import { DataTable } from '@/shared/components/DataTable';
 import { Modal } from '@/shared/components/Modal';
 import { PageState } from '@/shared/components/PageState';
 import { SearchFilterBar } from '@/shared/components/SearchFilterBar';
+import { ResourceExportModal } from '../components/ResourceExportModal';
 import { ResourceForm } from '../components/ResourceForm';
 import { ResourceHeader } from '../components/ResourceHeader';
 import { TransactionForm } from '../components/TransactionForm';
@@ -25,7 +26,7 @@ export function ResourceListPage() {
 function ResourceListContent({ resource }: { resource: CrudResourceDefinition }) {
   const viewModel = useResourceListViewModel(resource);
 
-  if (viewModel.isLoading) {
+  if (viewModel.isLoading && viewModel.records.length === 0) {
     return <PageState title="Cargando registros" message={`Preparando información de ${resource.label}.`} />;
   }
 
@@ -42,8 +43,11 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
         onClearFilters={viewModel.clearFilters}
         onCreate={viewModel.openCreate}
         onReload={() => void viewModel.load()}
+        onExportOpen={viewModel.openExportModal}
+        isSearchPending={viewModel.search !== viewModel.debouncedSearch}
       />
 
+      {viewModel.isLoading && viewModel.records.length > 0 ? <p className={styles.message}>Actualizando resultados...</p> : null}
       {viewModel.message ? <p className={styles.message}>{viewModel.message}</p> : null}
       {viewModel.error ? <PageState title="No se pudo completar la operación" message={viewModel.error} actionLabel="Reintentar" onAction={() => void viewModel.load()} /> : null}
 
@@ -80,6 +84,18 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
           </div>
         </>
       ) : null}
+
+      <ResourceExportModal
+        title={`Exportar ${resource.label}`}
+        isOpen={viewModel.isExportModalOpen}
+        filterFields={viewModel.availableFilters}
+        initialSearch={viewModel.debouncedSearch}
+        initialFilters={viewModel.filters}
+        isExporting={viewModel.isExporting}
+        error={viewModel.exportError}
+        onClose={viewModel.closeExportModal}
+        onExport={viewModel.exportWithQuery}
+      />
 
       <Modal
         title={viewModel.editingRecord ? `Editar ${resource.label}` : `Crear ${resource.label}`}

@@ -9,14 +9,12 @@ export function ModuleSummary() {
       <div className={styles.sectionHeader}>
         <span>Módulos disponibles</span>
         <h3>Elige el área que quieres gestionar</h3>
-        <p>Cada opción abre su primer recurso operativo y mantiene navegación lateral para cambiar de pantalla.</p>
+        <p>Cada opción abre un tablero propio para elegir la tabla exacta antes de cargar registros.</p>
       </div>
 
       <div className={styles.grid}>
         {resourceModules.map((module) => {
           const meta = getModuleVisualMeta(module.key);
-          const firstResource = module.resources[0];
-
           return (
             <section className={styles.card} key={module.key}>
               <div className={styles.cardTop}>
@@ -31,8 +29,8 @@ export function ModuleSummary() {
                 <p>{meta.description}</p>
               </div>
 
-              <Link to={`/modulos/${module.key}/${firstResource?.key}`} className={styles.cardLink}>
-                Abrir módulo
+              <Link to={`/modulos/${module.key}`} className={styles.cardLink}>
+                Ver tablas
                 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
               </Link>
             </section>

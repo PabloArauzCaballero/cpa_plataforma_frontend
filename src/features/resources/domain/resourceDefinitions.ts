@@ -429,6 +429,10 @@ export const resourceModules = Object.values(
   }, {}),
 );
 
+export function findResourceModule(module: string | undefined) {
+  return resourceModules.find((item) => item.key === module);
+}
+
 export function findResourceDefinition(module: string | undefined, resource: string | undefined): CrudResourceDefinition | undefined {
   return resourceDefinitions.find((item) => item.module === module && item.key === resource);
 }

@@ -11,6 +11,8 @@ interface SearchFilterBarProps {
   onClearFilters: () => void;
   onCreate: () => void;
   onReload: () => void;
+  onExportOpen: () => void;
+  isSearchPending?: boolean;
 }
 
 function normalizeOption(option: string | { value: string | number; label: string }) {
@@ -67,6 +69,8 @@ export function SearchFilterBar({
   onClearFilters,
   onCreate,
   onReload,
+  onExportOpen,
+  isSearchPending = false,
 }: SearchFilterBarProps) {
   return (
     <div className={styles.bar}>
@@ -74,10 +78,12 @@ export function SearchFilterBar({
         <label className={styles.searchBox}>
           <span>Buscar</span>
           <input value={search} placeholder="Buscar por cualquier campo" onChange={(event) => onSearchChange(event.target.value)} />
+          {isSearchPending ? <small>Buscando cuando termines de escribir...</small> : null}
         </label>
         <div className={styles.actions}>
           <Button type="button" variant="secondary" onClick={onReload}>Actualizar</Button>
           <Button type="button" variant="secondary" onClick={onClearFilters}>Limpiar filtros</Button>
+          <Button type="button" variant="secondary" onClick={onExportOpen}>Exportar</Button>
           <Button type="button" onClick={onCreate}>Crear registro</Button>
         </div>
       </div>

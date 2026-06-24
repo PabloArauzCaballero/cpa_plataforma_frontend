@@ -24,9 +24,15 @@
 }
 
 .bar span,
+.searchBox small,
 .filtersPanel summary {
   font-size: 0.85rem;
   color: var(--color-accent);
+}
+
+.searchBox small {
+  font-weight: 700;
+  color: var(--color-secondary);
 }
 
 .filtersPanel {
