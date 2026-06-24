@@ -31,14 +31,15 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
 
   return (
     <section className={styles.page}>
-      <ResourceHeader resource={resource} total={viewModel.records.length} visible={viewModel.visibleRecords.length} />
+      <ResourceHeader resource={resource} total={viewModel.totalRecords} visible={viewModel.visibleRecords.length} />
 
       <SearchFilterBar
         search={viewModel.search}
-        status={viewModel.status}
-        statusOptions={viewModel.statusOptions}
+        filters={viewModel.filters}
+        filterFields={viewModel.availableFilters}
         onSearchChange={viewModel.setSearch}
-        onStatusChange={viewModel.setStatus}
+        onFilterChange={viewModel.setFilterValue}
+        onClearFilters={viewModel.clearFilters}
         onCreate={viewModel.openCreate}
         onReload={() => void viewModel.load()}
       />
@@ -51,14 +52,33 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       ) : null}
 
       {!viewModel.error && viewModel.visibleRecords.length > 0 ? (
-        <DataTable
-          records={viewModel.visibleRecords}
-          columns={viewModel.columns}
-          primaryKey={resource.primaryKey}
-          onEdit={viewModel.openEdit}
-          canDisable={viewModel.canDisableRecord}
-          onDisable={(record) => void viewModel.disable(record)}
-        />
+        <>
+          <DataTable
+            records={viewModel.visibleRecords}
+            columns={viewModel.columns}
+            primaryKey={resource.primaryKey}
+            onEdit={viewModel.openEdit}
+            canDisable={viewModel.canDisableRecord}
+            onDisable={(record) => void viewModel.disable(record)}
+          />
+          <div className={styles.pagination}>
+            <div>
+              Página <strong>{viewModel.page}</strong> de <strong>{viewModel.totalPages}</strong> · {viewModel.totalRecords} registros
+            </div>
+            <label>
+              Filas por página
+              <select value={viewModel.pageSize} onChange={(event) => viewModel.changePageSize(Number(event.target.value))}>
+                {viewModel.pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </label>
+            <div className={styles.paginationActions}>
+              <button type="button" onClick={viewModel.goToPreviousPage} disabled={!viewModel.hasPreviousPage}>Anterior</button>
+              <button type="button" onClick={viewModel.goToNextPage} disabled={!viewModel.hasNextPage}>Siguiente</button>
+            </div>
+          </div>
+        </>
       ) : null}
 
       <Modal

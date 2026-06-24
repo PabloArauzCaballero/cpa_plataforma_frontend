@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter } from '../domain/CrudResource';
 import { createResource, listResource, updateResource } from '../services/resourceApi';
 
-function detectStatus(record: CrudRecord): string {
-  const statusKeys = Object.keys(record).filter((key) => key.toLowerCase().includes('estado') || key.toLowerCase() === 'activo');
-  const key = statusKeys[0];
-  return key ? String(record[key]) : '';
-}
+const DEFAULT_PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 function includesSearch(record: CrudRecord, search: string): boolean {
   if (!search.trim()) return true;
@@ -41,44 +38,124 @@ function buildDisablePayload(record: CrudRecord): CrudRecord {
   return stateKey ? { [stateKey]: 'INACTIVO' } : {};
 }
 
+function formatLabel(value: string): string {
+  return value
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function mapFilterType(fieldType: string): ResourceTableFilter['type'] {
+  if (fieldType === 'checkbox') return 'boolean';
+  if (fieldType === 'select') return 'select';
+  if (fieldType === 'number') return 'number';
+  if (fieldType === 'date') return 'date';
+  if (fieldType === 'time') return 'time';
+  if (fieldType === 'datetime-local') return 'datetime-local';
+  return 'text';
+}
+
+function shouldShowFilter(name: string): boolean {
+  const lower = name.toLowerCase();
+  if (lower.includes('contrasena')) return false;
+  if (lower.includes('password')) return false;
+  if (lower.includes('hash')) return false;
+  if (lower.includes('token')) return false;
+  return true;
+}
+
+function buildFilters(resource: CrudResourceDefinition): ResourceTableFilter[] {
+  const baseFilters = resource.fields
+    .filter((field) => shouldShowFilter(field.name))
+    .map((field) => ({
+      name: field.name,
+      label: field.label || formatLabel(field.name),
+      type: mapFilterType(field.type),
+      options: field.options,
+    } satisfies ResourceTableFilter));
+
+  const existing = new Set(baseFilters.map((filter) => filter.name));
+  const statusFilters: ResourceTableFilter[] = [];
+  if (!existing.has('estado_registro')) {
+    statusFilters.push({
+      name: 'estado_registro',
+      label: 'Estado registro',
+      type: 'select',
+      options: ['Activo', 'Inactivo', 'Eliminado'],
+    });
+  }
+
+  return [...baseFilters, ...statusFilters];
+}
+
+function sanitizeFilterValue(value: string): string | number | boolean | '' {
+  if (value === '') return '';
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+}
+
 export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const [records, setRecords] = useState<CrudRecord[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [orderBy, setOrderBy] = useState(resource.primaryKey);
+  const [orderDir, setOrderDir] = useState<'ASC' | 'DESC'>('ASC');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
+  const [search, setSearchState] = useState('');
+  const [filters, setFilters] = useState<Record<string, string | number | boolean>>({});
   const [editingRecord, setEditingRecord] = useState<CrudRecord | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  async function load() {
+  const availableFilters = useMemo(() => buildFilters(resource), [resource]);
+
+  const query = useMemo<ResourceListQuery>(() => ({
+    page,
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+    orderBy,
+    orderDir,
+    search,
+    filters,
+  }), [page, pageSize, orderBy, orderDir, search, filters]);
+
+  const load = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await listResource(resource);
-      setRecords(data);
+      const data = await listResource(resource, query);
+      setRecords(data.records);
+      setTotalRecords(data.count);
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : `No se pudo cargar ${resource.label}.`);
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [query, resource]);
 
   useEffect(() => {
     void load();
-  }, [resource.key, resource.module]);
+  }, [load]);
 
-  const statusOptions = useMemo(() => {
-    return Array.from(new Set(records.map(detectStatus).filter(Boolean))).sort();
-  }, [records]);
+  useEffect(() => {
+    setPage(1);
+    setOrderBy(resource.primaryKey);
+    setOrderDir('ASC');
+    setFilters({});
+    setSearchState('');
+  }, [resource.key, resource.module, resource.primaryKey]);
 
   const visibleRecords = useMemo(() => {
-    return records.filter((record) => includesSearch(record, search) && (!status || detectStatus(record) === status));
-  }, [records, search, status]);
+    // Filtro cliente como respaldo cuando el backend ignora q. Los filtros por campo
+    // se envían siempre como query params al backend.
+    return records.filter((record) => includesSearch(record, search));
+  }, [records, search]);
 
   const columns = useMemo(() => {
-    const priority = [resource.primaryKey, 'id', 'nombre', 'codigo', 'concepto', 'fecha', 'estado', 'activo'];
+    const priority = [resource.primaryKey, 'id', 'codigo', 'nombre', 'nombre_cuenta', 'concepto', 'fecha', 'estado', 'estado_registro', 'activo'];
     const keys = Array.from(new Set(records.slice(0, 8).flatMap((record) => Object.keys(record))));
     return keys
       .sort((a, b) => {
@@ -86,8 +163,47 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
         const bi = priority.indexOf(b);
         return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
       })
-      .slice(0, 8);
+      .slice(0, 10);
   }, [records, resource.primaryKey]);
+
+  const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+  const hasPreviousPage = page > 1;
+  const hasNextPage = page < totalPages;
+
+  function setSearch(value: string) {
+    setSearchState(value);
+    setPage(1);
+  }
+
+  function setFilterValue(name: string, value: string) {
+    setFilters((current) => {
+      const next = { ...current };
+      const cleanValue = sanitizeFilterValue(value);
+      if (cleanValue === '') delete next[name];
+      else next[name] = cleanValue;
+      return next;
+    });
+    setPage(1);
+  }
+
+  function clearFilters() {
+    setFilters({});
+    setSearchState('');
+    setPage(1);
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value);
+    setPage(1);
+  }
+
+  function goToPreviousPage() {
+    setPage((current) => Math.max(1, current - 1));
+  }
+
+  function goToNextPage() {
+    setPage((current) => Math.min(totalPages, current + 1));
+  }
 
   function openCreate() {
     setEditingRecord(null);
@@ -147,8 +263,17 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     visibleRecords,
     columns,
     search,
-    status,
-    statusOptions,
+    filters,
+    availableFilters,
+    totalRecords,
+    page,
+    pageSize,
+    pageSizeOptions: PAGE_SIZE_OPTIONS,
+    totalPages,
+    hasPreviousPage,
+    hasNextPage,
+    orderBy,
+    orderDir,
     isLoading,
     isSaving,
     error,
@@ -157,8 +282,15 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     isFormOpen,
     canDisableRecord: canDisable,
     setSearch,
-    setStatus,
+    setFilterValue,
+    clearFilters,
+    setPage,
+    changePageSize,
+    setOrderBy,
+    setOrderDir,
     setIsFormOpen,
+    goToPreviousPage,
+    goToNextPage,
     load,
     openCreate,
     openEdit,

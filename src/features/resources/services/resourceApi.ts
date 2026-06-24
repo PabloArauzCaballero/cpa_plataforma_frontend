@@ -5,12 +5,33 @@ import type {
   BatchValidationRow,
   CrudRecord,
   CrudResourceDefinition,
+  ResourceListQuery,
+  ResourceListResult,
 } from '../domain/CrudResource';
-import { normalizeListResponse, normalizeRecordResponse } from './resourceMapper';
+import { normalizeListResult, normalizeRecordResponse } from './resourceMapper';
 
-export async function listResource(resource: CrudResourceDefinition): Promise<CrudRecord[]> {
-  const response = await httpClient.get<unknown>(resource.endpoints.list);
-  return normalizeListResponse(response);
+function appendQuery(path: string, query: ResourceListQuery): string {
+  const params = new URLSearchParams();
+  params.set('page', String(query.page));
+  params.set('limit', String(query.limit));
+  params.set('offset', String(query.offset));
+  params.set('orderDir', query.orderDir);
+
+  if (query.orderBy) params.set('orderBy', query.orderBy);
+  if (query.search?.trim()) params.set('q', query.search.trim());
+
+  Object.entries(query.filters).forEach(([key, value]) => {
+    if (value === undefined || value === null || String(value).trim() === '') return;
+    params.set(key, String(value));
+  });
+
+  const separator = path.includes('?') ? '&' : '?';
+  return `${path}${separator}${params.toString()}`;
+}
+
+export async function listResource(resource: CrudResourceDefinition, query: ResourceListQuery): Promise<ResourceListResult> {
+  const response = await httpClient.get<unknown>(appendQuery(resource.endpoints.list, query));
+  return normalizeListResult(response, query.limit, query.offset);
 }
 
 export async function createResource(resource: CrudResourceDefinition, payload: CrudRecord): Promise<CrudRecord> {

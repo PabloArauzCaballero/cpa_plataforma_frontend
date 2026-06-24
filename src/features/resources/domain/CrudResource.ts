@@ -91,3 +91,30 @@ export interface BatchProcessResult {
 
 
 export type CrudRecord = Record<string, unknown>;
+
+
+export interface ResourceTableFilter {
+  name: string;
+  label: string;
+  type: 'text' | 'number' | 'date' | 'datetime-local' | 'time' | 'boolean' | 'select';
+  options?: Array<string | SelectOption>;
+}
+
+export interface ResourceListQuery {
+  page: number;
+  limit: number;
+  offset: number;
+  orderBy?: string;
+  orderDir: 'ASC' | 'DESC';
+  search?: string;
+  filters: Record<string, string | number | boolean>;
+}
+
+export interface ResourceListResult {
+  records: CrudRecord[];
+  count: number;
+  limit: number;
+  offset: number;
+  page: number;
+}
+

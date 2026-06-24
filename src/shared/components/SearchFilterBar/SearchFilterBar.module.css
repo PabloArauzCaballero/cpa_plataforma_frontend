@@ -1,8 +1,6 @@
 .bar {
   display: grid;
-  grid-template-columns: minmax(14rem, 1fr) minmax(12rem, 0.45fr) auto;
   gap: var(--space-4);
-  align-items: end;
   background: var(--color-white);
   color: var(--color-primary);
   border: 1px solid var(--color-neutral-light);
@@ -10,16 +8,42 @@
   padding: var(--space-4);
 }
 
-.bar label {
+.topRow {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) auto;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.searchBox,
+.filtersGrid label {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   font-weight: 700;
 }
 
-.bar span {
+.bar span,
+.filtersPanel summary {
   font-size: 0.85rem;
   color: var(--color-accent);
+}
+
+.filtersPanel {
+  border-top: 1px solid var(--color-neutral-light);
+  padding-top: var(--space-3);
+}
+
+.filtersPanel summary {
+  cursor: pointer;
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-3);
 }
 
 .bar input,
@@ -30,6 +54,7 @@
   color: var(--color-primary);
   background: var(--color-white);
   outline: none;
+  min-height: 2.85rem;
 }
 
 .bar input:focus,
@@ -41,10 +66,11 @@
   display: flex;
   gap: var(--space-3);
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 900px) {
-  .bar {
+  .topRow {
     grid-template-columns: 1fr;
   }
 

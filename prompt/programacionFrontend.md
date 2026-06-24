@@ -989,3 +989,50 @@ En el formulario de `contabilidad.transaccion`, el campo `id_cuenta` de los movi
 3. Permitir seleccionar una cuenta exacta desde una lista filtrada.
 4. Mantener el payload técnico correcto: `id_cuenta` numérico, `debe` y `haber`.
 5. No exponer rutas ni detalles técnicos al usuario.
+
+## Regla obligatoria de listados, paginación y filtros
+
+Todas las tablas CRUD deben implementar paginación real contra backend. No basta con cargar todos los registros y paginar en frontend.
+
+Cada listado debe enviar como mínimo:
+
+```txt
+page
+limit
+offset
+orderBy
+orderDir
+```
+
+Además, cuando exista búsqueda global, debe enviarse `q` si el backend lo soporta. Cuando el usuario filtre por campos específicos, cada filtro debe enviarse como query param con el nombre real de la columna/campo documentado.
+
+Cada tabla debe mostrar filtros dinámicos según los campos propios del recurso. Los campos `select`, enums y catálogos deben renderizar filtros tipo select; los booleanos deben renderizar filtros Sí/No; fechas y números deben usar inputs acordes al tipo.
+
+La UI debe mostrar:
+
+- total de registros devuelto por backend,
+- página actual,
+- total de páginas,
+- selector de filas por página,
+- botón anterior,
+- botón siguiente,
+- botón para limpiar búsqueda y filtros.
+
+El frontend debe normalizar respuestas como:
+
+```json
+{
+  "success": true,
+  "data": {
+    "rows": [],
+    "count": 0,
+    "limit": 20,
+    "offset": 0
+  },
+  "pagination": {
+    "count": 0,
+    "limit": 20,
+    "offset": 0
+  }
+}
+```
