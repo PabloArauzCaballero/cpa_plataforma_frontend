@@ -1,7 +1,9 @@
 .form {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-5);
   color: var(--color-primary);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
+  box-sizing: border-box;
 }
 
 .help {
@@ -9,12 +11,38 @@
   color: var(--color-accent);
   font-weight: 700;
   line-height: 1.5;
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 18%, var(--color-neutral-light));
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.grid,
+.filtersGrid {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.filtersGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-height: min(42vh, 360px);
+  overflow: auto;
+  padding: var(--space-1) var(--space-2) var(--space-1) 0;
+}
+
+.filtersGrid::-webkit-scrollbar {
+  width: 10px;
+}
+
+.filtersGrid::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary) 26%, transparent);
+  border-radius: 999px;
+  border: 3px solid var(--color-white);
 }
 
 .field {
@@ -22,15 +50,22 @@
   flex-direction: column;
   gap: var(--space-2);
   font-weight: 800;
+  min-width: 0;
 }
 
 .field span {
   font-size: 0.85rem;
   color: var(--color-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .field input,
 .field select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   padding: 0.78rem 0.9rem;
@@ -38,18 +73,24 @@
   background: var(--color-white);
   outline: none;
   min-height: 2.85rem;
+  font: inherit;
 }
 
 .field input:focus,
 .field select:focus {
   border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 18%, transparent);
 }
 
 .actions {
+  position: sticky;
+  bottom: 0;
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
   flex-wrap: wrap;
+  padding-top: var(--space-4);
+  background: linear-gradient(180deg, transparent 0%, var(--color-white) 28%, var(--color-white) 100%);
 }
 
 .error {
@@ -60,4 +101,35 @@
   border-radius: var(--radius-md);
   padding: var(--space-3);
   font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .grid,
+  .filtersGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .form {
+    padding: var(--space-4);
+  }
+
+  .grid,
+  .filtersGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtersGrid {
+    max-height: 48vh;
+    padding-right: 0;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
 }

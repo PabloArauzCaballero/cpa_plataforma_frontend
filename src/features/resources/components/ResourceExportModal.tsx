@@ -140,7 +140,7 @@ export function ResourceExportModal({
           </label>
         </div>
 
-        <div className={styles.grid}>
+        <div className={styles.filtersGrid}>
           {filterFields.map((filter) => (
             <label key={filter.name} className={styles.field}>
               <span>{filter.label}</span>
