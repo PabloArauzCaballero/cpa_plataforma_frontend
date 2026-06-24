@@ -1046,3 +1046,17 @@ Toda tabla debe incluir una opción de exportación mediante modal de consulta. 
 ## Regla de navegación v20
 
 Cuando el usuario seleccione un módulo desde el inicio, el frontend NO debe redirigir automáticamente a la primera tabla del módulo. Debe abrir un tablero intermedio en `/modulos/:module` donde el usuario pueda elegir la tabla o recurso correspondiente. Solo después de elegir una tabla debe abrirse `/modulos/:module/:resource`.
+
+## Regla v23 - Exportación completa y confirmación sin filtros
+
+Cuando se exporten registros desde una tabla, el frontend debe traer todas las páginas reales del backend hasta completar el total informado por la respuesta. No debe asumir que el backend respeta exactamente el `limit` solicitado; debe avanzar el `offset` con la cantidad real recibida.
+
+Si el usuario intenta exportar sin búsqueda global y sin filtros activos, el sistema debe mostrar una confirmación previa indicando que se descargarán todos los registros de la tabla. La descarga solo debe ejecutarse si el usuario confirma explícitamente.
+
+## Regla v24 - Presentación humana, ayuda y aula visual
+
+- La interfaz no debe mostrar nombres de campos en `snake_case`; siempre debe convertirlos a texto natural.
+- El footer debe mostrar `CPA Plataforma · Versión 1.1.23` y `Todos los derechos reservados 2026`.
+- Las vistas relacionadas a aula o clase por hora deben ordenarse visualmente por hora y mostrar color por bloque horario.
+- Cada tabla debe tener un botón de ayuda interactiva con flujos operativos reales.
+- No se deben inventar tablas o endpoints. Para ventas con varios productos/servicios, el detalle de venta debe manejarse aparte cuando el backend lo exponga/documente.

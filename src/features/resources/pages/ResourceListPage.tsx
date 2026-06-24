@@ -1,16 +1,59 @@
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DataTable } from '@/shared/components/DataTable';
 import { Modal } from '@/shared/components/Modal';
 import { PageState } from '@/shared/components/PageState';
 import { SearchFilterBar } from '@/shared/components/SearchFilterBar';
+import { HelpGuideModal } from '../components/HelpGuideModal';
 import { ResourceExportModal } from '../components/ResourceExportModal';
 import { ResourceForm } from '../components/ResourceForm';
 import { ResourceHeader } from '../components/ResourceHeader';
 import { TransactionForm } from '../components/TransactionForm';
-import type { CrudResourceDefinition } from '../domain/CrudResource';
+import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { useResourceListViewModel } from '../hooks/useResourceListViewModel';
 import styles from './ResourceListPage.module.css';
+
+function readHourValue(record: CrudRecord): string {
+  const candidates = ['hora_llegada', 'hora_inicio_real', 'hora_inicio', 'fecha_hora', 'fecha_registro'];
+  for (const key of candidates) {
+    const value = record[key];
+    if (value !== undefined && value !== null && String(value).trim()) return String(value);
+  }
+  return '';
+}
+
+function extractHour(record: CrudRecord): number | null {
+  const value = readHourValue(record);
+  if (!value) return null;
+  const date = new Date(value);
+  if (!Number.isNaN(date.getTime())) return date.getHours();
+  const match = value.match(/(?:T|\s|^)(\d{1,2}):\d{2}/);
+  if (!match) return null;
+  const hour = Number(match[1]);
+  return Number.isFinite(hour) ? hour : null;
+}
+
+function sortByHour(records: CrudRecord[]): CrudRecord[] {
+  return [...records].sort((a, b) => {
+    const hourA = extractHour(a);
+    const hourB = extractHour(b);
+    if (hourA === null && hourB === null) return 0;
+    if (hourA === null) return 1;
+    if (hourB === null) return -1;
+    if (hourA !== hourB) return hourA - hourB;
+    return readHourValue(a).localeCompare(readHourValue(b));
+  });
+}
+
+function isHourVisualResource(resource: CrudResourceDefinition): boolean {
+  return resource.key === 'clase-por-hora' || resource.key === 'clase-curso' || resource.key === 'aula';
+}
+
+function getHourTone(record: CrudRecord): number | null {
+  const hour = extractHour(record);
+  return hour === null ? null : hour % 8;
+}
 
 export function ResourceListPage() {
   const { module, resource: resourceKey } = useParams();
@@ -25,6 +68,12 @@ export function ResourceListPage() {
 
 function ResourceListContent({ resource }: { resource: CrudResourceDefinition }) {
   const viewModel = useResourceListViewModel(resource);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const showHourColors = isHourVisualResource(resource);
+
+  const displayRecords = useMemo(() => {
+    return showHourColors ? sortByHour(viewModel.visibleRecords) : viewModel.visibleRecords;
+  }, [showHourColors, viewModel.visibleRecords]);
 
   if (viewModel.isLoading && viewModel.records.length === 0) {
     return <PageState title="Cargando registros" message={`Preparando información de ${resource.label}.`} />;
@@ -32,7 +81,19 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
 
   return (
     <section className={styles.page}>
-      <ResourceHeader resource={resource} total={viewModel.totalRecords} visible={viewModel.visibleRecords.length} />
+      <ResourceHeader
+        resource={resource}
+        total={viewModel.totalRecords}
+        visible={displayRecords.length}
+        onHelpOpen={() => setIsHelpOpen(true)}
+      />
+
+      {showHourColors ? (
+        <div className={styles.hourLegend}>
+          <strong>Orden visual por hora</strong>
+          <span>Cada color representa un bloque horario distinto para leer mejor aulas y clases.</span>
+        </div>
+      ) : null}
 
       <SearchFilterBar
         search={viewModel.search}
@@ -51,19 +112,21 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       {viewModel.message ? <p className={styles.message}>{viewModel.message}</p> : null}
       {viewModel.error ? <PageState title="No se pudo completar la operación" message={viewModel.error} actionLabel="Reintentar" onAction={() => void viewModel.load()} /> : null}
 
-      {!viewModel.error && viewModel.visibleRecords.length === 0 ? (
+      {!viewModel.error && displayRecords.length === 0 ? (
         <PageState title="Sin registros" message="No hay datos para mostrar con los filtros actuales." actionLabel="Crear registro" onAction={viewModel.openCreate} />
       ) : null}
 
-      {!viewModel.error && viewModel.visibleRecords.length > 0 ? (
+      {!viewModel.error && displayRecords.length > 0 ? (
         <>
           <DataTable
-            records={viewModel.visibleRecords}
+            records={displayRecords}
             columns={viewModel.columns}
+            columnLabels={viewModel.columnLabels}
             primaryKey={resource.primaryKey}
             onEdit={viewModel.openEdit}
             canDisable={viewModel.canDisableRecord}
             onDisable={(record) => void viewModel.disable(record)}
+            getRowHourTone={showHourColors ? getHourTone : undefined}
           />
           <div className={styles.pagination}>
             <div>
@@ -91,11 +154,14 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
         filterFields={viewModel.availableFilters}
         initialSearch={viewModel.debouncedSearch}
         initialFilters={viewModel.filters}
+        totalRecords={viewModel.totalRecords}
         isExporting={viewModel.isExporting}
         error={viewModel.exportError}
         onClose={viewModel.closeExportModal}
         onExport={viewModel.exportWithQuery}
       />
+
+      <HelpGuideModal isOpen={isHelpOpen} resource={resource} onClose={() => setIsHelpOpen(false)} />
 
       <Modal
         title={viewModel.editingRecord ? `Editar ${resource.label}` : `Crear ${resource.label}`}

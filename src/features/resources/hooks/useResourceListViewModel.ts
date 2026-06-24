@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter } from '../domain/CrudResource';
 import { createResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
 import { exportRecords } from '../utils/exportRecords';
+import { humanizeFieldLabel } from '@/shared/utils/humanize';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
@@ -39,12 +40,6 @@ function buildDisablePayload(record: CrudRecord): CrudRecord {
   return stateKey ? { [stateKey]: 'Inactivo' } : {};
 }
 
-function formatLabel(value: string): string {
-  return value
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
 function mapFilterType(fieldType: string): ResourceTableFilter['type'] {
   if (fieldType === 'checkbox') return 'boolean';
   if (fieldType === 'select') return 'select';
@@ -69,7 +64,7 @@ function buildFilters(resource: CrudResourceDefinition): ResourceTableFilter[] {
     .filter((field) => shouldShowFilter(field.name))
     .map((field) => ({
       name: field.name,
-      label: field.label || formatLabel(field.name),
+      label: humanizeFieldLabel(field.label, field.name),
       type: mapFilterType(field.type),
       options: field.options,
     } satisfies ResourceTableFilter));
@@ -79,7 +74,7 @@ function buildFilters(resource: CrudResourceDefinition): ResourceTableFilter[] {
   if (!existing.has('estado_registro')) {
     statusFilters.push({
       name: 'estado_registro',
-      label: 'Estado registro',
+      label: 'Estado Registro',
       type: 'select',
       options: ['Activo', 'Inactivo', 'Eliminado'],
     });
@@ -180,6 +175,15 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
       })
       .slice(0, 10);
   }, [records, resource.primaryKey]);
+
+  const columnLabels = useMemo(() => {
+    const labels: Record<string, string> = {};
+    const fieldLabelByName = new Map(resource.fields.map((field) => [field.name, humanizeFieldLabel(field.label, field.name)]));
+    columns.forEach((column) => {
+      labels[column] = fieldLabelByName.get(column) ?? humanizeFieldLabel(column);
+    });
+    return labels;
+  }, [columns, resource.fields]);
 
   const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
   const hasPreviousPage = page > 1;
@@ -308,6 +312,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
       exportRecords({
         records: result.records,
         preferredColumns: columns,
+        columnLabels,
         resourceLabel: resource.label,
         format: options.format,
       });
@@ -324,6 +329,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     records,
     visibleRecords,
     columns,
+    columnLabels,
     search: searchInput,
     debouncedSearch,
     filters,

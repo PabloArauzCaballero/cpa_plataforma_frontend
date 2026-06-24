@@ -14,6 +14,7 @@ interface ResourceExportModalProps {
   filterFields: ResourceTableFilter[];
   initialSearch: string;
   initialFilters: Record<string, FilterValue>;
+  totalRecords: number;
   isExporting: boolean;
   error: string | null;
   onClose: () => void;
@@ -33,6 +34,11 @@ function sanitizeFilterValue(value: string): FilterValue | '' {
   if (value === 'true') return true;
   if (value === 'false') return false;
   return value;
+}
+
+function hasActiveQuery(search: string, filters: Record<string, FilterValue>): boolean {
+  if (search.trim()) return true;
+  return Object.values(filters).some((value) => value !== undefined && value !== null && String(value).trim() !== '');
 }
 
 function renderFilterInput(
@@ -70,7 +76,7 @@ function renderFilterInput(
     <input
       type={filter.type}
       value={stringValue}
-      placeholder={`Filtrar ${filter.label}`}
+      placeholder={`Filtrar por ${filter.label}`}
       onChange={(event) => onChange(filter.name, event.target.value)}
     />
   );
@@ -82,6 +88,7 @@ export function ResourceExportModal({
   filterFields,
   initialSearch,
   initialFilters,
+  totalRecords,
   isExporting,
   error,
   onClose,
@@ -90,15 +97,23 @@ export function ResourceExportModal({
   const [format, setFormat] = useState<ExportFormat>('csv');
   const [search, setSearch] = useState(initialSearch);
   const [filters, setFilters] = useState<Record<string, FilterValue>>(initialFilters);
+  const [isConfirmingAll, setIsConfirmingAll] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSearch(initialSearch);
       setFilters(initialFilters);
+      setIsConfirmingAll(false);
     }
   }, [isOpen, initialSearch, initialFilters]);
 
+  function setSearchValue(value: string) {
+    setSearch(value);
+    setIsConfirmingAll(false);
+  }
+
   function setFilterValue(name: string, rawValue: string) {
+    setIsConfirmingAll(false);
     setFilters((current) => {
       const next = { ...current };
       const cleanValue = sanitizeFilterValue(rawValue);
@@ -111,9 +126,16 @@ export function ResourceExportModal({
   function clearModalFilters() {
     setSearch('');
     setFilters({});
+    setIsConfirmingAll(false);
   }
 
   async function submit() {
+    const willExportEverything = !hasActiveQuery(search, filters);
+    if (willExportEverything && !isConfirmingAll) {
+      setIsConfirmingAll(true);
+      return;
+    }
+
     await onExport({ format, search, filters });
   }
 
@@ -123,6 +145,19 @@ export function ResourceExportModal({
         <p className={styles.help}>
           Selecciona los filtros de consulta y el formato. La exportación usará estos filtros, no solo la página visible.
         </p>
+
+        {isConfirmingAll ? (
+          <section className={styles.warning} aria-live="polite">
+            <h3>Confirmar exportación completa</h3>
+            <p>
+              No seleccionaste ningún filtro ni búsqueda. Esto descargará todos los registros encontrados para esta tabla
+              {totalRecords > 0 ? `: ${totalRecords} registro(s).` : '.'}
+            </p>
+            <p>
+              Usa filtros si solo necesitas una parte de la información. Confirma únicamente si realmente quieres descargar todo.
+            </p>
+          </section>
+        ) : null}
 
         <div className={styles.grid}>
           <label className={styles.field}>
@@ -136,7 +171,7 @@ export function ResourceExportModal({
 
           <label className={styles.field}>
             <span>Búsqueda global</span>
-            <input value={search} placeholder="Buscar en los registros" onChange={(event) => setSearch(event.target.value)} />
+            <input value={search} placeholder="Buscar en los registros" onChange={(event) => setSearchValue(event.target.value)} />
           </label>
         </div>
 
@@ -154,8 +189,11 @@ export function ResourceExportModal({
         <div className={styles.actions}>
           <Button type="button" variant="secondary" onClick={clearModalFilters} disabled={isExporting}>Limpiar consulta</Button>
           <Button type="button" variant="ghost" onClick={onClose} disabled={isExporting}>Cancelar</Button>
+          {isConfirmingAll ? (
+            <Button type="button" variant="ghost" onClick={() => setIsConfirmingAll(false)} disabled={isExporting}>Volver a filtros</Button>
+          ) : null}
           <Button type="button" onClick={() => void submit()} disabled={isExporting}>
-            {isExporting ? 'Exportando...' : 'Exportar registros'}
+            {isExporting ? 'Exportando...' : isConfirmingAll ? 'Sí, exportar todo' : 'Exportar registros'}
           </Button>
         </div>
       </div>

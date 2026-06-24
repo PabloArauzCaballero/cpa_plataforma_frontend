@@ -42,3 +42,33 @@
     flex-direction: column;
   }
 }
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.actions button,
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.actions button {
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.actions a {
+  background: var(--color-primary);
+  color: var(--color-white);
+}

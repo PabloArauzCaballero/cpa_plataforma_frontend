@@ -2,6 +2,7 @@ import { Button } from '@/shared/components/Button';
 import { FormField } from '@/shared/components/FormField';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
+import { humanizeFieldLabel } from '@/shared/utils/humanize';
 import { CloudinaryUploadField } from './CloudinaryUploadField';
 import styles from './ResourceForm.module.css';
 
@@ -56,7 +57,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
       ) : (
         <div className={styles.grid}>
           {visibleFields.map((field) => {
-            const label = field.label && field.label !== field.name ? field.label : humanizeFieldName(field.name);
+            const label = humanizeFieldLabel(field.label, field.name);
 
             if (isCloudinaryArchivoTransaccionField(resource, field.name)) {
               return (

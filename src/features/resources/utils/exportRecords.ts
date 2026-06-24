@@ -1,4 +1,5 @@
 import type { CrudRecord } from '../domain/CrudResource';
+import { humanizeFieldLabel } from '@/shared/utils/humanize';
 
 type ExportFormat = 'csv' | 'excel' | 'json';
 
@@ -26,14 +27,18 @@ function resolveColumns(records: CrudRecord[], preferredColumns: string[]): stri
   return [...ordered, ...missing];
 }
 
-function buildCsv(records: CrudRecord[], columns: string[]): string {
-  const header = columns.map(escapeCsv).join(';');
+function displayColumn(column: string, labels?: Record<string, string>): string {
+  return labels?.[column] ?? humanizeFieldLabel(column);
+}
+
+function buildCsv(records: CrudRecord[], columns: string[], columnLabels?: Record<string, string>): string {
+  const header = columns.map((column) => escapeCsv(displayColumn(column, columnLabels))).join(';');
   const rows = records.map((record) => columns.map((column) => escapeCsv(record[column])).join(';'));
   return `\uFEFF${[header, ...rows].join('\n')}`;
 }
 
-function buildExcelHtml(records: CrudRecord[], columns: string[], title: string): string {
-  const header = columns.map((column) => `<th>${escapeHtml(column)}</th>`).join('');
+function buildExcelHtml(records: CrudRecord[], columns: string[], title: string, columnLabels?: Record<string, string>): string {
+  const header = columns.map((column) => `<th>${escapeHtml(displayColumn(column, columnLabels))}</th>`).join('');
   const rows = records
     .map((record) => `<tr>${columns.map((column) => `<td>${escapeHtml(record[column])}</td>`).join('')}</tr>`)
     .join('');
@@ -77,6 +82,7 @@ function safeFilename(value: string): string {
 export function exportRecords(options: {
   records: CrudRecord[];
   preferredColumns: string[];
+  columnLabels?: Record<string, string>;
   resourceLabel: string;
   format: ExportFormat;
 }) {
@@ -90,10 +96,10 @@ export function exportRecords(options: {
   }
 
   if (options.format === 'excel') {
-    const html = buildExcelHtml(options.records, columns, options.resourceLabel);
+    const html = buildExcelHtml(options.records, columns, options.resourceLabel, options.columnLabels);
     downloadTextFile(html, `${baseName}.xls`, 'application/vnd.ms-excel;charset=utf-8');
     return;
   }
 
-  downloadTextFile(buildCsv(options.records, columns), `${baseName}.csv`, 'text/csv;charset=utf-8');
+  downloadTextFile(buildCsv(options.records, columns, options.columnLabels), `${baseName}.csv`, 'text/csv;charset=utf-8');
 }

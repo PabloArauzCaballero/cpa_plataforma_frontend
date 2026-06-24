@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PageState } from '@/shared/components/PageState';
+import { humanizeFieldLabel } from '@/shared/utils/humanize';
 import { findResourceModule } from '@/features/resources/domain/resourceDefinitions';
 import { getModuleVisualMeta } from '../moduleMeta';
 import styles from './ModuleResourcePickerPage.module.css';
@@ -78,7 +79,7 @@ export function ModuleResourcePickerPage() {
         <div className={styles.grid}>
           {filteredResources.map((resource) => {
             const requiredFields = resource.fields.filter((field) => field.required).slice(0, 4);
-            const sampleFields = (requiredFields.length > 0 ? requiredFields : resource.fields.slice(0, 4)).map((field) => humanizeFieldName(field.label || field.name));
+            const sampleFields = (requiredFields.length > 0 ? requiredFields : resource.fields.slice(0, 4)).map((field) => humanizeFieldLabel(field.label, field.name));
 
             return (
               <article className={styles.card} key={resource.key}>

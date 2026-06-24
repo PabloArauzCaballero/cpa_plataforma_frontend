@@ -70,3 +70,12 @@
   background: var(--color-surface-soft);
   transform: translateY(-1px);
 }
+
+.table tbody tr[data-hour-tone='0'] td { background: rgba(32, 160, 197, 0.10); }
+.table tbody tr[data-hour-tone='1'] td { background: rgba(1, 43, 101, 0.08); }
+.table tbody tr[data-hour-tone='2'] td { background: rgba(26, 123, 166, 0.12); }
+.table tbody tr[data-hour-tone='3'] td { background: rgba(25, 86, 135, 0.10); }
+.table tbody tr[data-hour-tone='4'] td { background: rgba(222, 223, 225, 0.42); }
+.table tbody tr[data-hour-tone='5'] td { background: rgba(154, 169, 187, 0.16); }
+.table tbody tr[data-hour-tone='6'] td { background: rgba(32, 160, 197, 0.18); }
+.table tbody tr[data-hour-tone='7'] td { background: rgba(1, 43, 101, 0.13); }

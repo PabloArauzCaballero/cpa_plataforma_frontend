@@ -8,9 +8,11 @@ interface DataTableProps {
   records: TableRecord[];
   columns: string[];
   primaryKey: string;
+  columnLabels?: Record<string, string>;
   onEdit?: (record: TableRecord) => void;
   onDisable?: (record: TableRecord) => void;
   canDisable?: (record: TableRecord) => boolean;
+  getRowHourTone?: (record: TableRecord) => number | null;
 }
 
 function renderValue(value: unknown): string {
@@ -20,14 +22,27 @@ function renderValue(value: unknown): string {
   return String(value);
 }
 
-export function DataTable({ records, columns, primaryKey, onEdit, onDisable, canDisable }: DataTableProps) {
+function resolveColumnLabel(column: string, columnLabels?: Record<string, string>): string {
+  return columnLabels?.[column] ?? column;
+}
+
+export function DataTable({
+  records,
+  columns,
+  primaryKey,
+  columnLabels,
+  onEdit,
+  onDisable,
+  canDisable,
+  getRowHourTone,
+}: DataTableProps) {
   return (
     <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column}>{column}</th>
+              <th key={column}>{resolveColumnLabel(column, columnLabels)}</th>
             ))}
             <th>Acciones</th>
           </tr>
@@ -35,20 +50,21 @@ export function DataTable({ records, columns, primaryKey, onEdit, onDisable, can
         <tbody>
           {records.map((record, index) => {
             const key = String(record[primaryKey] ?? record.id ?? index);
+            const hourTone = getRowHourTone?.(record);
             return (
-              <tr key={key}>
+              <tr key={key} data-hour-tone={hourTone ?? undefined}>
                 {columns.map((column) => (
                   <td key={`${key}-${column}`}>{renderValue(record[column])}</td>
                 ))}
                 <td>
                   <div className={styles.actions}>
                     {onEdit ? (
-                      <button type="button" onClick={() => onEdit(record)}>
+                      <button type="button" onClick={() => onEdit(record)} aria-label="Editar registro">
                         <FontAwesomeIcon icon={faPen} />
                       </button>
                     ) : null}
                     {onDisable && (!canDisable || canDisable(record)) ? (
-                      <button type="button" onClick={() => onDisable(record)}>
+                      <button type="button" onClick={() => onDisable(record)} aria-label="Inhabilitar registro">
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
                     ) : null}

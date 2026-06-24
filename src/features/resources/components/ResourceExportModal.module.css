@@ -133,3 +133,26 @@
     width: 100%;
   }
 }
+
+.warning {
+  border: 1px solid color-mix(in srgb, #f59e0b 50%, var(--color-neutral-light));
+  background: color-mix(in srgb, #f59e0b 10%, var(--color-white));
+  color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.warning h3 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
+.warning p {
+  margin: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+  line-height: 1.45;
+}

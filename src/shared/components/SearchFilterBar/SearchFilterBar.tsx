@@ -54,7 +54,7 @@ function renderFilterInput(
     <input
       type={filter.type}
       value={stringValue}
-      placeholder={`Filtrar ${filter.label}`}
+      placeholder={`Filtrar por ${filter.label}`}
       onChange={(event) => onFilterChange(filter.name, event.target.value)}
     />
   );

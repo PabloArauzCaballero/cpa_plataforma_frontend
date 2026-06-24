@@ -63,13 +63,19 @@ export async function listResource(resource: CrudResourceDefinition, query: Reso
   return normalizeListResult(response, query.limit, query.offset);
 }
 
-export async function listAllResource(resource: CrudResourceDefinition, query: ResourceListQuery, maxRows = 10000): Promise<ResourceListResult> {
-  const pageSize = 500;
+export async function listAllResource(resource: CrudResourceDefinition, query: ResourceListQuery, maxRows = 50000): Promise<ResourceListResult> {
+  // El backend puede limitar internamente la cantidad devuelta aunque se pida un limit mayor.
+  // Por eso avanzamos el offset con la cantidad REAL recibida y no con el limit solicitado.
+  const pageSize = 200;
   let offset = 0;
   let count = 0;
   const records: CrudRecord[] = [];
+  const seenOffsets = new Set<number>();
 
   do {
+    if (seenOffsets.has(offset)) break;
+    seenOffsets.add(offset);
+
     const response = await listResource(resource, {
       ...query,
       page: Math.floor(offset / pageSize) + 1,
@@ -81,7 +87,7 @@ export async function listAllResource(resource: CrudResourceDefinition, query: R
     count = response.count;
 
     if (response.records.length === 0) break;
-    offset += pageSize;
+    offset += response.records.length;
   } while (records.length < count && records.length < maxRows);
 
   return {
