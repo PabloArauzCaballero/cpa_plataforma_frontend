@@ -526,3 +526,28 @@
     flex-direction: column;
   }
 }
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.emptyText {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.rawGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.125rem;
+}
+
+@media (max-width: 760px) {
+  .rawGrid {
+    grid-template-columns: 1fr;
+  }
+}

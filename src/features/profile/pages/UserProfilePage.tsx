@@ -1,62 +1,47 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { PageState } from '@/shared/components/PageState';
+import { useUserProfileViewModel } from '../hooks/useUserProfileViewModel';
+import type { UserProfile } from '../domain/UserProfile';
 import styles from './UserProfilePage.module.css';
 
-interface ProfileFormState {
-  firstName: string;
-  lastName: string;
-  email: string;
-  username: string;
-  phone: string;
-  document: string;
-  role: string;
-  status: string;
-  notes: string;
+function getInitials(profile: UserProfile): string {
+  const fullName = profile.nombreCompleto || `${profile.nombres} ${profile.apellidos}`.trim() || profile.username || profile.email;
+  const parts = fullName.split(/\s+/).filter(Boolean);
+  const initials = parts.length >= 2 ? `${parts[0][0]}${parts[1][0]}` : fullName.slice(0, 2);
+  return initials ? initials.toUpperCase() : 'CP';
 }
 
-function buildInitialProfile(): ProfileFormState {
-  const storedEmail = window.localStorage.getItem('cpa.userEmail') ?? 'admin.demo@cpa.test';
-  const username = storedEmail.includes('@') ? storedEmail.split('@')[0] : 'admin.demo';
-  const [first = 'Admin', last = 'Demo'] = username
-    .split(/[._-]/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
-
-  return {
-    firstName: first,
-    lastName: last,
-    email: storedEmail,
-    username,
-    phone: '+591 70000000',
-    document: '900001-SC',
-    role: 'Super usuario',
-    status: 'Activo',
-    notes: 'Usuario demo para pruebas internas del sistema CPA.',
-  };
+function display(value: string | undefined | null, fallback = 'No disponible'): string {
+  return value && String(value).trim() ? String(value).trim() : fallback;
 }
 
-function getInitials(firstName: string, lastName: string): string {
-  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
-  return initials ? initials.toUpperCase() : 'AD';
+function formatBoolean(value: boolean): string {
+  return value ? 'Sí' : 'No';
+}
+
+function getMainRole(profile: UserProfile): string {
+  if (profile.esSuperUsuario) return 'Super usuario';
+  if (profile.roles.length > 0) return profile.roles[0];
+  return display(profile.tipoUsuario, 'Sin rol principal disponible');
 }
 
 export function UserProfilePage() {
-  const initialProfile = useMemo(buildInitialProfile, []);
-  const [profile, setProfile] = useState<ProfileFormState>(initialProfile);
-  const [message, setMessage] = useState<string | null>(null);
-  const initials = getInitials(profile.firstName, profile.lastName);
+  const { profile, isLoading, error, reload } = useUserProfileViewModel();
+  const initials = useMemo(() => (profile ? getInitials(profile) : 'CP'), [profile]);
 
-  function updateField(field: keyof ProfileFormState, value: string) {
-    setProfile((current) => ({ ...current, [field]: value }));
-    setMessage(null);
+  if (isLoading) {
+    return <PageState title="Cargando perfil" message="Consultando la sesión actual del usuario autenticado." />;
   }
 
-  function resetProfileForm() {
-    setProfile(initialProfile);
-    setMessage('Cambios restaurados con los datos iniciales de la sesión.');
-  }
-
-  function saveProfile() {
-    setMessage('Perfil actualizado correctamente como mockup local.');
+  if (error || !profile) {
+    return (
+      <PageState
+        title="No se pudo cargar el perfil"
+        message={error ?? 'La sesión no devolvió información de perfil.'}
+        actionLabel="Reintentar"
+        onAction={reload}
+      />
+    );
   }
 
   return (
@@ -64,23 +49,16 @@ export function UserProfilePage() {
       <section className={styles.pageHeader}>
         <div>
           <h1>Perfil de Usuario</h1>
-          <p>Consulta y actualiza la información general del usuario autenticado dentro del sistema CPA.</p>
+          <p>Información real de la sesión autenticada, obtenida desde el backend CPA.</p>
         </div>
 
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnLight}`} type="button" onClick={resetProfileForm}>
-            <i className="fa-solid fa-rotate-left" aria-hidden="true" />
-            Restaurar
-          </button>
-
-          <button className={`${styles.btn} ${styles.btnPrimary}`} type="button" onClick={saveProfile}>
-            <i className="fa-solid fa-floppy-disk" aria-hidden="true" />
-            Guardar cambios
+          <button className={`${styles.btn} ${styles.btnPrimary}`} type="button" onClick={reload}>
+            <i className="fa-solid fa-rotate" aria-hidden="true" />
+            Actualizar datos
           </button>
         </div>
       </section>
-
-      {message ? <p className={styles.message}>{message}</p> : null}
 
       <section className={styles.profileGrid}>
         <aside className={`${styles.card} ${styles.profileSummary}`}>
@@ -91,62 +69,27 @@ export function UserProfilePage() {
           </div>
 
           <div className={styles.profileName}>
-            <h2>{profile.firstName} {profile.lastName}</h2>
-            <p>{profile.email}</p>
+            <h2>{display(profile.nombreCompleto)}</h2>
+            <p>{display(profile.email)}</p>
           </div>
 
           <div className={styles.badgeRow}>
             <span className={`${styles.badge} ${styles.badgeSuccess}`}>
               <i className="fa-solid fa-circle-check" aria-hidden="true" />
-              Activo
+              {display(profile.estado, 'Estado no disponible')}
             </span>
 
             <span className={`${styles.badge} ${styles.badgeInfo}`}>
               <i className="fa-solid fa-shield-halved" aria-hidden="true" />
-              Super usuario
+              {getMainRole(profile)}
             </span>
           </div>
 
           <div className={styles.summaryList}>
-            <div className={styles.summaryItem}>
-              <div className={styles.summaryIcon}>
-                <i className="fa-solid fa-user" aria-hidden="true" />
-              </div>
-              <div>
-                <small>Nombre de usuario</small>
-                <strong>{profile.username}</strong>
-              </div>
-            </div>
-
-            <div className={styles.summaryItem}>
-              <div className={styles.summaryIcon}>
-                <i className="fa-solid fa-id-card" aria-hidden="true" />
-              </div>
-              <div>
-                <small>ID Persona</small>
-                <strong>{profile.document}</strong>
-              </div>
-            </div>
-
-            <div className={styles.summaryItem}>
-              <div className={styles.summaryIcon}>
-                <i className="fa-solid fa-briefcase" aria-hidden="true" />
-              </div>
-              <div>
-                <small>Rol principal</small>
-                <strong>Administrador del sistema</strong>
-              </div>
-            </div>
-
-            <div className={styles.summaryItem}>
-              <div className={styles.summaryIcon}>
-                <i className="fa-solid fa-lock" aria-hidden="true" />
-              </div>
-              <div>
-                <small>Seguridad de sesión</small>
-                <strong>Sesión privada activa</strong>
-              </div>
-            </div>
+            <SummaryItem icon="fa-solid fa-user" label="Nombre de usuario" value={display(profile.username)} />
+            <SummaryItem icon="fa-solid fa-id-card" label="ID Persona" value={display(profile.idPersona)} />
+            <SummaryItem icon="fa-solid fa-briefcase" label="Tipo de usuario" value={display(profile.tipoUsuario)} />
+            <SummaryItem icon="fa-solid fa-lock" label="Super usuario" value={formatBoolean(profile.esSuperUsuario)} />
           </div>
         </aside>
 
@@ -155,141 +98,89 @@ export function UserProfilePage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Información personal</h2>
-                <p>Datos principales visibles para administración, auditoría y operación interna.</p>
+                <p>Datos devueltos por la sesión actual. Esta pantalla no inventa información local.</p>
               </div>
 
-              <span className={`${styles.badge} ${styles.badgeWarning}`}>
+              <span className={`${styles.badge} ${styles.badgeInfo}`}>
                 <i className="fa-solid fa-database" aria-hidden="true" />
-                Mockup
+                Backend
               </span>
             </div>
 
-            <form id="profileForm">
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="firstName">Nombres</label>
-                  <input id="firstName" type="text" value={profile.firstName} onChange={(event) => updateField('firstName', event.target.value)} />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="lastName">Apellidos</label>
-                  <input id="lastName" type="text" value={profile.lastName} onChange={(event) => updateField('lastName', event.target.value)} />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="email">Correo electrónico</label>
-                  <input id="email" type="email" value={profile.email} onChange={(event) => updateField('email', event.target.value)} />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="username">Nombre de usuario</label>
-                  <input id="username" type="text" value={profile.username} disabled />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="phone">Teléfono</label>
-                  <input id="phone" type="text" value={profile.phone} onChange={(event) => updateField('phone', event.target.value)} />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="document">Documento</label>
-                  <input id="document" type="text" value={profile.document} onChange={(event) => updateField('document', event.target.value)} />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="role">Tipo de usuario</label>
-                  <select id="role" value={profile.role} onChange={(event) => updateField('role', event.target.value)}>
-                    <option>Super usuario</option>
-                    <option>Administrador</option>
-                    <option>Operador</option>
-                    <option>Consulta</option>
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="status">Estado</label>
-                  <select id="status" value={profile.status} onChange={(event) => updateField('status', event.target.value)}>
-                    <option>Activo</option>
-                    <option>Inactivo</option>
-                    <option>Bloqueado</option>
-                  </select>
-                </div>
-
-                <div className={`${styles.formGroup} ${styles.full}`}>
-                  <label htmlFor="notes">Notas internas</label>
-                  <textarea id="notes" value={profile.notes} onChange={(event) => updateField('notes', event.target.value)} />
-                </div>
-              </div>
-
-              <div className={styles.formActions}>
-                <button type="button" className={`${styles.btn} ${styles.btnLight}`} onClick={resetProfileForm}>
-                  Limpiar cambios
-                </button>
-
-                <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={saveProfile}>
-                  Actualizar perfil
-                </button>
-              </div>
-            </form>
-          </section>
-
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div>
-                <h2>Preferencias</h2>
-                <p>Configuraciones generales del usuario dentro del panel administrativo.</p>
-              </div>
-            </div>
-
-            <div className={styles.preferencesGrid}>
-              <Preference icon="fa-solid fa-bell" title="Notificaciones internas" description="Recibir avisos del sistema, alertas de operación y cambios importantes." checked />
-              <Preference icon="fa-solid fa-envelope" title="Resumen por correo" description="Recibir resumen administrativo cuando existan cambios relevantes." checked />
-              <Preference icon="fa-solid fa-table-columns" title="Vista compacta" description="Mostrar tablas, filtros y formularios con menor separación visual." />
-              <Preference icon="fa-solid fa-shield-halved" title="Confirmar acciones críticas" description="Solicitar confirmación antes de inhabilitar o modificar registros sensibles." checked />
+            <div className={styles.formGrid}>
+              <ReadOnlyField label="Nombres" value={display(profile.nombres)} />
+              <ReadOnlyField label="Apellidos" value={display(profile.apellidos)} />
+              <ReadOnlyField label="Correo electrónico" value={display(profile.email)} />
+              <ReadOnlyField label="Nombre de usuario" value={display(profile.username)} />
+              <ReadOnlyField label="Teléfono" value={display(profile.telefono)} />
+              <ReadOnlyField label="ID Persona" value={display(profile.idPersona)} />
+              <ReadOnlyField label="Tipo de usuario" value={display(profile.tipoUsuario)} />
+              <ReadOnlyField label="Estado" value={display(profile.estado)} />
             </div>
           </section>
 
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <div>
-                <h2>Permisos principales</h2>
-                <p>Resumen visual de módulos habilitados para este usuario.</p>
+                <h2>Roles reales</h2>
+                <p>Roles devueltos por el endpoint de sesión. Si el backend no los envía, se muestra vacío.</p>
               </div>
             </div>
 
-            <div className={styles.permissionTableWrapper}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Módulo</th>
-                    <th>Lectura</th>
-                    <th>Creación</th>
-                    <th>Edición</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <PermissionRow icon="fa-solid fa-building" module="Administración" />
-                  <PermissionRow icon="fa-solid fa-file-invoice-dollar" module="Contabilidad" />
-                  <PermissionRow icon="fa-solid fa-shield-halved" module="Seguridad" />
-                </tbody>
-              </table>
-            </div>
+            {profile.roles.length > 0 ? (
+              <div className={styles.chipList}>
+                {profile.roles.map((role) => <span className={`${styles.badge} ${styles.badgeInfo}`} key={role}>{role}</span>)}
+              </div>
+            ) : (
+              <p className={styles.emptyText}>El backend no devolvió roles en la respuesta de sesión.</p>
+            )}
           </section>
 
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <div>
-                <h2>Actividad reciente</h2>
-                <p>Últimas acciones realizadas por el usuario dentro del sistema.</p>
+                <h2>Permisos reales</h2>
+                <p>Permisos devueltos por el endpoint de sesión. No se usa una matriz de permisos simulada.</p>
               </div>
             </div>
 
-            <div className={styles.activityList}>
-              <Activity icon="fa-solid fa-right-to-bracket" title="Inicio de sesión" detail="Ingreso correcto con sesión privada del sistema." date="Hace 5 min" />
-              <Activity icon="fa-solid fa-list-check" title="Smoke test ejecutado" detail="Validación E2E completada con pruebas aprobadas." date="Hoy" />
-              <Activity icon="fa-solid fa-user-shield" title="Permisos verificados" detail="Acceso de super usuario validado para módulos CRUD." date="Hoy" />
+            {profile.permisos.length > 0 ? (
+              <div className={styles.permissionTableWrapper}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Permiso</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {profile.permisos.map((permission) => (
+                      <tr key={permission}>
+                        <td>{permission}</td>
+                        <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>Permitido</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className={styles.emptyText}>El backend no devolvió permisos en la respuesta de sesión.</p>
+            )}
+          </section>
+
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div>
+                <h2>Respuesta de sesión</h2>
+                <p>Resumen técnico mínimo para confirmar que la vista está leyendo el backend. No expone token ni rutas.</p>
+              </div>
+            </div>
+
+            <div className={styles.rawGrid}>
+              <ReadOnlyField label="Fuente" value="Sesión autenticada" />
+              <ReadOnlyField label="Datos de usuario" value={Object.keys((profile.rawData.user as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
+              <ReadOnlyField label="Datos de persona" value={Object.keys((profile.rawData.person as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
+              <ReadOnlyField label="Datos de sesión" value={Object.keys((profile.rawData.session as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
             </div>
           </section>
         </section>
@@ -298,56 +189,25 @@ export function UserProfilePage() {
   );
 }
 
-function Preference({ icon, title, description, checked = false }: { icon: string; title: string; description: string; checked?: boolean }) {
+function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
-    <div className={styles.preferenceItem}>
-      <div className={styles.preferenceIcon}>
-        <i className={icon} aria-hidden="true" />
-      </div>
-
-      <div className={styles.preferenceContent}>
-        <strong>{title}</strong>
-        <span>{description}</span>
-
-        <label className={styles.switch}>
-          <input type="checkbox" defaultChecked={checked} />
-          <span className={styles.slider} />
-        </label>
-      </div>
+    <div className={styles.formGroup}>
+      <label>{label}</label>
+      <input type="text" value={value} disabled readOnly />
     </div>
   );
 }
 
-function PermissionRow({ icon, module }: { icon: string; module: string }) {
+function SummaryItem({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <tr>
-      <td>
-        <span className={styles.modulePill}>
-          <i className={icon} aria-hidden="true" />
-          {module}
-        </span>
-      </td>
-      <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>Permitido</span></td>
-      <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>Permitido</span></td>
-      <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>Permitido</span></td>
-      <td><span className={`${styles.badge} ${styles.badgeInfo}`}>Activo</span></td>
-    </tr>
-  );
-}
-
-function Activity({ icon, title, detail, date }: { icon: string; title: string; detail: string; date: string }) {
-  return (
-    <div className={styles.activityItem}>
-      <div className={styles.activityIcon}>
+    <div className={styles.summaryItem}>
+      <div className={styles.summaryIcon}>
         <i className={icon} aria-hidden="true" />
       </div>
-
-      <div className={styles.activityInfo}>
-        <strong>{title}</strong>
-        <span>{detail}</span>
+      <div>
+        <small>{label}</small>
+        <strong>{value}</strong>
       </div>
-
-      <span className={styles.activityDate}>{date}</span>
     </div>
   );
 }

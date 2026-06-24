@@ -975,3 +975,7 @@ Debe leer `tipo_transaccion` y mostrar únicamente los campos relacionados al or
 Los campos ocultos no deben enviarse en el payload. Si el usuario cambia `tipo_transaccion`, se deben limpiar las referencias que ya no correspondan al nuevo tipo.
 
 `sub_tipo_transaccion` debe renderizarse como `select` y sus opciones deben depender de `tipo_transaccion`.
+
+## Regla obligatoria adicional: perfil conectado al backend
+
+La pantalla de perfil no debe usar mockups ni construir datos desde `localStorage` salvo para mantener la sesión. Debe consumir el endpoint documentado de sesión actual (`privateAuth/me`) mediante un servicio/hook real. Si no existe endpoint documentado para actualizar perfil, la vista debe ser de solo lectura y mostrar un mensaje funcional; no se debe simular guardado local ni inventar actividad, permisos, preferencias o roles.
