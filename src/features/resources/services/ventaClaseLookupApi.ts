@@ -5,8 +5,18 @@ export interface VentaClaseLookupOption {
   value: string;
   label: string;
   payloadLabel: string;
-  tema?: string;
-  subtema?: string;
+}
+
+export interface MateriaTreeOption {
+  id: number;
+  materia: string;
+  tema: string;
+  subtema: string;
+  label: string;
+}
+
+export interface ProductoEducativoOption extends VentaClaseLookupOption {
+  tipoProducto?: string;
 }
 
 const LOOKUP_PAGE_SIZE = 500;
@@ -26,11 +36,16 @@ function readText(record: Record<string, unknown>, fields: string[]): string {
   return '';
 }
 
-function readId(record: Record<string, unknown>, fields: string[]): string {
-  return readText(record, fields);
+function readNumber(record: Record<string, unknown>, fields: string[]): number | undefined {
+  for (const field of fields) {
+    const value = record[field];
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return undefined;
 }
 
-function uniqueOptions(options: VentaClaseLookupOption[]): VentaClaseLookupOption[] {
+function uniqueOptions<T extends { value: string; label: string }>(options: T[]): T[] {
   const seen = new Set<string>();
   return options
     .filter((option) => option.value.trim() && option.label.trim())
@@ -43,12 +58,13 @@ function uniqueOptions(options: VentaClaseLookupOption[]): VentaClaseLookupOptio
     .sort((a, b) => a.label.localeCompare(b.label, 'es'));
 }
 
-function withPaging(endpoint: string, offset: number): string {
+function withPaging(endpoint: string, offset: number, orderBy = 'nombre'): string {
   const separator = endpoint.includes('?') ? '&' : '?';
   const params = new URLSearchParams();
   params.set('page', String(Math.floor(offset / LOOKUP_PAGE_SIZE) + 1));
   params.set('limit', String(LOOKUP_PAGE_SIZE));
   params.set('offset', String(offset));
+  params.set('orderBy', orderBy);
   params.set('orderDir', 'ASC');
   params.set('onlyActivos', 'false');
   params.set('only_activos', 'false');
@@ -74,14 +90,14 @@ function resolveTotal(response: unknown): number | null {
   return Number.isFinite(direct) && direct >= 0 ? direct : null;
 }
 
-async function listAllRecords(endpoint: string): Promise<Record<string, unknown>[]> {
+async function listAllRecords(endpoint: string, orderBy = 'nombre'): Promise<Record<string, unknown>[]> {
   const collected: Record<string, unknown>[] = [];
   let offset = 0;
   let total: number | null = null;
 
   while (collected.length < LOOKUP_MAX_RECORDS) {
-    const response = await httpClient.get<unknown>(withPaging(endpoint, offset));
-    const records = normalizeListResponse(response);
+    const response = await httpClient.get<unknown>(withPaging(endpoint, offset, orderBy));
+    const records = normalizeListResponse(response).filter(isRecord);
     total = total ?? resolveTotal(response);
     collected.push(...records);
 
@@ -118,9 +134,9 @@ function personLabel(record: Record<string, unknown>, fallback: string): string 
 }
 
 export async function listEstudianteOptions(): Promise<VentaClaseLookupOption[]> {
-  const records = await listAllRecords('/api/personas/estudiante');
+  const records = await listAllRecords('/api/personas/estudiante', 'id_estudiante');
   return uniqueOptions(records.map((record) => {
-    const id = readId(record, ['id_persona', 'id_estudiante']);
+    const id = readText(record, ['id_estudiante', 'id_persona']);
     const label = personLabel(record, id ? `Estudiante ${id}` : 'Estudiante disponible');
     const code = readText(record, ['codigo_estudiante']);
     return {
@@ -132,9 +148,9 @@ export async function listEstudianteOptions(): Promise<VentaClaseLookupOption[]>
 }
 
 export async function listTutorOptions(): Promise<VentaClaseLookupOption[]> {
-  const records = await listAllRecords('/api/personas/tutor');
+  const records = await listAllRecords('/api/personas/tutor', 'id_tutor');
   return uniqueOptions(records.map((record) => {
-    const id = readId(record, ['id_tutor', 'id_persona']);
+    const id = readText(record, ['id_tutor', 'id_persona']);
     const label = personLabel(record, id ? `Tutor ${id}` : 'Tutor disponible');
     const level = readText(record, ['nivel_experiencia']);
     return {
@@ -145,38 +161,53 @@ export async function listTutorOptions(): Promise<VentaClaseLookupOption[]> {
   }));
 }
 
-export async function listMateriaProductoOptions(): Promise<VentaClaseLookupOption[]> {
-  const materiaRecords = await listAllRecords('/api/servicios_educativos/materia-tree');
-  const productoRecords = await listAllRecords('/api/servicios_educativos/producto-educativo');
+export async function listAulaOptions(): Promise<VentaClaseLookupOption[]> {
+  const records = await listAllRecords('/api/infraestructura/aula', 'nombre');
+  return uniqueOptions(records.map((record) => {
+    const id = readText(record, ['id_aula']);
+    const nombre = readText(record, ['nombre', 'codigo', 'descripcion']);
+    const capacidad = readText(record, ['capacidad']);
+    const label = nombre || (id ? `Aula ${id}` : 'Aula disponible');
+    return {
+      value: id,
+      label: capacidad ? `${label} · cap. ${capacidad}` : label,
+      payloadLabel: label,
+    };
+  }));
+}
 
-  const materias = materiaRecords.map((record) => {
-    const id = readId(record, ['id_tree', 'id_materia_tree']);
-    const nombre = readText(record, ['nombre']);
+export async function listMateriaTreeOptions(): Promise<MateriaTreeOption[]> {
+  const records = await listAllRecords('/api/servicios_educativos/materia-tree', 'nombre');
+  const mapped = records.map((record) => {
+    const id = readNumber(record, ['id_tree', 'id_materia_tree']);
+    const materia = readText(record, ['nombre', 'materia']);
     const tema = readText(record, ['tema']);
     const subtema = readText(record, ['subtema']);
-    const payloadLabel = [nombre, tema].filter(Boolean).join(' · ') || (id ? `Materia ${id}` : 'Materia disponible');
-    return {
-      value: `materia:${id}`,
-      label: `Materia · ${payloadLabel}`,
-      payloadLabel,
-      tema,
-      subtema,
-    };
-  });
+    const label = [materia, tema, subtema].filter(Boolean).join(' · ');
+    return id && materia ? { id, materia, tema, subtema, label } : null;
+  }).filter((item): item is MateriaTreeOption => Boolean(item));
 
-  const productos = productoRecords.map((record) => {
-    const id = readId(record, ['id_producto_educativo']);
+  const seen = new Set<string>();
+  return mapped.filter((item) => {
+    const key = `${item.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).sort((a, b) => a.label.localeCompare(b.label, 'es'));
+}
+
+export async function listProductoEducativoOptions(): Promise<ProductoEducativoOption[]> {
+  const records = await listAllRecords('/api/servicios_educativos/producto-educativo', 'nombre');
+  return uniqueOptions(records.map((record) => {
+    const id = readText(record, ['id_producto_educativo']);
     const nombre = readText(record, ['nombre', 'nombre_producto']);
     const tipo = readText(record, ['tipo_producto']);
-    const payloadLabel = nombre || (id ? `Producto educativo ${id}` : 'Producto educativo disponible');
+    const label = nombre || (id ? `Producto educativo ${id}` : 'Producto educativo disponible');
     return {
-      value: `producto:${id}`,
-      label: tipo ? `Producto · ${payloadLabel} · ${tipo}` : `Producto · ${payloadLabel}`,
-      payloadLabel,
-      tema: '',
-      subtema: '',
+      value: id,
+      label: tipo ? `${label} · ${tipo}` : label,
+      payloadLabel: label,
+      tipoProducto: tipo,
     };
-  });
-
-  return uniqueOptions([...materias, ...productos]);
+  }));
 }

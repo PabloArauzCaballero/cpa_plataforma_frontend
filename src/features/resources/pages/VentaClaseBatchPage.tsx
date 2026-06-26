@@ -1,21 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/shared/components/Button';
 import { PageState } from '@/shared/components/PageState';
-import { registrarVentaClaseBatch, type VentaClaseRowPayload } from '../services/ventaClaseApi';
-import { listEstudianteOptions, listMateriaProductoOptions, listTutorOptions, type VentaClaseLookupOption } from '../services/ventaClaseLookupApi';
+import { explainVentaClaseError, registrarVentaClaseBatch, type VentaClaseRowPayload } from '../services/ventaClaseApi';
+import {
+  listAulaOptions,
+  listEstudianteOptions,
+  listMateriaTreeOptions,
+  listProductoEducativoOptions,
+  listTutorOptions,
+  type MateriaTreeOption,
+  type ProductoEducativoOption,
+  type VentaClaseLookupOption,
+} from '../services/ventaClaseLookupApi';
 import styles from './VentaClaseBatchPage.module.css';
 
-type VentaClaseDraftRow = VentaClaseRowPayload & {
+type VentaClaseDraftRow = {
   id: string;
-  id_estudiante_lookup: string;
-  id_tutor_lookup: string;
-  id_materia_producto_lookup: string;
+  fecha: string;
+  hora_ingreso: string;
+  hora_salida: string;
+  id_estudiante: string;
+  nombre_estudiante: string;
+  id_tutor: string;
+  nombre_tutor: string;
+  id_aula: string;
+  id_materia_tree: string;
+  id_producto_educativo: string;
+  materia: string;
+  tema: string;
+  subtema: string;
+  motivo_clase: string;
+  efectivo: string;
+  qr: string;
+  cxc: string;
+  paquete: string;
+  situacion_base: string;
 };
 
 type DraftField = keyof VentaClaseDraftRow;
 
-const MOTIVOS = ['CLASE', 'RECUPERACION', 'REFORZAMIENTO', 'NIVELACION', 'EXAMEN', 'OTRO'];
-const SIT_BASE = ['PENDIENTE', 'REGISTRADA', 'OBSERVADA', 'ANULADA'];
+const MOTIVOS = ['Nivelación', 'Apoyo', 'Reforzamiento', 'Avance', 'Recuperación', 'Examen', 'Otro'];
+const SIT_BASE = ['CLASE_PASADA', 'OBSERVADA'];
 
 function createEmptyRow(index: number): VentaClaseDraftRow {
   return {
@@ -23,54 +48,77 @@ function createEmptyRow(index: number): VentaClaseDraftRow {
     fecha: new Date().toISOString().slice(0, 10),
     hora_ingreso: '',
     hora_salida: '',
-    nombre_completo_estudiante: '',
-    tutor: '',
-    id_estudiante_lookup: '',
-    id_tutor_lookup: '',
-    id_materia_producto_lookup: '',
-    motivo_clase: 'CLASE',
-    materia_producto: '',
+    id_estudiante: '',
+    nombre_estudiante: '',
+    id_tutor: '',
+    nombre_tutor: '',
+    id_aula: '',
+    id_materia_tree: '',
+    id_producto_educativo: '',
+    materia: '',
     tema: '',
     subtema: '',
-    efectivo: 0,
-    qr: 0,
-    cxc: 0,
-    paquete: '',
-    situacion_base: 'PENDIENTE',
+    motivo_clase: 'Nivelación',
+    efectivo: '0',
+    qr: '0',
+    cxc: '0',
+    paquete: '0',
+    situacion_base: 'CLASE_PASADA',
   };
 }
 
-function toMoney(value: unknown): number {
+function parseMoney(value: unknown): number {
   const parsed = Number(String(value ?? '').replace(',', '.'));
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function normalizeRow(row: VentaClaseDraftRow): VentaClaseRowPayload {
+function optionalNumber(value: string): number | undefined {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function asPayload(row: VentaClaseDraftRow): VentaClaseRowPayload {
   return {
     fecha: row.fecha,
     hora_ingreso: row.hora_ingreso,
-    hora_salida: row.hora_salida,
-    nombre_completo_estudiante: row.nombre_completo_estudiante.trim(),
-    tutor: row.tutor.trim(),
+    hora_salida: row.hora_salida || undefined,
+    id_estudiante: optionalNumber(row.id_estudiante),
+    nombre_estudiante: row.nombre_estudiante.trim() || undefined,
+    id_tutor: optionalNumber(row.id_tutor),
+    nombre_tutor: row.nombre_tutor.trim() || undefined,
+    id_aula: optionalNumber(row.id_aula),
+    id_materia_tree: optionalNumber(row.id_materia_tree),
+    id_producto_educativo: optionalNumber(row.id_producto_educativo),
+    materia: row.materia.trim() || undefined,
+    tema: row.tema.trim() || undefined,
+    subtema: row.subtema.trim() || undefined,
     motivo_clase: row.motivo_clase.trim(),
-    materia_producto: row.materia_producto.trim(),
-    tema: row.tema.trim(),
-    subtema: row.subtema.trim(),
-    efectivo: toMoney(row.efectivo),
-    qr: toMoney(row.qr),
-    cxc: toMoney(row.cxc),
-    paquete: row.paquete.trim(),
-    situacion_base: row.situacion_base.trim(),
+    efectivo: parseMoney(row.efectivo),
+    qr: parseMoney(row.qr),
+    cxc: parseMoney(row.cxc),
+    paquete: parseMoney(row.paquete),
+    situacion_base: row.situacion_base.trim() || 'CLASE_PASADA',
   };
 }
 
 function hasContent(row: VentaClaseDraftRow): boolean {
-  const normalized = normalizeRow(row);
-  return Object.entries(normalized).some(([key, value]) => {
-    if (key === 'fecha' || key === 'motivo_clase' || key === 'situacion_base') return false;
-    if (typeof value === 'number') return value > 0;
-    return String(value ?? '').trim() !== '';
-  });
+  const values = [
+    row.hora_ingreso,
+    row.hora_salida,
+    row.id_estudiante,
+    row.nombre_estudiante,
+    row.id_tutor,
+    row.nombre_tutor,
+    row.id_aula,
+    row.id_materia_tree,
+    row.id_producto_educativo,
+    row.materia,
+    row.tema,
+    row.subtema,
+  ];
+  const hasText = values.some((value) => String(value ?? '').trim() !== '');
+  const hasAmount = [row.efectivo, row.qr, row.cxc, row.paquete].some((value) => parseMoney(value) > 0);
+  return hasText || hasAmount;
 }
 
 function validateRows(rows: VentaClaseDraftRow[]): string[] {
@@ -83,18 +131,37 @@ function validateRows(rows: VentaClaseDraftRow[]): string[] {
 
   activeRows.forEach((row, index) => {
     const number = index + 1;
+    const efectivo = parseMoney(row.efectivo);
+    const qr = parseMoney(row.qr);
+    const cxc = parseMoney(row.cxc);
+    const paquete = parseMoney(row.paquete);
+    const total = efectivo + qr + cxc + paquete;
+
     if (!row.fecha) errors.push(`Fila ${number}: la fecha es obligatoria.`);
     if (!row.hora_ingreso) errors.push(`Fila ${number}: la hora de ingreso es obligatoria.`);
-    if (!row.hora_salida) errors.push(`Fila ${number}: la hora de salida es obligatoria.`);
     if (row.hora_ingreso && row.hora_salida && row.hora_salida <= row.hora_ingreso) {
       errors.push(`Fila ${number}: la hora de salida debe ser mayor a la hora de ingreso.`);
     }
-    if (!row.nombre_completo_estudiante.trim()) errors.push(`Fila ${number}: el nombre del estudiante es obligatorio.`);
-    if (!row.tutor.trim()) errors.push(`Fila ${number}: el tutor es obligatorio.`);
-    if (!row.materia_producto.trim()) errors.push(`Fila ${number}: la materia o producto es obligatorio.`);
+    if (total <= 0) errors.push(`Fila ${number}: debe registrar al menos un monto en efectivo, QR, CxC o paquete.`);
+    if ([efectivo, qr, cxc, paquete].some((value) => value < 0)) {
+      errors.push(`Fila ${number}: los montos no pueden ser negativos.`);
+    }
+    if ((cxc > 0 || paquete > 0) && !row.id_estudiante) {
+      errors.push(`Fila ${number}: para CxC o paquete debes seleccionar un estudiante registrado.`);
+    }
+    if (!row.motivo_clase.trim()) errors.push(`Fila ${number}: el motivo de clase es obligatorio.`);
   });
 
   return errors;
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)))
+    .sort((a, b) => a.localeCompare(b, 'es'));
+}
+
+function getSelectedLabel(options: VentaClaseLookupOption[], value: string): string {
+  return options.find((option) => option.value === value)?.payloadLabel ?? '';
 }
 
 export function VentaClaseBatchPage() {
@@ -105,8 +172,10 @@ export function VentaClaseBatchPage() {
   const [responsePreview, setResponsePreview] = useState('');
   const [estudianteOptions, setEstudianteOptions] = useState<VentaClaseLookupOption[]>([]);
   const [tutorOptions, setTutorOptions] = useState<VentaClaseLookupOption[]>([]);
-  const [materiaProductoOptions, setMateriaProductoOptions] = useState<VentaClaseLookupOption[]>([]);
-  const [lookupStatus, setLookupStatus] = useState('Cargando estudiantes, tutores y materias desde el backend...');
+  const [aulaOptions, setAulaOptions] = useState<VentaClaseLookupOption[]>([]);
+  const [materiaTreeOptions, setMateriaTreeOptions] = useState<MateriaTreeOption[]>([]);
+  const [productoOptions, setProductoOptions] = useState<ProductoEducativoOption[]>([]);
+  const [lookupStatus, setLookupStatus] = useState('Cargando catálogos desde el backend...');
   const [lookupError, setLookupError] = useState('');
 
   useEffect(() => {
@@ -114,18 +183,22 @@ export function VentaClaseBatchPage() {
 
     async function loadLookups() {
       setLookupError('');
-      setLookupStatus('Cargando estudiantes, tutores y materias desde el backend...');
+      setLookupStatus('Cargando estudiantes, tutores, aulas, materias, temas, subtemas y productos desde el backend...');
       try {
-        const [estudiantes, tutores, materiasProductos] = await Promise.all([
+        const [estudiantes, tutores, aulas, materias, productos] = await Promise.all([
           listEstudianteOptions(),
           listTutorOptions(),
-          listMateriaProductoOptions(),
+          listAulaOptions(),
+          listMateriaTreeOptions(),
+          listProductoEducativoOptions(),
         ]);
         if (!active) return;
         setEstudianteOptions(estudiantes);
         setTutorOptions(tutores);
-        setMateriaProductoOptions(materiasProductos);
-        setLookupStatus('Listas de selección cargadas desde el backend.');
+        setAulaOptions(aulas);
+        setMateriaTreeOptions(materias);
+        setProductoOptions(productos);
+        setLookupStatus('Catálogos cargados desde el backend. El frontend solo captura datos; el backend genera venta, detalle, clase y asiento contable.');
       } catch (error) {
         if (!active) return;
         const message = error instanceof Error ? error.message : 'No se pudieron cargar los datos relacionados.';
@@ -138,49 +211,74 @@ export function VentaClaseBatchPage() {
     return () => { active = false; };
   }, []);
 
-  const payloadRows = useMemo(() => rows.filter(hasContent).map(normalizeRow), [rows]);
+  const materiaOptions = useMemo(() => uniqueStrings(materiaTreeOptions.map((option) => option.materia)), [materiaTreeOptions]);
+
+  const payloadRows = useMemo(() => rows.filter(hasContent).map(asPayload), [rows]);
+  const batchPayload = useMemo(() => ({
+    fecha: payloadRows[0]?.fecha ?? new Date().toISOString().slice(0, 10),
+    items: payloadRows,
+  }), [payloadRows]);
+
   const totals = useMemo(() => payloadRows.reduce(
     (acc, row) => ({
       efectivo: acc.efectivo + row.efectivo,
       qr: acc.qr + row.qr,
       cxc: acc.cxc + row.cxc,
+      paquete: acc.paquete + row.paquete,
     }),
-    { efectivo: 0, qr: 0, cxc: 0 },
+    { efectivo: 0, qr: 0, cxc: 0, paquete: 0 },
   ), [payloadRows]);
 
-  function updateRow(id: string, field: DraftField, value: string | number) {
-    setRows((current) => current.map((row) => row.id === id ? { ...row, [field]: value } : row));
+  function getTemaOptions(row: VentaClaseDraftRow): string[] {
+    return uniqueStrings(materiaTreeOptions
+      .filter((option) => !row.materia || option.materia === row.materia)
+      .map((option) => option.tema));
   }
 
-  function chooseOption(id: string, field: 'id_estudiante_lookup' | 'id_tutor_lookup' | 'id_materia_producto_lookup', value: string) {
+  function getSubtemaOptions(row: VentaClaseDraftRow): MateriaTreeOption[] {
+    return materiaTreeOptions
+      .filter((option) => !row.materia || option.materia === row.materia)
+      .filter((option) => !row.tema || option.tema === row.tema)
+      .filter((option) => option.subtema)
+      .sort((a, b) => a.subtema.localeCompare(b.subtema, 'es'));
+  }
+
+  function findMateriaTreeBySubtema(row: VentaClaseDraftRow, selectedId: string): MateriaTreeOption | undefined {
+    const id = Number(selectedId);
+    if (!Number.isFinite(id)) return undefined;
+    return getSubtemaOptions(row).find((option) => option.id === id);
+  }
+
+  function updateRow(id: string, field: DraftField, value: string) {
     setRows((current) => current.map((row) => {
       if (row.id !== id) return row;
+      if (field === 'materia') return { ...row, materia: value, tema: '', subtema: '', id_materia_tree: '' };
+      if (field === 'tema') return { ...row, tema: value, subtema: '', id_materia_tree: '' };
+      return { ...row, [field]: value };
+    }));
+  }
 
-      if (field === 'id_estudiante_lookup') {
-        const option = estudianteOptions.find((item) => item.value === value);
-        return {
-          ...row,
-          id_estudiante_lookup: value,
-          nombre_completo_estudiante: option?.payloadLabel ?? '',
-        };
-      }
+  function chooseLookup(id: string, field: 'id_estudiante' | 'id_tutor' | 'id_aula' | 'id_producto_educativo', value: string) {
+    setRows((current) => current.map((row) => {
+      if (row.id !== id) return row;
+      if (field === 'id_estudiante') return { ...row, id_estudiante: value, nombre_estudiante: getSelectedLabel(estudianteOptions, value) };
+      if (field === 'id_tutor') return { ...row, id_tutor: value, nombre_tutor: getSelectedLabel(tutorOptions, value) };
+      if (field === 'id_aula') return { ...row, id_aula: value };
+      return { ...row, id_producto_educativo: value };
+    }));
+  }
 
-      if (field === 'id_tutor_lookup') {
-        const option = tutorOptions.find((item) => item.value === value);
-        return {
-          ...row,
-          id_tutor_lookup: value,
-          tutor: option?.payloadLabel ?? '',
-        };
-      }
-
-      const option = materiaProductoOptions.find((item) => item.value === value);
+  function chooseSubtema(id: string, selectedId: string) {
+    setRows((current) => current.map((row) => {
+      if (row.id !== id) return row;
+      const selected = findMateriaTreeBySubtema(row, selectedId);
+      if (!selected) return { ...row, id_materia_tree: '', subtema: '' };
       return {
         ...row,
-        id_materia_producto_lookup: value,
-        materia_producto: option?.payloadLabel ?? '',
-        tema: option?.tema || row.tema,
-        subtema: option?.subtema || row.subtema,
+        id_materia_tree: String(selected.id),
+        materia: selected.materia,
+        tema: selected.tema,
+        subtema: selected.subtema,
       };
     }));
   }
@@ -217,12 +315,11 @@ export function VentaClaseBatchPage() {
 
     setIsSaving(true);
     try {
-      const response = await registrarVentaClaseBatch({ registros: payloadRows });
-      setSuccessMessage(`Se enviaron ${payloadRows.length} clases pasadas correctamente.`);
+      const response = await registrarVentaClaseBatch(batchPayload);
+      setSuccessMessage(`Se enviaron ${payloadRows.length} clases pasadas correctamente. Si el backend devolvió advertencias por fila, revísalas abajo.`);
       setResponsePreview(JSON.stringify(response, null, 2));
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'No se pudo registrar la parte de clases pasadas.';
-      setErrors([message]);
+      setErrors([explainVentaClaseError(error)]);
     } finally {
       setIsSaving(false);
     }
@@ -239,15 +336,14 @@ export function VentaClaseBatchPage() {
           <span>Contabilidad · clases pasadas</span>
           <h2>PARTE DE CLASES PASADAS</h2>
           <p>
-            Registra en lote las clases ya realizadas. La pantalla replica el formulario físico: horas, estudiante,
-            tutor, motivo, materia o producto, tema, subtema y forma de cobro.
+            Registra en lote las clases ya realizadas. El frontend captura datos; el backend genera la clase, venta,
+            detalle, transacción, movimientos contables y trazabilidad.
           </p>
         </div>
       </div>
 
       <div className={styles.notice}>
-        Este formulario envía un lote bajo la llave <strong>registros</strong>. Cada fila con datos se convierte en un registro del batch.
-        Estudiante, tutor, materia/producto y tema se seleccionan desde los datos reales del backend.
+        No registres movimientos contables manuales para este flujo. Efectivo, QR, CxC y paquete se resuelven con la configuración y cuentas asociadas desde el backend.
       </div>
 
       {lookupError ? (
@@ -282,6 +378,7 @@ export function VentaClaseBatchPage() {
           <div className={styles.summaryCard}><strong>{totals.efectivo.toFixed(2)}</strong><span>Total efectivo</span></div>
           <div className={styles.summaryCard}><strong>{totals.qr.toFixed(2)}</strong><span>Total QR</span></div>
           <div className={styles.summaryCard}><strong>{totals.cxc.toFixed(2)}</strong><span>Total CxC</span></div>
+          <div className={styles.summaryCard}><strong>{totals.paquete.toFixed(2)}</strong><span>Total paquete</span></div>
         </div>
 
         <div className={styles.tableWrap}>
@@ -292,12 +389,14 @@ export function VentaClaseBatchPage() {
                 <th>Fecha</th>
                 <th>Hora ingreso</th>
                 <th>Hora salida</th>
-                <th>Nombre completo estudiante</th>
+                <th>Estudiante</th>
                 <th>Tutor</th>
-                <th>Motivo clase</th>
-                <th>Materia / Producto</th>
+                <th>Aula</th>
+                <th>Materia</th>
                 <th>Tema</th>
                 <th>Subtema</th>
+                <th>Producto educativo</th>
+                <th>Motivo clase</th>
                 <th>Efectivo</th>
                 <th>QR</th>
                 <th>CxC</th>
@@ -314,15 +413,45 @@ export function VentaClaseBatchPage() {
                   <td><input type="time" value={row.hora_ingreso} onChange={(event) => updateRow(row.id, 'hora_ingreso', event.target.value)} /></td>
                   <td><input type="time" value={row.hora_salida} onChange={(event) => updateRow(row.id, 'hora_salida', event.target.value)} /></td>
                   <td>
-                    <select value={row.id_estudiante_lookup} onChange={(event) => chooseOption(row.id, 'id_estudiante_lookup', event.target.value)}>
+                    <select value={row.id_estudiante} onChange={(event) => chooseLookup(row.id, 'id_estudiante', event.target.value)}>
                       <option value="">Selecciona estudiante</option>
                       {estudianteOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                   </td>
                   <td>
-                    <select value={row.id_tutor_lookup} onChange={(event) => chooseOption(row.id, 'id_tutor_lookup', event.target.value)}>
+                    <select value={row.id_tutor} onChange={(event) => chooseLookup(row.id, 'id_tutor', event.target.value)}>
                       <option value="">Selecciona tutor</option>
                       {tutorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.id_aula} onChange={(event) => chooseLookup(row.id, 'id_aula', event.target.value)}>
+                      <option value="">Sin aula</option>
+                      {aulaOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.materia} onChange={(event) => updateRow(row.id, 'materia', event.target.value)}>
+                      <option value="">Selecciona materia</option>
+                      {materiaOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.tema} onChange={(event) => updateRow(row.id, 'tema', event.target.value)}>
+                      <option value="">Selecciona tema</option>
+                      {getTemaOptions(row).map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.id_materia_tree} onChange={(event) => chooseSubtema(row.id, event.target.value)}>
+                      <option value="">Selecciona subtema</option>
+                      {getSubtemaOptions(row).map((option) => <option key={option.id} value={option.id}>{option.subtema}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.id_producto_educativo} onChange={(event) => chooseLookup(row.id, 'id_producto_educativo', event.target.value)}>
+                      <option value="">Sin producto</option>
+                      {productoOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                   </td>
                   <td>
@@ -330,22 +459,10 @@ export function VentaClaseBatchPage() {
                       {MOTIVOS.map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </td>
-                  <td>
-                    <select value={row.id_materia_producto_lookup} onChange={(event) => chooseOption(row.id, 'id_materia_producto_lookup', event.target.value)}>
-                      <option value="">Selecciona materia/producto</option>
-                      {materiaProductoOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                    </select>
-                  </td>
-                  <td>
-                    <input value={row.tema} onChange={(event) => updateRow(row.id, 'tema', event.target.value)} placeholder="Tema cargado del backend" list="venta-clase-temas" />
-                  </td>
-                  <td>
-                    <input value={row.subtema} onChange={(event) => updateRow(row.id, 'subtema', event.target.value)} placeholder="Subtema cargado del backend" list="venta-clase-subtemas" />
-                  </td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.efectivo} onChange={(event) => updateRow(row.id, 'efectivo', event.target.value)} /></td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.qr} onChange={(event) => updateRow(row.id, 'qr', event.target.value)} /></td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.cxc} onChange={(event) => updateRow(row.id, 'cxc', event.target.value)} /></td>
-                  <td><input value={row.paquete} onChange={(event) => updateRow(row.id, 'paquete', event.target.value)} placeholder="Paq." /></td>
+                  <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.paquete} onChange={(event) => updateRow(row.id, 'paquete', event.target.value)} /></td>
                   <td>
                     <select value={row.situacion_base} onChange={(event) => updateRow(row.id, 'situacion_base', event.target.value)}>
                       {SIT_BASE.map((option) => <option key={option} value={option}>{option}</option>)}
@@ -356,16 +473,6 @@ export function VentaClaseBatchPage() {
               ))}
             </tbody>
           </table>
-          <datalist id="venta-clase-temas">
-            {Array.from(new Set(materiaProductoOptions.map((option) => option.tema).filter(Boolean))).map((tema) => (
-              <option key={tema} value={tema} />
-            ))}
-          </datalist>
-          <datalist id="venta-clase-subtemas">
-            {Array.from(new Set(materiaProductoOptions.map((option) => option.subtema).filter(Boolean))).map((subtema) => (
-              <option key={subtema} value={subtema} />
-            ))}
-          </datalist>
         </div>
 
         <div className={styles.actions}>
@@ -378,10 +485,10 @@ export function VentaClaseBatchPage() {
         <div className={styles.panelHeader}>
           <div>
             <h3>Vista previa del payload</h3>
-            <p>Sirve para revisar exactamente lo que se enviará antes de confirmar.</p>
+            <p>Se envía como batch con llave <strong>items</strong>. El backend arma la contabilidad.</p>
           </div>
         </div>
-        <pre className={styles.preview}>{JSON.stringify({ registros: payloadRows }, null, 2)}</pre>
+        <pre className={styles.preview}>{JSON.stringify(batchPayload, null, 2)}</pre>
       </div>
 
       {responsePreview ? (
@@ -389,7 +496,7 @@ export function VentaClaseBatchPage() {
           <div className={styles.panelHeader}>
             <div>
               <h3>Respuesta del backend</h3>
-              <p>Resultado devuelto por el endpoint de registro batch.</p>
+              <p>Resultado devuelto por el registro batch. Revisa advertencias por fila si existen.</p>
             </div>
           </div>
           <pre className={styles.preview}>{responsePreview}</pre>

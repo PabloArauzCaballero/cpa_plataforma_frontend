@@ -1103,3 +1103,16 @@ En la pantalla de `Parte Clases Pasadas`, no se debe pedir manualmente estudiant
 - Productos educativos desde `GET /api/servicios_educativos/producto-educativo`.
 
 La pantalla puede mostrar selects o controles buscables, pero el payload debe seguir respetando el contrato de `POST /api/contabilidad/venta-clase/registrar-batch`. No se debe mostrar la tarjeta visual del endpoint en el hero, aunque la llamada al endpoint debe mantenerse en código.
+
+## Regla v30 - Parte de clases pasadas: tema/subtema select y paquete
+
+En la pantalla especial `Parte Clases Pasadas`:
+
+- `Estudiante`, `Tutor`, `Materia / Producto`, `Tema` y `Subtema` deben ser controles de selección cuando existan datos del backend.
+- `Tema` y `Subtema` no deben quedar como texto libre por defecto.
+- Al elegir `Materia / Producto`, si la opción trae `tema` y `subtema`, estos se autocompletan.
+- Si cambia `Tema`, debe limpiarse `Subtema` para evitar una combinación incorrecta.
+- `Subtema` debe filtrarse según el `Tema` seleccionado cuando el backend permita inferir esa relación.
+- `Paq.` debe mantenerse como campo de texto.
+- Las tarjetas resumen deben mostrar también `Total paquete`.
+- No cambiar el endpoint real de envío: `POST /api/contabilidad/venta-clase/registrar-batch`.
