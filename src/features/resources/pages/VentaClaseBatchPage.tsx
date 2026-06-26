@@ -176,6 +176,7 @@ export function VentaClaseBatchPage() {
   const [aulaOptions, setAulaOptions] = useState<VentaClaseLookupOption[]>([]);
   const [materiaTreeOptions, setMateriaTreeOptions] = useState<MateriaTreeOption[]>([]);
   const [productoOptions, setProductoOptions] = useState<ProductoEducativoOption[]>([]);
+  const [defaultProductoId, setDefaultProductoId] = useState('');
   const [lookupStatus, setLookupStatus] = useState('Cargando catálogos desde el backend...');
   const [lookupError, setLookupError] = useState('');
 
@@ -199,7 +200,7 @@ export function VentaClaseBatchPage() {
         setAulaOptions(aulas);
         setMateriaTreeOptions(materias);
         setProductoOptions(productos);
-        setLookupStatus('Catálogos cargados desde el backend. El frontend solo captura datos; el backend genera venta, detalle, clase y asiento contable.');
+        setLookupStatus(`Catálogos cargados desde el backend: ${estudiantes.length} estudiantes, ${tutores.length} tutores, ${aulas.length} aulas, ${materias.length} materia/tema/subtema y ${productos.length} productos educativos.`);
       } catch (error) {
         if (!active) return;
         const message = error instanceof Error ? error.message : 'No se pudieron cargar los datos relacionados.';
@@ -213,6 +214,11 @@ export function VentaClaseBatchPage() {
   }, []);
 
   const materiaOptions = useMemo(() => uniqueStrings(materiaTreeOptions.map((option) => option.materia)), [materiaTreeOptions]);
+
+  const selectedDefaultProducto = useMemo(
+    () => productoOptions.find((option) => option.value === defaultProductoId),
+    [defaultProductoId, productoOptions],
+  );
 
   const payloadRows = useMemo(() => rows.filter(hasContent).map(asPayload), [rows]);
   const batchPayload = useMemo(() => ({
@@ -240,6 +246,7 @@ export function VentaClaseBatchPage() {
     return materiaTreeOptions
       .filter((option) => !row.materia || option.materia === row.materia)
       .filter((option) => !row.tema || option.tema === row.tema)
+      .filter((option) => option.id > 0)
       .filter((option) => option.subtema)
       .sort((a, b) => a.subtema.localeCompare(b.subtema, 'es'));
   }
@@ -285,7 +292,28 @@ export function VentaClaseBatchPage() {
   }
 
   function addRow() {
-    setRows((current) => [...current, createEmptyRow(current.length + 1)]);
+    setRows((current) => {
+      const next = createEmptyRow(current.length + 1);
+      if (defaultProductoId) {
+        next.id_producto_educativo = defaultProductoId;
+      }
+      return [...current, next];
+    });
+  }
+
+  function chooseDefaultProducto(value: string) {
+    setDefaultProductoId(value);
+    setRows((current) => current.map((row) => ({
+      ...row,
+      id_producto_educativo: value,
+    })));
+  }
+
+  function applyDefaultProductoToAllRows() {
+    setRows((current) => current.map((row) => ({
+      ...row,
+      id_producto_educativo: defaultProductoId,
+    })));
   }
 
   function duplicateLastRow() {
@@ -300,7 +328,11 @@ export function VentaClaseBatchPage() {
   }
 
   function clearRows() {
-    setRows([createEmptyRow(1), createEmptyRow(2), createEmptyRow(3)]);
+    const initial = [createEmptyRow(1), createEmptyRow(2), createEmptyRow(3)].map((row) => ({
+      ...row,
+      id_producto_educativo: defaultProductoId,
+    }));
+    setRows(initial);
     setErrors([]);
     setSuccessMessage('');
     setResponsePreview('');
@@ -355,6 +387,19 @@ export function VentaClaseBatchPage() {
           No se pudieron cargar las listas relacionadas: {lookupError}
         </div>
       ) : <div className={styles.lookupInfo}>{lookupStatus}</div>}
+
+      <div className={styles.defaultsPanel}>
+        <div>
+          <strong>Producto educativo por defecto</strong>
+          <span>Al elegirlo aquí se aplica automáticamente a todas las filas. Cada fila sigue pudiendo cambiarse manualmente.</span>
+        </div>
+        <select value={defaultProductoId} onChange={(event) => chooseDefaultProducto(event.target.value)}>
+          <option value="">Sin producto por defecto</option>
+          {productoOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+        <Button type="button" variant="secondary" onClick={applyDefaultProductoToAllRows} disabled={!defaultProductoId}>Aplicar a todas</Button>
+        {selectedDefaultProducto ? <small>Actual: {selectedDefaultProducto.label}</small> : null}
+      </div>
 
       {errors.length > 0 ? (
         <div className={styles.error}>
@@ -436,19 +481,19 @@ export function VentaClaseBatchPage() {
                   </td>
                   <td>
                     <select value={row.materia} onChange={(event) => updateRow(row.id, 'materia', event.target.value)}>
-                      <option value="">Selecciona materia</option>
+                      <option value="">{materiaOptions.length ? 'Selecciona materia' : 'Sin materias cargadas'}</option>
                       {materiaOptions.map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </td>
                   <td>
                     <select value={row.tema} onChange={(event) => updateRow(row.id, 'tema', event.target.value)}>
-                      <option value="">Selecciona tema</option>
+                      <option value="">{getTemaOptions(row).length ? 'Selecciona tema' : 'Sin temas cargados'}</option>
                       {getTemaOptions(row).map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </td>
                   <td>
                     <select value={row.id_materia_tree} onChange={(event) => chooseSubtema(row.id, event.target.value)}>
-                      <option value="">Selecciona subtema</option>
+                      <option value="">{getSubtemaOptions(row).length ? 'Selecciona subtema' : 'Sin subtemas cargados'}</option>
                       {getSubtemaOptions(row).map((option) => <option key={option.id} value={option.id}>{option.subtema}</option>)}
                     </select>
                   </td>

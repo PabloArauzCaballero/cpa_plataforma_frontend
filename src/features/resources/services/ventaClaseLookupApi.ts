@@ -13,6 +13,15 @@ export interface MateriaTreeOption {
   tema: string;
   subtema: string;
   label: string;
+  raw?: Record<string, unknown>;
+}
+
+interface MateriaTreeDraft {
+  id?: number;
+  materia: string;
+  tema: string;
+  subtema: string;
+  raw?: Record<string, unknown>;
 }
 
 export interface ProductoEducativoOption extends VentaClaseLookupOption {
@@ -43,6 +52,22 @@ function readNumber(record: Record<string, unknown>, fields: string[]): number |
     if (Number.isFinite(parsed) && parsed > 0) return parsed;
   }
   return undefined;
+}
+
+function readFirstObject(record: Record<string, unknown>, fields: string[]): Record<string, unknown> | undefined {
+  for (const field of fields) {
+    const value = record[field];
+    if (isRecord(value)) return value;
+  }
+  return undefined;
+}
+
+function readFirstArray(record: Record<string, unknown>, fields: string[]): Record<string, unknown>[] {
+  for (const field of fields) {
+    const value = record[field];
+    if (Array.isArray(value)) return value.filter(isRecord);
+  }
+  return [];
 }
 
 function uniqueOptions<T extends { value: string; label: string }>(options: T[]): T[] {
@@ -164,32 +189,99 @@ export async function listTutorOptions(): Promise<VentaClaseLookupOption[]> {
 export async function listAulaOptions(): Promise<VentaClaseLookupOption[]> {
   const records = await listAllRecords('/api/infraestructura/aula', 'nombre');
   return uniqueOptions(records.map((record) => {
-    const id = readText(record, ['id_aula']);
+    const id = readText(record, ['id_espacio', 'id_aula', 'id']);
     const nombre = readText(record, ['nombre', 'codigo', 'descripcion']);
     const capacidad = readText(record, ['capacidad']);
+    const tipoAula = readText(record, ['tipo_aula']);
     const label = nombre || (id ? `Aula ${id}` : 'Aula disponible');
+    const details = [tipoAula, capacidad ? `Cap. ${capacidad}` : 'Cap. N/D'].filter(Boolean).join(' · ');
     return {
       value: id,
-      label: capacidad ? `${label} · cap. ${capacidad}` : label,
+      label: details ? `${label} - ${details}` : label,
       payloadLabel: label,
     };
   }));
 }
 
+function resolveMateriaParts(record: Record<string, unknown>, inherited: Partial<MateriaTreeDraft> = {}): MateriaTreeDraft {
+  const materiaObject = readFirstObject(record, ['materia', 'materia_base', 'materiaBase']);
+  const temaObject = readFirstObject(record, ['tema_ref', 'temaBase', 'tema_base']);
+  const subtemaObject = readFirstObject(record, ['subtema_ref', 'subtemaBase', 'subtema_base']);
+
+  const materia = readText(record, [
+    'materia',
+    'nombre_materia',
+    'materia_nombre',
+    'nombre_materia_tree',
+    'asignatura',
+    'nombre_asignatura',
+    'nombre',
+    'descripcion_materia',
+  ]) || (materiaObject ? readText(materiaObject, ['nombre', 'materia', 'descripcion']) : '') || inherited.materia || '';
+
+  const tema = readText(record, [
+    'tema',
+    'nombre_tema',
+    'tema_nombre',
+    'descripcion_tema',
+    'unidad',
+    'nombre_unidad',
+  ]) || (temaObject ? readText(temaObject, ['nombre', 'tema', 'descripcion']) : '') || inherited.tema || '';
+
+  const subtema = readText(record, [
+    'subtema',
+    'nombre_subtema',
+    'subtema_nombre',
+    'descripcion_subtema',
+    'contenido',
+    'nombre_contenido',
+  ]) || (subtemaObject ? readText(subtemaObject, ['nombre', 'subtema', 'descripcion']) : '') || inherited.subtema || '';
+
+  const id = readNumber(record, [
+    'id_tree',
+    'id_materia_tree',
+    'id_materia_tema_subtema',
+    'id_materia_subtema',
+    'id_subtema',
+    'id',
+  ]);
+
+  return { id, materia, tema, subtema, raw: record };
+}
+
+function collectMateriaTreeRecords(record: Record<string, unknown>, inherited: Partial<MateriaTreeDraft> = {}): MateriaTreeDraft[] {
+  const current = resolveMateriaParts(record, inherited);
+  const children = [
+    ...readFirstArray(record, ['children', 'hijos', 'items']),
+    ...readFirstArray(record, ['temas']),
+    ...readFirstArray(record, ['subtemas']),
+    ...readFirstArray(record, ['materias']),
+  ];
+
+  const nested = children.flatMap((child) => collectMateriaTreeRecords(child, current));
+  const shouldKeepCurrent = Boolean(current.materia && (current.id || current.tema || current.subtema));
+  return shouldKeepCurrent ? [current, ...nested] : nested;
+}
+
 export async function listMateriaTreeOptions(): Promise<MateriaTreeOption[]> {
   const records = await listAllRecords('/api/servicios_educativos/materia-tree', 'nombre');
-  const mapped = records.map((record) => {
-    const id = readNumber(record, ['id_tree', 'id_materia_tree']);
-    const materia = readText(record, ['nombre', 'materia']);
-    const tema = readText(record, ['tema']);
-    const subtema = readText(record, ['subtema']);
+  const flattened = records.flatMap((record) => collectMateriaTreeRecords(record));
+
+  const mapped: MateriaTreeOption[] = [];
+  flattened.forEach((item) => {
+    const resolvedId = item.id ?? 0;
+    const materia = item.materia.trim();
+    const tema = item.tema.trim();
+    const subtema = item.subtema.trim();
     const label = [materia, tema, subtema].filter(Boolean).join(' · ');
-    return id && materia ? { id, materia, tema, subtema, label } : null;
-  }).filter((item): item is MateriaTreeOption => Boolean(item));
+    if (materia) {
+      mapped.push({ id: resolvedId, materia, tema, subtema, label, raw: item.raw });
+    }
+  });
 
   const seen = new Set<string>();
   return mapped.filter((item) => {
-    const key = `${item.id}`;
+    const key = `${item.id}-${item.materia}-${item.tema}-${item.subtema}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
