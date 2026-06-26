@@ -247,3 +247,12 @@
     max-width: 100%;
   }
 }
+
+.lookupInfo {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 32%, var(--color-neutral-light));
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
+  color: var(--color-accent);
+  font-weight: 800;
+}

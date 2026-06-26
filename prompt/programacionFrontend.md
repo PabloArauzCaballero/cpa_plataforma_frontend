@@ -1092,3 +1092,14 @@ Debe existir una pantalla operativa en Contabilidad para `Parte Clases Pasadas`,
 Columnas visibles: Fecha, Hora ingreso, Hora salida, Nombre completo estudiante, Tutor, Motivo clase, Materia / Producto, Tema, Subtema, Efectivo, QR, CxC, Paq. y Sit. Base.
 
 El formulario debe validar filas incompletas, ignorar filas vacías, mostrar resumen de importes y mostrar vista previa del payload.
+
+## Regla v29 - Parte de clases pasadas con datos relacionados reales
+
+En la pantalla de `Parte Clases Pasadas`, no se debe pedir manualmente estudiante, tutor, materia/producto y tema cuando existan endpoints relacionados. La interfaz debe cargar:
+
+- Estudiantes desde `GET /api/personas/estudiante`.
+- Tutores desde `GET /api/personas/tutor`.
+- Materias desde `GET /api/servicios_educativos/materia-tree`.
+- Productos educativos desde `GET /api/servicios_educativos/producto-educativo`.
+
+La pantalla puede mostrar selects o controles buscables, pero el payload debe seguir respetando el contrato de `POST /api/contabilidad/venta-clase/registrar-batch`. No se debe mostrar la tarjeta visual del endpoint en el hero, aunque la llamada al endpoint debe mantenerse en código.

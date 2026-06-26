@@ -1,12 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/shared/components/Button';
 import { PageState } from '@/shared/components/PageState';
 import { registrarVentaClaseBatch, type VentaClaseRowPayload } from '../services/ventaClaseApi';
+import { listEstudianteOptions, listMateriaProductoOptions, listTutorOptions, type VentaClaseLookupOption } from '../services/ventaClaseLookupApi';
 import styles from './VentaClaseBatchPage.module.css';
 
-type VentaClaseDraftRow = VentaClaseRowPayload & { id: string };
+type VentaClaseDraftRow = VentaClaseRowPayload & {
+  id: string;
+  id_estudiante_lookup: string;
+  id_tutor_lookup: string;
+  id_materia_producto_lookup: string;
+};
 
-type DraftField = keyof VentaClaseRowPayload;
+type DraftField = keyof VentaClaseDraftRow;
 
 const MOTIVOS = ['CLASE', 'RECUPERACION', 'REFORZAMIENTO', 'NIVELACION', 'EXAMEN', 'OTRO'];
 const SIT_BASE = ['PENDIENTE', 'REGISTRADA', 'OBSERVADA', 'ANULADA'];
@@ -19,6 +25,9 @@ function createEmptyRow(index: number): VentaClaseDraftRow {
     hora_salida: '',
     nombre_completo_estudiante: '',
     tutor: '',
+    id_estudiante_lookup: '',
+    id_tutor_lookup: '',
+    id_materia_producto_lookup: '',
     motivo_clase: 'CLASE',
     materia_producto: '',
     tema: '',
@@ -94,6 +103,40 @@ export function VentaClaseBatchPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [responsePreview, setResponsePreview] = useState('');
+  const [estudianteOptions, setEstudianteOptions] = useState<VentaClaseLookupOption[]>([]);
+  const [tutorOptions, setTutorOptions] = useState<VentaClaseLookupOption[]>([]);
+  const [materiaProductoOptions, setMateriaProductoOptions] = useState<VentaClaseLookupOption[]>([]);
+  const [lookupStatus, setLookupStatus] = useState('Cargando estudiantes, tutores y materias desde el backend...');
+  const [lookupError, setLookupError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadLookups() {
+      setLookupError('');
+      setLookupStatus('Cargando estudiantes, tutores y materias desde el backend...');
+      try {
+        const [estudiantes, tutores, materiasProductos] = await Promise.all([
+          listEstudianteOptions(),
+          listTutorOptions(),
+          listMateriaProductoOptions(),
+        ]);
+        if (!active) return;
+        setEstudianteOptions(estudiantes);
+        setTutorOptions(tutores);
+        setMateriaProductoOptions(materiasProductos);
+        setLookupStatus('Listas de selección cargadas desde el backend.');
+      } catch (error) {
+        if (!active) return;
+        const message = error instanceof Error ? error.message : 'No se pudieron cargar los datos relacionados.';
+        setLookupError(message);
+        setLookupStatus('No se pudieron cargar las listas relacionadas.');
+      }
+    }
+
+    void loadLookups();
+    return () => { active = false; };
+  }, []);
 
   const payloadRows = useMemo(() => rows.filter(hasContent).map(normalizeRow), [rows]);
   const totals = useMemo(() => payloadRows.reduce(
@@ -107,6 +150,39 @@ export function VentaClaseBatchPage() {
 
   function updateRow(id: string, field: DraftField, value: string | number) {
     setRows((current) => current.map((row) => row.id === id ? { ...row, [field]: value } : row));
+  }
+
+  function chooseOption(id: string, field: 'id_estudiante_lookup' | 'id_tutor_lookup' | 'id_materia_producto_lookup', value: string) {
+    setRows((current) => current.map((row) => {
+      if (row.id !== id) return row;
+
+      if (field === 'id_estudiante_lookup') {
+        const option = estudianteOptions.find((item) => item.value === value);
+        return {
+          ...row,
+          id_estudiante_lookup: value,
+          nombre_completo_estudiante: option?.payloadLabel ?? '',
+        };
+      }
+
+      if (field === 'id_tutor_lookup') {
+        const option = tutorOptions.find((item) => item.value === value);
+        return {
+          ...row,
+          id_tutor_lookup: value,
+          tutor: option?.payloadLabel ?? '',
+        };
+      }
+
+      const option = materiaProductoOptions.find((item) => item.value === value);
+      return {
+        ...row,
+        id_materia_producto_lookup: value,
+        materia_producto: option?.payloadLabel ?? '',
+        tema: option?.tema || row.tema,
+        subtema: option?.subtema || row.subtema,
+      };
+    }));
   }
 
   function addRow() {
@@ -167,12 +243,18 @@ export function VentaClaseBatchPage() {
             tutor, motivo, materia o producto, tema, subtema y forma de cobro.
           </p>
         </div>
-        <div className={styles.endpointBadge}>POST /api/contabilidad/venta-clase/registrar-batch</div>
       </div>
 
       <div className={styles.notice}>
         Este formulario envía un lote bajo la llave <strong>registros</strong>. Cada fila con datos se convierte en un registro del batch.
+        Estudiante, tutor, materia/producto y tema se seleccionan desde los datos reales del backend.
       </div>
+
+      {lookupError ? (
+        <div className={styles.error}>
+          No se pudieron cargar las listas relacionadas: {lookupError}
+        </div>
+      ) : <div className={styles.lookupInfo}>{lookupStatus}</div>}
 
       {errors.length > 0 ? (
         <div className={styles.error}>
@@ -231,16 +313,35 @@ export function VentaClaseBatchPage() {
                   <td><input type="date" value={row.fecha} onChange={(event) => updateRow(row.id, 'fecha', event.target.value)} /></td>
                   <td><input type="time" value={row.hora_ingreso} onChange={(event) => updateRow(row.id, 'hora_ingreso', event.target.value)} /></td>
                   <td><input type="time" value={row.hora_salida} onChange={(event) => updateRow(row.id, 'hora_salida', event.target.value)} /></td>
-                  <td><input value={row.nombre_completo_estudiante} onChange={(event) => updateRow(row.id, 'nombre_completo_estudiante', event.target.value)} placeholder="Nombre y apellido" /></td>
-                  <td><input value={row.tutor} onChange={(event) => updateRow(row.id, 'tutor', event.target.value)} placeholder="Tutor" /></td>
+                  <td>
+                    <select value={row.id_estudiante_lookup} onChange={(event) => chooseOption(row.id, 'id_estudiante_lookup', event.target.value)}>
+                      <option value="">Selecciona estudiante</option>
+                      {estudianteOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <select value={row.id_tutor_lookup} onChange={(event) => chooseOption(row.id, 'id_tutor_lookup', event.target.value)}>
+                      <option value="">Selecciona tutor</option>
+                      {tutorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </td>
                   <td>
                     <select value={row.motivo_clase} onChange={(event) => updateRow(row.id, 'motivo_clase', event.target.value)}>
                       {MOTIVOS.map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   </td>
-                  <td><input value={row.materia_producto} onChange={(event) => updateRow(row.id, 'materia_producto', event.target.value)} placeholder="Materia o producto" /></td>
-                  <td><textarea value={row.tema} onChange={(event) => updateRow(row.id, 'tema', event.target.value)} placeholder="Tema" /></td>
-                  <td><textarea value={row.subtema} onChange={(event) => updateRow(row.id, 'subtema', event.target.value)} placeholder="Subtema" /></td>
+                  <td>
+                    <select value={row.id_materia_producto_lookup} onChange={(event) => chooseOption(row.id, 'id_materia_producto_lookup', event.target.value)}>
+                      <option value="">Selecciona materia/producto</option>
+                      {materiaProductoOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <input value={row.tema} onChange={(event) => updateRow(row.id, 'tema', event.target.value)} placeholder="Tema cargado del backend" list="venta-clase-temas" />
+                  </td>
+                  <td>
+                    <input value={row.subtema} onChange={(event) => updateRow(row.id, 'subtema', event.target.value)} placeholder="Subtema cargado del backend" list="venta-clase-subtemas" />
+                  </td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.efectivo} onChange={(event) => updateRow(row.id, 'efectivo', event.target.value)} /></td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.qr} onChange={(event) => updateRow(row.id, 'qr', event.target.value)} /></td>
                   <td><input className={styles.moneyInput} type="number" min="0" step="0.01" value={row.cxc} onChange={(event) => updateRow(row.id, 'cxc', event.target.value)} /></td>
@@ -255,6 +356,16 @@ export function VentaClaseBatchPage() {
               ))}
             </tbody>
           </table>
+          <datalist id="venta-clase-temas">
+            {Array.from(new Set(materiaProductoOptions.map((option) => option.tema).filter(Boolean))).map((tema) => (
+              <option key={tema} value={tema} />
+            ))}
+          </datalist>
+          <datalist id="venta-clase-subtemas">
+            {Array.from(new Set(materiaProductoOptions.map((option) => option.subtema).filter(Boolean))).map((subtema) => (
+              <option key={subtema} value={subtema} />
+            ))}
+          </datalist>
         </div>
 
         <div className={styles.actions}>
