@@ -1116,3 +1116,20 @@ En la pantalla especial `Parte Clases Pasadas`:
 - `Paq.` debe mantenerse como campo de texto.
 - Las tarjetas resumen deben mostrar también `Total paquete`.
 - No cambiar el endpoint real de envío: `POST /api/contabilidad/venta-clase/registrar-batch`.
+
+## Regla v32 - Catálogos y cuentas operativas para venta-clase
+
+Cuando se trabaje el flujo de parte de clases pasadas, no basta con el formulario de carga. Debe existir también una pantalla operativa para preparar los catálogos y cuentas que alimentan el flujo:
+
+- Ruta: `/contabilidad/catalogos-cuentas-operativas`.
+- Debe configurar cuentas operativas desde base de datos, no desde `.env`:
+  - `CANAL_COBRO_EFECTIVO`
+  - `CANAL_COBRO_QR`
+  - `IVA_DEBITO_FISCAL`
+  - `INGRESO_CLASE_POR_HORA`
+- Debe permitir seleccionar cuenta contable con búsqueda por código o nombre.
+- Debe mostrar materia, tema y subtema desde `materia-tree`.
+- Debe mostrar productos educativos desde `producto-educativo`.
+- Debe mostrar unidades educativas desde `unidad-educativa`.
+- El formulario de parte de clases debe enlazar a esta pantalla.
+- El frontend no debe armar movimientos contables manualmente para venta-clase; el backend resuelve la contabilidad.

@@ -49,6 +49,12 @@ export function AppShell({ children }: AppShellProps) {
                     <i className="fa-solid fa-table-cells-large" aria-hidden="true" />
                     Tablero del módulo
                   </NavLink>
+                  {module.key === 'contabilidad' ? (
+                    <NavLink to="/contabilidad/catalogos-cuentas-operativas" className={styles.moduleBoardLink}>
+                      <i className="fa-solid fa-sliders" aria-hidden="true" />
+                      Catálogos y cuentas operativas
+                    </NavLink>
+                  ) : null}
                   {module.resources.map((resource) => (
                     <NavLink to={`/modulos/${module.key}/${resource.key}`} key={resource.key}>
                       {resource.label}

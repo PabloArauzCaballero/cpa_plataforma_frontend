@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
 import { PageState } from '@/shared/components/PageState';
 import { explainVentaClaseError, registrarVentaClaseBatch, type VentaClaseRowPayload } from '../services/ventaClaseApi';
@@ -342,8 +343,11 @@ export function VentaClaseBatchPage() {
         </div>
       </div>
 
-      <div className={styles.notice}>
-        No registres movimientos contables manuales para este flujo. Efectivo, QR, CxC y paquete se resuelven con la configuración y cuentas asociadas desde el backend.
+      <div className={styles.noticeRow}>
+        <div className={styles.notice}>
+          No registres movimientos contables manuales para este flujo. Efectivo, QR, CxC y paquete se resuelven con la configuración y cuentas asociadas desde el backend.
+        </div>
+        <Link className={styles.catalogLink} to="/contabilidad/catalogos-cuentas-operativas">Configurar catálogos y cuentas</Link>
       </div>
 
       {lookupError ? (

@@ -256,3 +256,38 @@
   color: var(--color-accent);
   font-weight: 800;
 }
+
+.noticeRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.catalogLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 14px 30px rgba(1, 43, 101, 0.14);
+}
+
+.catalogLink:hover {
+  background: var(--color-secondary-dark);
+}
+
+@media (max-width: 900px) {
+  .noticeRow {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogLink {
+    width: 100%;
+  }
+}
