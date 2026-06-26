@@ -63,7 +63,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className={styles.mainArea}>
         <header className={styles.header}>
           <div className={styles.headerBrand}>
-            <span className={styles.headerTitleMark}>CPA</span>
+            <img src="/logo.png" alt="CPA Centro de Preparación Académica" className={styles.headerLogo} />
             <div>
               <p>Plataforma interna</p>
               <h1>Gestión CPA</h1>

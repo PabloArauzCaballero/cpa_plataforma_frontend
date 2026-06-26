@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PageState } from '@/shared/components/PageState';
-import { humanizeFieldLabel } from '@/shared/utils/humanize';
+import { humanizeFieldLabel, humanizeTitleLabel } from '@/shared/utils/humanize';
 import { findResourceModule } from '@/features/resources/domain/resourceDefinitions';
 import { getModuleVisualMeta } from '../moduleMeta';
 import styles from './ModuleResourcePickerPage.module.css';
@@ -51,7 +51,7 @@ export function ModuleResourcePickerPage() {
         </div>
         <div className={styles.heroCopy}>
           <span>{meta.accent}</span>
-          <h2>{resourceModule.label}</h2>
+          <h2>{humanizeTitleLabel(resourceModule.label, resourceModule.key)}</h2>
           <p>{meta.description}</p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export function ModuleResourcePickerPage() {
                 <div className={styles.cardHeader}>
                   <div>
                     <span>{resource.table}</span>
-                    <h4>{resource.label}</h4>
+                    <h4>{humanizeTitleLabel(resource.label, resource.key)}</h4>
                   </div>
                   <i className="fa-solid fa-table" aria-hidden="true" />
                 </div>
@@ -102,12 +102,14 @@ export function ModuleResourcePickerPage() {
 
                 <div className={styles.cardActions}>
                   <Link to={`/modulos/${resourceModule.key}/${resource.key}`} className={styles.primaryAction}>
-                    Abrir tabla
+                    {resource.composite === 'venta-clase-batch' ? 'Abrir formulario' : 'Abrir tabla'}
                     <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                   </Link>
-                  <Link to={`/batch/${resourceModule.key}/${resource.key}`} className={styles.secondaryAction}>
-                    Importar
-                  </Link>
+                  {resource.composite === 'venta-clase-batch' ? null : (
+                    <Link to={`/batch/${resourceModule.key}/${resource.key}`} className={styles.secondaryAction}>
+                      Importar
+                    </Link>
+                  )}
                 </div>
               </article>
             );

@@ -1084,3 +1084,11 @@ No se debe inventar venta detalle si el backend no tiene endpoint documentado. L
 - No debe permitir que las frases se quiebren letra por letra o palabra por palabra por errores de grid.
 - El sidebar y el header del shell deben usar título textual en la parte superior, no la imagen grande del logo CPA.
 - El logo gráfico puede mantenerse como archivo público para login u otros usos puntuales, pero no debe reemplazar el título principal del shell.
+
+## Regla v28 - Parte de clases pasadas
+
+Debe existir una pantalla operativa en Contabilidad para `Parte Clases Pasadas`, accesible desde el tablero del módulo y sidebar. No es una tabla CRUD genérica: debe ser una tabla editable que envía en lote a `POST /api/contabilidad/venta-clase/registrar-batch`.
+
+Columnas visibles: Fecha, Hora ingreso, Hora salida, Nombre completo estudiante, Tutor, Motivo clase, Materia / Producto, Tema, Subtema, Efectivo, QR, CxC, Paq. y Sit. Base.
+
+El formulario debe validar filas incompletas, ignorar filas vacías, mostrar resumen de importes y mostrar vista previa del payload.

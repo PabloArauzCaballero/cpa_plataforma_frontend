@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '@/shared/components/Modal';
 import { humanizeFieldLabel } from '@/shared/utils/humanize';
 import type { CrudResourceDefinition, ResourceFieldDefinition } from '../domain/CrudResource';
+import { humanizeTitleLabel } from '@/shared/utils/humanize';
 import styles from './HelpGuideModal.module.css';
 
 type HelpTab = 'tabla' | 'orden' | 'transaccion' | 'campos';
@@ -252,11 +253,11 @@ export function HelpGuideModal({ isOpen, resource, onClose }: HelpGuideModalProp
   }
 
   return (
-    <Modal title={`Ayuda: ${resource.label}`} isOpen={isOpen} onClose={onClose}>
+    <Modal title={`Ayuda: ${humanizeTitleLabel(resource.label, resource.key)}`} isOpen={isOpen} onClose={onClose}>
       <div className={styles.guideBody}>
         <div className={styles.summaryCard}>
           <span>{resource.moduleLabel}</span>
-          <h3>{resource.label}</h3>
+          <h3>{humanizeTitleLabel(resource.label, resource.key)}</h3>
           <p>{transactionHelp.description}</p>
           <strong>Uso en transacción: {transactionHelp.typeLabel}</strong>
         </div>

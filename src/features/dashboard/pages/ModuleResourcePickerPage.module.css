@@ -50,8 +50,10 @@
 }
 
 .heroCopy h2 {
-  font-size: clamp(1.8rem, 4vw, 2.7rem);
-  letter-spacing: -0.035em;
+  font-size: clamp(2.35rem, 5vw, 3.7rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
 }
 
 .heroCopy p {
@@ -92,7 +94,7 @@
 
 .toolbar h3 {
   color: var(--color-primary);
-  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
 }
 
 .toolbar p {
@@ -266,4 +268,9 @@
   .cardActions {
     grid-template-columns: 1fr;
   }
+}
+
+.cardHeader h4 {
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }

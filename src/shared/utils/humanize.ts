@@ -45,3 +45,7 @@ export function humanizeFieldLabel(labelOrName: string, fallback?: string): stri
   const value = labelOrName || fallback || '';
   return humanizeLabel(value);
 }
+
+export function humanizeTitleLabel(labelOrName: string, fallback?: string): string {
+  return humanizeFieldLabel(labelOrName, fallback).toUpperCase();
+}

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { CrudResourceDefinition } from '../domain/CrudResource';
+import { humanizeTitleLabel } from '@/shared/utils/humanize';
 import styles from './ResourceHeader.module.css';
 
 interface ResourceHeaderProps {
@@ -14,7 +15,7 @@ export function ResourceHeader({ resource, total, visible, onHelpOpen }: Resourc
     <div className={styles.header}>
       <div>
         <span>{resource.moduleLabel}</span>
-        <h2>{resource.label}</h2>
+        <h2>{humanizeTitleLabel(resource.label, resource.key)}</h2>
         <p>{visible} de {total} registros visibles · Gestiona esta información desde una vista segura y operativa.</p>
       </div>
       <div className={styles.actions}>

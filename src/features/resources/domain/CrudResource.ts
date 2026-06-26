@@ -57,7 +57,7 @@ export interface CrudResourceDefinition {
   permissions: string;
   fields: ResourceFieldDefinition[];
   hideFromNavigation?: boolean;
-  composite?: 'transaction-with-account-movements';
+  composite?: 'transaction-with-account-movements' | 'venta-clase-batch';
 }
 
 export interface BatchValidationRow {

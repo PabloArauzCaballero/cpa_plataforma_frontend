@@ -6,6 +6,7 @@ import { PageState } from '@/shared/components/PageState';
 import type { BatchProcessResult, BatchValidationResult, CrudResourceDefinition } from '../domain/CrudResource';
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { processBatchResource, validateBatchResource } from '../services/resourceApi';
+import { humanizeTitleLabel } from '@/shared/utils/humanize';
 import styles from './ResourceBatchPage.module.css';
 
 const acceptedFileTypes = '.xlsx,.xls,.csv';
@@ -109,7 +110,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
       <div className={styles.header}>
         <div>
           <span>{resource.moduleLabel}</span>
-          <h2>Importar Excel · {resource.label}</h2>
+          <h2>Importar Excel · {humanizeTitleLabel(resource.label, resource.key)}</h2>
           <p>
             Carga masiva real para muchos registros. Primero se valida el archivo y luego se procesa el lote en el sistema.
           </p>
