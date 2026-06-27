@@ -83,7 +83,7 @@ export async function listLookupOptions(relation: ResourceLookupRelation): Promi
   return recordsToOptions(records, relation);
 }
 
-export async function listAllLookupOptions(relation: ResourceLookupRelation, pageSize = 500, maxRecords = 5000): Promise<SelectOption[]> {
+export async function listAllLookupOptions(relation: ResourceLookupRelation, pageSize = 500, maxRecords = 100000): Promise<SelectOption[]> {
   const collected: Record<string, unknown>[] = [];
   let offset = 0;
   let total: number | null = null;
@@ -95,10 +95,12 @@ export async function listAllLookupOptions(relation: ResourceLookupRelation, pag
 
     collected.push(...records);
 
-    if (records.length < pageSize) break;
+    if (records.length === 0) break;
     if (total !== null && collected.length >= total) break;
 
-    offset += pageSize;
+    // El backend puede capar internamente el limit solicitado.
+    // Avanzamos por la cantidad REAL recibida para no quedarnos solo con los primeros 100 registros.
+    offset += records.length;
   }
 
   return recordsToOptions(collected.slice(0, maxRecords), relation);

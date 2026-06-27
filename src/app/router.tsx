@@ -11,7 +11,6 @@ const ResourceListPage = lazy(() => import('@/features/resources/pages/ResourceL
 const ResourceBatchPage = lazy(() => import('@/features/resources/pages/ResourceBatchPage').then((module) => ({ default: module.ResourceBatchPage })));
 const UserProfilePage = lazy(() => import('@/features/profile/pages/UserProfilePage').then((module) => ({ default: module.UserProfilePage })));
 const CatalogosOperativosPage = lazy(() => import('@/features/catalogs/pages/CatalogosOperativosPage').then((module) => ({ default: module.CatalogosOperativosPage })));
-const QualityGatePage = lazy(() => import('@/features/quality/pages/QualityGatePage').then((module) => ({ default: module.QualityGatePage })));
 
 function withSuspense(element: ReactElement) {
   return (
@@ -39,7 +38,6 @@ export const router = createBrowserRouter([
       { path: 'modulos/:module/:resource', element: withSuspense(<ResourceListPage />) },
       { path: 'batch/:module/:resource', element: withSuspense(<ResourceBatchPage />) },
       { path: 'contabilidad/catalogos-cuentas-operativas', element: withSuspense(<CatalogosOperativosPage />) },
-      { path: 'calidad', element: withSuspense(<QualityGatePage />) },
       { path: 'perfil', element: withSuspense(<UserProfilePage />) },
       { path: '*', element: <PageState title="Pantalla no encontrada" message="La opción solicitada no existe o fue movida." /> },
     ],

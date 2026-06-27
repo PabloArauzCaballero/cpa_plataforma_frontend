@@ -43,11 +43,6 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
         if (payload) onSubmit(payload);
       }}
     >
-      <div className={styles.notice}>
-        <strong>Contrato de datos</strong>
-        <span>{isJsonMode ? 'Usa un cuerpo JSON controlado para este registro.' : 'Campos alineados al payload documentado para este recurso.'}</span>
-      </div>
-
       {isJsonMode ? (
         <label className={styles.jsonField}>
           <span>Payload JSON</span>

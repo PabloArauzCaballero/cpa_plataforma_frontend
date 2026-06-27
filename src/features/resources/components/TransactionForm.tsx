@@ -213,6 +213,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   const [movements, setMovements] = useState<MovementDraft[]>(() => getRecordMovements(record));
   const [movementDraft, setMovementDraft] = useState<MovementDraft>(emptyMovement);
   const [accountOptions, setAccountOptions] = useState<SelectOption[]>([]);
+  const [accountSearchInput, setAccountSearchInput] = useState('');
   const [accountSearch, setAccountSearch] = useState('');
   const [isLoadingAccounts, setIsLoadingAccounts] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -249,6 +250,14 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setAccountSearch(accountSearchInput);
+    }, 450);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [accountSearchInput]);
 
   const filteredAccountOptions = useMemo(() => filterAccountOptions(accountOptions, accountSearch), [accountOptions, accountSearch]);
   const selectedAccountLabel = useMemo(
@@ -290,6 +299,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
   function selectAccount(accountId: string) {
     setMovementField('cuentaId', accountId);
+    setAccountSearchInput('');
     setAccountSearch('');
   }
 
@@ -306,6 +316,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
     setMovements((current) => [...current, movementDraft]);
     setMovementDraft(emptyMovement);
+    setAccountSearchInput('');
     setAccountSearch('');
     setError(null);
   }
@@ -423,9 +434,9 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
           <label className={styles.accountPicker}>
             <span>Cuenta</span>
             <input
-              value={accountSearch}
+              value={accountSearchInput}
               disabled={isLoadingAccounts}
-              onChange={(event) => setAccountSearch(event.target.value)}
+              onChange={(event) => setAccountSearchInput(event.target.value)}
               placeholder={isLoadingAccounts ? 'Cargando cuentas...' : 'Buscar por código o nombre de cuenta'}
             />
             <select
@@ -442,7 +453,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             <small>
               {selectedAccountLabel
                 ? `Seleccionada: ${selectedAccountLabel}`
-                : `${filteredAccountOptions.length} de ${accountOptions.length} cuentas disponibles`}
+                : `${filteredAccountOptions.length} resultado(s) visibles · ${accountOptions.length} cuenta(s) cargadas`}
             </small>
           </label>
           <label>

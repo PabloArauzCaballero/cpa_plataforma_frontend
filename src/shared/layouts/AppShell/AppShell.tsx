@@ -30,10 +30,6 @@ export function AppShell({ children }: AppShellProps) {
             <i className="fa-solid fa-house" aria-hidden="true" />
             <span>Inicio</span>
           </NavLink>
-          <NavLink to="/calidad" className={styles.homeLink}>
-            <i className="fa-solid fa-shield-halved" aria-hidden="true" />
-            <span>Calidad 10/10</span>
-          </NavLink>
           {resourceModules.map((module) => {
             const meta = getModuleVisualMeta(module.key);
             const visibleResources = module.resources.filter((resource) => userHasAnyPermission(resource.permissions));
@@ -94,7 +90,7 @@ export function AppShell({ children }: AppShellProps) {
         </header>
         <main className={styles.content}>{children ?? <Outlet />}</main>
         <footer className={styles.footer}>
-          <span>CPA Plataforma · Versión 1.1.24</span>
+          <span>CPA Plataforma · Versión 1.1.25</span>
           <span>Todos los derechos reservados 2026</span>
         </footer>
       </div>

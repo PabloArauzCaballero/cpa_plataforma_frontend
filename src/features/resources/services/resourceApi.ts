@@ -47,11 +47,26 @@ function appendQuery(path: string, query: ResourceListQuery): string {
   appendVisibilityParams(params, query);
 
   if (query.orderBy) params.set('orderBy', query.orderBy);
-  if (query.search?.trim()) params.set('q', query.search.trim());
+  const cleanSearch = query.search?.trim();
+  if (cleanSearch) {
+    params.set('q', cleanSearch);
+    params.set('search', cleanSearch);
+    params.set('term', cleanSearch);
+  }
+
+  const textFilterValues = Object.values(query.filters)
+    .filter((value) => typeof value === 'string' && value.trim() !== '')
+    .map((value) => String(value).trim());
+  if (!cleanSearch && textFilterValues.length === 1) {
+    params.set('q', textFilterValues[0]);
+    params.set('search', textFilterValues[0]);
+  }
 
   Object.entries(query.filters).forEach(([key, value]) => {
     if (value === undefined || value === null || String(value).trim() === '') return;
-    params.set(key, String(value));
+    const textValue = String(value);
+    params.set(key, textValue);
+    params.set(`filter_${key}`, textValue);
   });
 
   const separator = path.includes('?') ? '&' : '?';

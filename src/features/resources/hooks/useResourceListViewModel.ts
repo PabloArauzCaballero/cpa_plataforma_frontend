@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter } from '../domain/CrudResource';
+import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter, SelectOption } from '../domain/CrudResource';
 import { createResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
+import { listAllLookupOptions } from '../services/lookupApi';
 import { exportRecords } from '../utils/exportRecords';
 import { humanizeFieldLabel } from '@/shared/utils/humanize';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-function includesSearch(record: CrudRecord, search: string): boolean {
-  if (!search.trim()) return true;
-  return JSON.stringify(record).toLowerCase().includes(search.trim().toLowerCase());
-}
 
 function resolveRecordId(resource: CrudResourceDefinition, record: CrudRecord): string | null {
   if (resource.primaryKeys?.length) {
@@ -59,15 +56,46 @@ function shouldShowFilter(name: string): boolean {
   return true;
 }
 
-function buildFilters(resource: CrudResourceDefinition): ResourceTableFilter[] {
+function inferFilterTypeFromValue(value: unknown): ResourceTableFilter['type'] {
+  if (typeof value === 'boolean') return 'boolean';
+  if (typeof value === 'number') return 'number';
+  const text = String(value ?? '');
+  if (/^\d{4}-\d{2}-\d{2}T/.test(text)) return 'datetime-local';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return 'date';
+  if (/^\d{2}:\d{2}/.test(text)) return 'time';
+  return 'text';
+}
+
+function buildDynamicFilterOptions(records: CrudRecord[], name: string): Array<string> | undefined {
+  const values = Array.from(new Set(
+    records
+      .map((record) => record[name])
+      .filter((value) => value !== undefined && value !== null && String(value).trim() !== '')
+      .map((value) => String(value).trim()),
+  ));
+
+  if (values.length === 0 || values.length > 30) return undefined;
+  return values.sort((a, b) => a.localeCompare(b, 'es'));
+}
+
+function buildFilters(
+  resource: CrudResourceDefinition,
+  records: CrudRecord[] = [],
+  lookupOptionsByField: Record<string, SelectOption[]> = {},
+): ResourceTableFilter[] {
   const baseFilters = resource.fields
     .filter((field) => shouldShowFilter(field.name))
-    .map((field) => ({
-      name: field.name,
-      label: humanizeFieldLabel(field.label, field.name),
-      type: mapFilterType(field.type),
-      options: field.options,
-    } satisfies ResourceTableFilter));
+    .map((field) => {
+      const lookupOptions = lookupOptionsByField[field.name];
+      const options = lookupOptions?.length ? lookupOptions : field.options;
+      return {
+        name: field.name,
+        label: humanizeFieldLabel(field.label, field.name),
+        type: options?.length || field.relation ? 'select' : mapFilterType(field.type),
+        options,
+        relation: field.relation,
+      } satisfies ResourceTableFilter;
+    });
 
   const existing = new Set(baseFilters.map((filter) => filter.name));
   const statusFilters: ResourceTableFilter[] = [];
@@ -80,7 +108,22 @@ function buildFilters(resource: CrudResourceDefinition): ResourceTableFilter[] {
     });
   }
 
-  return [...baseFilters, ...statusFilters];
+  const existingAfterStatus = new Set([...baseFilters, ...statusFilters].map((filter) => filter.name));
+  const dynamicFilters: ResourceTableFilter[] = [];
+
+  for (const key of Array.from(new Set(records.flatMap((record) => Object.keys(record))))) {
+    if (existingAfterStatus.has(key) || !shouldShowFilter(key)) continue;
+    const sample = records.find((record) => record[key] !== undefined && record[key] !== null)?.[key];
+    const options = buildDynamicFilterOptions(records, key);
+    dynamicFilters.push({
+      name: key,
+      label: humanizeFieldLabel(key),
+      type: options ? 'select' : inferFilterTypeFromValue(sample),
+      options,
+    });
+  }
+
+  return [...baseFilters, ...dynamicFilters.slice(0, 12), ...statusFilters];
 }
 
 function sanitizeFilterValue(value: string): string | number | boolean | '' {
@@ -88,6 +131,79 @@ function sanitizeFilterValue(value: string): string | number | boolean | '' {
   if (value === 'true') return true;
   if (value === 'false') return false;
   return value;
+}
+
+function hasActiveQuery(search: string | undefined, filters: Record<string, string | number | boolean>): boolean {
+  return Boolean(search?.trim()) || Object.keys(filters).some((key) => String(filters[key] ?? '').trim() !== '');
+}
+
+function normalizeForCompare(value: unknown): string {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isIdLikeField(name: string): boolean {
+  return /^id_/i.test(name) || /^id[A-Z]/.test(name);
+}
+
+function recordMatchesFilters(record: CrudRecord, filters: Record<string, string | number | boolean>): boolean {
+  return Object.entries(filters).every(([key, expected]) => {
+    if (expected === undefined || expected === null || String(expected).trim() === '') return true;
+
+    const actual = record[key];
+    if (actual === undefined || actual === null) return false;
+
+    if (typeof expected === 'boolean') return Boolean(actual) === expected || normalizeForCompare(actual) === normalizeForCompare(expected);
+
+    const expectedText = normalizeForCompare(expected);
+    const actualText = normalizeForCompare(actual);
+
+    // Los FK y selects deben filtrar por valor exacto para evitar coincidencias accidentales.
+    if (isIdLikeField(key) || typeof actual === 'number') return actualText === expectedText;
+
+    return actualText.includes(expectedText);
+  });
+}
+
+function recordMatchesSearch(record: CrudRecord, search: string | undefined): boolean {
+  const cleanSearch = normalizeForCompare(search);
+  if (!cleanSearch) return true;
+
+  return Object.values(record).some((value) => {
+    if (value === undefined || value === null) return false;
+    return normalizeForCompare(value).includes(cleanSearch);
+  });
+}
+
+function compareRecords(a: CrudRecord, b: CrudRecord, orderBy: string | undefined, orderDir: 'ASC' | 'DESC'): number {
+  if (!orderBy) return 0;
+  const left = a[orderBy];
+  const right = b[orderBy];
+  const direction = orderDir === 'DESC' ? -1 : 1;
+
+  const leftNumber = Number(left);
+  const rightNumber = Number(right);
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return (leftNumber - rightNumber) * direction;
+
+  return normalizeForCompare(left).localeCompare(normalizeForCompare(right), 'es') * direction;
+}
+
+function applyLocalQuery(
+  allRecords: CrudRecord[],
+  query: ResourceListQuery,
+): { records: CrudRecord[]; count: number } {
+  const filtered = allRecords
+    .filter((record) => recordMatchesSearch(record, query.search))
+    .filter((record) => recordMatchesFilters(record, query.filters))
+    .sort((a, b) => compareRecords(a, b, query.orderBy, query.orderDir));
+
+  return {
+    records: filtered.slice(query.offset, query.offset + query.limit),
+    count: filtered.length,
+  };
 }
 
 export function useResourceListViewModel(resource: CrudResourceDefinition) {
@@ -103,14 +219,16 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const [message, setMessage] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filterInputs, setFilterInputs] = useState<Record<string, string | number | boolean>>({});
   const [filters, setFilters] = useState<Record<string, string | number | boolean>>({});
   const [editingRecord, setEditingRecord] = useState<CrudRecord | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [lookupOptionsByField, setLookupOptionsByField] = useState<Record<string, SelectOption[]>>({});
 
-  const availableFilters = useMemo(() => buildFilters(resource), [resource]);
+  const availableFilters = useMemo(() => buildFilters(resource, records, lookupOptionsByField), [resource, records, lookupOptionsByField]);
 
   const query = useMemo<ResourceListQuery>(() => ({
     page,
@@ -123,18 +241,77 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   }), [page, pageSize, orderBy, orderDir, debouncedSearch, filters]);
 
   useEffect(() => {
+    let isMounted = true;
+
+    async function loadLookupFilters() {
+      const fieldsWithRelations = resource.fields.filter((field) => field.relation);
+      if (fieldsWithRelations.length === 0) {
+        setLookupOptionsByField({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        fieldsWithRelations.map(async (field) => {
+          try {
+            const options = await listAllLookupOptions(field.relation!, 300, 100000);
+            return [field.name, options] as const;
+          } catch {
+            return [field.name, []] as const;
+          }
+        }),
+      );
+
+      if (!isMounted) return;
+      setLookupOptionsByField(Object.fromEntries(entries));
+    }
+
+    void loadLookupFilters();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [resource.fields, resource.key]);
+
+  useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       setDebouncedSearch(searchInput);
       setPage(1);
-    }, 500);
+    }, 900);
 
     return () => window.clearTimeout(timeoutId);
   }, [searchInput]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setFilters(filterInputs);
+      setPage(1);
+    }, 800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [filterInputs]);
 
   const load = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+
+      if (hasActiveQuery(query.search, query.filters)) {
+        // Fallback profesional: algunos endpoints genéricos no aplican todos los filtros FK en servidor.
+        // Para que la tabla nunca mienta, cuando hay búsqueda/filtros cargamos el universo paginado
+        // y aplicamos la consulta en frontend antes de paginar visualmente.
+        const allData = await listAllResource(resource, {
+          ...query,
+          page: 1,
+          offset: 0,
+          search: '',
+          filters: {},
+        });
+        const localResult = applyLocalQuery(allData.records, query);
+        setRecords(localResult.records);
+        setTotalRecords(localResult.count);
+        return;
+      }
+
       const data = await listResource(resource, query);
       setRecords(data.records);
       setTotalRecords(data.count);
@@ -153,16 +330,14 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     setPage(1);
     setOrderBy(resource.primaryKey);
     setOrderDir('ASC');
+    setFilterInputs({});
     setFilters({});
     setSearchInput('');
     setDebouncedSearch('');
+    setLookupOptionsByField({});
   }, [resource.key, resource.module, resource.primaryKey]);
 
-  const visibleRecords = useMemo(() => {
-    // Filtro cliente como respaldo cuando el backend ignora q. Los filtros por campo
-    // se envían siempre como query params al backend.
-    return records.filter((record) => includesSearch(record, debouncedSearch));
-  }, [records, debouncedSearch]);
+  const visibleRecords = useMemo(() => records, [records]);
 
   const columns = useMemo(() => {
     const priority = [resource.primaryKey, 'id', 'codigo', 'nombre', 'nombre_cuenta', 'concepto', 'fecha', 'estado', 'estado_registro', 'activo'];
@@ -194,17 +369,17 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   }
 
   function setFilterValue(name: string, value: string) {
-    setFilters((current) => {
+    setFilterInputs((current) => {
       const next = { ...current };
       const cleanValue = sanitizeFilterValue(value);
       if (cleanValue === '') delete next[name];
       else next[name] = cleanValue;
       return next;
     });
-    setPage(1);
   }
 
   function clearFilters() {
+    setFilterInputs({});
     setFilters({});
     setSearchInput('');
     setDebouncedSearch('');
@@ -304,7 +479,16 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
         search: options.search,
         filters: options.filters,
       };
-      const result = await listAllResource(resource, exportQuery);
+      const rawResult = await listAllResource(resource, {
+        ...exportQuery,
+        search: '',
+        filters: {},
+      });
+      const localExport = applyLocalQuery(
+        rawResult.records,
+        { ...exportQuery, limit: rawResult.records.length || 1, offset: 0 },
+      );
+      const result = { records: localExport.records, count: localExport.count };
       if (result.records.length === 0) {
         setExportError('No hay registros para exportar con la consulta seleccionada.');
         return;
@@ -332,7 +516,8 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     columnLabels,
     search: searchInput,
     debouncedSearch,
-    filters,
+    filters: filterInputs,
+    activeFilters: filters,
     availableFilters,
     totalRecords,
     page,

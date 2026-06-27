@@ -98,6 +98,7 @@ export interface ResourceTableFilter {
   label: string;
   type: 'text' | 'number' | 'date' | 'datetime-local' | 'time' | 'boolean' | 'select';
   options?: Array<string | SelectOption>;
+  relation?: ResourceLookupRelation;
 }
 
 export interface ResourceListQuery {
