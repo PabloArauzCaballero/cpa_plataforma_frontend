@@ -14,6 +14,7 @@ import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource'
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { useResourceListViewModel } from '../hooks/useResourceListViewModel';
 import { humanizeTitleLabel } from '@/shared/utils/humanize';
+import { userHasAnyPermission } from '@/shared/auth/session';
 import styles from './ResourceListPage.module.css';
 
 function readHourValue(record: CrudRecord): string {
@@ -57,6 +58,13 @@ function getHourTone(record: CrudRecord): number | null {
   return hour === null ? null : hour % 8;
 }
 
+function resolveActionPermission(resource: CrudResourceDefinition, action: 'create' | 'update' | 'delete' | 'export'): string | undefined {
+  if (action === 'create') return resource.permissions;
+  if (!resource.permissions) return undefined;
+  const base = resource.permissions.replace(/create=/gi, `${action}=`).replace(/\.CREATE/gi, `.${action.toUpperCase()}`);
+  return base;
+}
+
 export function ResourceListPage() {
   const { module, resource: resourceKey } = useParams();
   const resource = findResourceDefinition(module, resourceKey);
@@ -76,6 +84,10 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
   const viewModel = useResourceListViewModel(resource);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const showHourColors = isHourVisualResource(resource);
+  const canCreate = userHasAnyPermission(resolveActionPermission(resource, 'create'));
+  const canUpdate = userHasAnyPermission(resolveActionPermission(resource, 'update'));
+  const canDelete = userHasAnyPermission(resolveActionPermission(resource, 'delete'));
+  const canExport = userHasAnyPermission(resource.permissions);
 
   const displayRecords = useMemo(() => {
     return showHourColors ? sortByHour(viewModel.visibleRecords) : viewModel.visibleRecords;
@@ -108,9 +120,11 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
         onSearchChange={viewModel.setSearch}
         onFilterChange={viewModel.setFilterValue}
         onClearFilters={viewModel.clearFilters}
-        onCreate={viewModel.openCreate}
+        onCreate={canCreate ? viewModel.openCreate : undefined}
         onReload={() => void viewModel.load()}
-        onExportOpen={viewModel.openExportModal}
+        onExportOpen={canExport ? viewModel.openExportModal : undefined}
+        canCreate={canCreate}
+        canExport={canExport}
         isSearchPending={viewModel.search !== viewModel.debouncedSearch}
       />
 
@@ -119,7 +133,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       {viewModel.error ? <PageState title="No se pudo completar la operación" message={viewModel.error} actionLabel="Reintentar" onAction={() => void viewModel.load()} /> : null}
 
       {!viewModel.error && displayRecords.length === 0 ? (
-        <PageState title="Sin registros" message="No hay datos para mostrar con los filtros actuales." actionLabel="Crear registro" onAction={viewModel.openCreate} />
+        <PageState title="Sin registros" message="No hay datos para mostrar con los filtros actuales." actionLabel={canCreate ? "Crear registro" : undefined} onAction={canCreate ? viewModel.openCreate : undefined} />
       ) : null}
 
       {!viewModel.error && displayRecords.length > 0 ? (
@@ -129,9 +143,9 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
             columns={viewModel.columns}
             columnLabels={viewModel.columnLabels}
             primaryKey={resource.primaryKey}
-            onEdit={viewModel.openEdit}
-            canDisable={viewModel.canDisableRecord}
-            onDisable={(record) => void viewModel.disable(record)}
+            onEdit={canUpdate ? viewModel.openEdit : undefined}
+            canDisable={canDelete ? viewModel.canDisableRecord : undefined}
+            onDisable={canDelete ? (record) => void viewModel.disable(record) : undefined}
             getRowHourTone={showHourColors ? getHourTone : undefined}
           />
           <div className={styles.pagination}>

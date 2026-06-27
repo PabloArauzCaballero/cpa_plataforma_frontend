@@ -227,7 +227,7 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
     fields: [
       { name: "fecha", label: "fecha", type: "date", required: true },
       { name: "hora_ingreso", label: "hora_ingreso", type: "time", required: true },
-      { name: "hora_salida", label: "hora_salida", type: "time", required: true },
+      { name: "hora_salida", label: "hora_salida", type: "time" },
       { name: "nombre_completo_estudiante", label: "nombre_completo_estudiante", type: "text", required: true },
       { name: "tutor", label: "tutor", type: "text", required: true },
       { name: "motivo_clase", label: "motivo_clase", type: "select", options: ["CLASE", "RECUPERACION", "REFORZAMIENTO", "NIVELACION", "EXAMEN", "OTRO"] },
@@ -237,8 +237,8 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
       { name: "efectivo", label: "efectivo", type: "number" },
       { name: "qr", label: "qr", type: "number" },
       { name: "cxc", label: "cxc", type: "number" },
-      { name: "paquete", label: "paquete", type: "text" },
-      { name: "situacion_base", label: "situacion_base", type: "select", options: ["PENDIENTE", "REGISTRADA", "OBSERVADA", "ANULADA"] }
+      { name: "paquete", label: "paquete", type: "number" },
+      { name: "situacion_base", label: "situacion_base", type: "select", options: ["CLASE_PASADA", "OBSERVADA"] }
     ],
     composite: 'venta-clase-batch',
   },

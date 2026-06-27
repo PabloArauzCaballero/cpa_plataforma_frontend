@@ -44,7 +44,7 @@ export function DataTable({
             {columns.map((column) => (
               <th key={column}>{resolveColumnLabel(column, columnLabels)}</th>
             ))}
-            <th>Acciones</th>
+            {(onEdit || onDisable) ? <th>Acciones</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -56,6 +56,7 @@ export function DataTable({
                 {columns.map((column) => (
                   <td key={`${key}-${column}`}>{renderValue(record[column])}</td>
                 ))}
+                {(onEdit || onDisable) ? (
                 <td>
                   <div className={styles.actions}>
                     {onEdit ? (
@@ -70,6 +71,7 @@ export function DataTable({
                     ) : null}
                   </div>
                 </td>
+                ) : null}
               </tr>
             );
           })}

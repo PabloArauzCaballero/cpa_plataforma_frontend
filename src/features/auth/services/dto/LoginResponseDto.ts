@@ -1,15 +1,21 @@
 export interface LoginResponseDto {
+  success?: boolean;
+  message?: string;
   data?: {
     sessionToken?: string;
-    user?: {
-      email?: string;
-      username?: string;
-    };
+    token?: string;
+    tokenType?: string;
+    user?: Record<string, unknown>;
+    usuario?: Record<string, unknown>;
+    roles?: unknown[];
+    permisos?: unknown[];
+    permissions?: unknown[];
   };
   sessionToken?: string;
   token?: string;
-  user?: {
-    email?: string;
-    username?: string;
-  };
+  user?: Record<string, unknown>;
+  usuario?: Record<string, unknown>;
+  roles?: unknown[];
+  permisos?: unknown[];
+  permissions?: unknown[];
 }

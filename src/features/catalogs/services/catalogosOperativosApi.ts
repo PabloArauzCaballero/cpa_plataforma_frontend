@@ -153,6 +153,7 @@ export async function upsertConfiguracionCuentaOperativa(config: ConfiguracionCu
     nombre: config.nombre,
     descripcion: config.descripcion ?? '',
     id_cuenta: Number(config.id_cuenta),
+    estado_registro: 'Activo',
   };
 
   if (config.id_configuracion_cuenta) {

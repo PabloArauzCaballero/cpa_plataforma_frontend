@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
+import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
 import styles from './AppShell.module.css';
 
@@ -10,11 +11,10 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
-  const email = window.localStorage.getItem('cpa.userEmail') ?? 'Usuario CPA';
+  const email = getSessionDisplayName();
 
   function logout() {
-    window.localStorage.removeItem('cpa.sessionToken');
-    window.localStorage.removeItem('cpa.userEmail');
+    clearStoredSession();
     navigate('/login', { replace: true });
   }
 
@@ -30,8 +30,14 @@ export function AppShell({ children }: AppShellProps) {
             <i className="fa-solid fa-house" aria-hidden="true" />
             <span>Inicio</span>
           </NavLink>
+          <NavLink to="/calidad" className={styles.homeLink}>
+            <i className="fa-solid fa-shield-halved" aria-hidden="true" />
+            <span>Calidad 10/10</span>
+          </NavLink>
           {resourceModules.map((module) => {
             const meta = getModuleVisualMeta(module.key);
+            const visibleResources = module.resources.filter((resource) => userHasAnyPermission(resource.permissions));
+            if (visibleResources.length === 0) return null;
 
             return (
               <details key={module.key} open={module.key === 'personas' || module.key === 'servicios_educativos'}>
@@ -55,7 +61,7 @@ export function AppShell({ children }: AppShellProps) {
                       Catálogos y cuentas operativas
                     </NavLink>
                   ) : null}
-                  {module.resources.map((resource) => (
+                  {visibleResources.map((resource) => (
                     <NavLink to={`/modulos/${module.key}/${resource.key}`} key={resource.key}>
                       {resource.label}
                     </NavLink>
@@ -88,7 +94,7 @@ export function AppShell({ children }: AppShellProps) {
         </header>
         <main className={styles.content}>{children ?? <Outlet />}</main>
         <footer className={styles.footer}>
-          <span>CPA Plataforma · Versión 1.1.23</span>
+          <span>CPA Plataforma · Versión 1.1.24</span>
           <span>Todos los derechos reservados 2026</span>
         </footer>
       </div>

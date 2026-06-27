@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authApi';
+import { saveStoredSession } from '@/shared/auth/session';
 
 export function useLoginViewModel() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin.demo@cpa.test');
-  const [password, setPassword] = useState('DemoAdmin123!');
+  const [email, setEmail] = useState('pablo.admin');
+  const [password, setPassword] = useState('PabloAdmin2026!');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function submit() {
     if (!email.trim() || !password.trim()) {
-      setError('Ingresa correo y contraseña.');
+      setError('Ingresa usuario o correo y contraseña.');
       return;
     }
 
@@ -19,8 +20,7 @@ export function useLoginViewModel() {
       setIsSubmitting(true);
       setError(null);
       const session = await login({ email, password });
-      window.localStorage.setItem('cpa.sessionToken', session.sessionToken);
-      window.localStorage.setItem('cpa.userEmail', session.email);
+      saveStoredSession(session);
       navigate('/', { replace: true });
     } catch (currentError) {
       setError(currentError instanceof Error ? currentError.message : 'No se pudo iniciar sesión.');

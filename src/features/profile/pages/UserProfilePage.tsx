@@ -48,7 +48,7 @@ export function UserProfilePage() {
     <main className={styles.profilePage}>
       <section className={styles.pageHeader}>
         <div>
-          <h1>Perfil de Usuario</h1>
+          <h1>PERFIL DE USUARIO</h1>
           <p>Información real de la sesión autenticada, obtenida desde el backend CPA.</p>
         </div>
 
@@ -178,9 +178,9 @@ export function UserProfilePage() {
 
             <div className={styles.rawGrid}>
               <ReadOnlyField label="Fuente" value="Sesión autenticada" />
-              <ReadOnlyField label="Datos de usuario" value={Object.keys((profile.rawData.user as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
-              <ReadOnlyField label="Datos de persona" value={Object.keys((profile.rawData.person as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
-              <ReadOnlyField label="Datos de sesión" value={Object.keys((profile.rawData.session as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
+              <ReadOnlyField label="Datos de usuario" value={profile.username || profile.idPersona ? 'Disponible' : 'No disponible'} />
+              <ReadOnlyField label="Datos de persona" value={profile.nombreCompleto || profile.nombres || profile.apellidos ? 'Disponible' : 'No disponible'} />
+              <ReadOnlyField label="Datos de sesión" value={Object.keys((profile.rawData.session as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No devuelto por backend'} />
             </div>
           </section>
         </section>

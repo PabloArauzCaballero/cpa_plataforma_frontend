@@ -9,10 +9,12 @@ interface SearchFilterBarProps {
   onSearchChange: (value: string) => void;
   onFilterChange: (name: string, value: string) => void;
   onClearFilters: () => void;
-  onCreate: () => void;
+  onCreate?: () => void;
   onReload: () => void;
-  onExportOpen: () => void;
+  onExportOpen?: () => void;
   isSearchPending?: boolean;
+  canCreate?: boolean;
+  canExport?: boolean;
 }
 
 function normalizeOption(option: string | { value: string | number; label: string }) {
@@ -71,6 +73,8 @@ export function SearchFilterBar({
   onReload,
   onExportOpen,
   isSearchPending = false,
+  canCreate = true,
+  canExport = true,
 }: SearchFilterBarProps) {
   return (
     <div className={styles.bar}>
@@ -83,8 +87,8 @@ export function SearchFilterBar({
         <div className={styles.actions}>
           <Button type="button" variant="secondary" onClick={onReload}>Actualizar</Button>
           <Button type="button" variant="secondary" onClick={onClearFilters}>Limpiar filtros</Button>
-          <Button type="button" variant="secondary" onClick={onExportOpen}>Exportar</Button>
-          <Button type="button" onClick={onCreate}>Crear registro</Button>
+          {canExport && onExportOpen ? <Button type="button" variant="secondary" onClick={onExportOpen}>Exportar</Button> : null}
+          {canCreate && onCreate ? <Button type="button" onClick={onCreate}>Crear registro</Button> : null}
         </div>
       </div>
 

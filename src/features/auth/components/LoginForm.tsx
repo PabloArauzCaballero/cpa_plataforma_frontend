@@ -19,7 +19,7 @@ export function LoginForm() {
         <h1>Ingresar a CPA</h1>
         <p>Usa las credenciales seed del backend o las credenciales reales configuradas para el sistema.</p>
       </div>
-      <FormField id="email" label="Correo" type="email" value={viewModel.email} onChange={(value) => viewModel.setEmail(String(value))} required />
+      <FormField id="email" label="Usuario o correo" type="text" value={viewModel.email} onChange={(value) => viewModel.setEmail(String(value))} required />
       <FormField id="password" label="Contraseña" type="password" value={viewModel.password} onChange={(value) => viewModel.setPassword(String(value))} required />
       {viewModel.error ? <p className={styles.error}>{viewModel.error}</p> : null}
       <Button type="submit" fullWidth disabled={viewModel.isSubmitting}>

@@ -36,8 +36,8 @@ El backend documenta rutas con prefijo `/api`, por lo que la URL base no debe re
 El archivo `docs/endpoints/endpoints.md` documenta estas credenciales de seed:
 
 ```txt
-admin.demo@cpa.test
-DemoAdmin123!
+pablo.admin
+PabloAdmin2026!
 ```
 
 ## Nota técnica

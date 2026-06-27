@@ -1,4 +1,5 @@
 import { env, assertEnv } from '@/config/env';
+import { clearStoredSession, getSessionToken } from '@/shared/auth/session';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -17,10 +18,6 @@ export class HttpError extends Error {
     super(message);
     this.name = 'HttpError';
   }
-}
-
-function getSessionToken(): string | null {
-  return window.localStorage.getItem('cpa.sessionToken');
 }
 
 function normalizePath(path: string): string {
@@ -101,6 +98,7 @@ export async function request<TResponse, TBody = unknown>(
   const payload = await parseResponse(response);
 
   if (!response.ok) {
+    if (response.status === 401) clearStoredSession();
     throw new HttpError(resolveErrorMessage(payload, response.status), response.status, payload);
   }
 
@@ -131,6 +129,7 @@ export async function upload<TResponse>(
   const payload = await parseResponse(response);
 
   if (!response.ok) {
+    if (response.status === 401) clearStoredSession();
     throw new HttpError(resolveErrorMessage(payload, response.status), response.status, payload);
   }
 

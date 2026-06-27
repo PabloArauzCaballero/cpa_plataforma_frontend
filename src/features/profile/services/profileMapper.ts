@@ -12,6 +12,15 @@ function pickRecord(...values: unknown[]): Record<string, unknown> {
   return {};
 }
 
+function mergeRecords(...values: unknown[]): Record<string, unknown> {
+  return values.reduce<Record<string, unknown>>((accumulator, value) => {
+    if (isRecord(value)) {
+      return { ...accumulator, ...value };
+    }
+    return accumulator;
+  }, {});
+}
+
 function readString(source: Record<string, unknown>, keys: string[], fallback = ''): string {
   for (const key of keys) {
     const value = source[key];
@@ -28,8 +37,8 @@ function readBoolean(source: Record<string, unknown>, keys: string[], fallback =
     if (typeof value === 'boolean') return value;
     if (typeof value === 'string') {
       const normalized = value.trim().toLowerCase();
-      if (['true', '1', 'si', 'sí', 'super', 'activo'].includes(normalized)) return true;
-      if (['false', '0', 'no', 'inactivo'].includes(normalized)) return false;
+      if (['true', '1', 'si', 'sí', 'super', 'activo', 's'].includes(normalized)) return true;
+      if (['false', '0', 'no', 'inactivo', 'n'].includes(normalized)) return false;
     }
     if (typeof value === 'number') return value === 1;
   }
@@ -45,7 +54,16 @@ function readStringArray(...values: unknown[]): string[] {
         if (typeof item === 'string' && item.trim()) {
           result.push(item.trim());
         } else if (isRecord(item)) {
-          const label = readString(item, ['codigo', 'nombre', 'descripcion', 'modulo', 'name']);
+          const label = readString(item, [
+            'codigo',
+            'nombre',
+            'descripcion',
+            'modulo',
+            'name',
+            'permiso',
+            'rol',
+            'tipo_usuario',
+          ]);
           if (label) result.push(label);
         }
       }
@@ -55,41 +73,90 @@ function readStringArray(...values: unknown[]): string[] {
   return Array.from(new Set(result));
 }
 
-function buildFullName(person: Record<string, unknown>, user: Record<string, unknown>): string {
-  const nombres = readString(person, ['nombres', 'nombre', 'firstName', 'first_name']);
-  const apellidos = readString(person, ['apellidos', 'apellido', 'lastName', 'last_name']);
-  const explicit = readString(person, ['nombre_completo', 'fullName', 'full_name']);
-  const username = readString(user, ['nombre_usuario', 'username', 'userName', 'email']);
-  const fullName = explicit || `${nombres} ${apellidos}`.trim();
+function buildFullName(person: Record<string, unknown>, user: Record<string, unknown>, fallbackSource: Record<string, unknown>): string {
+  const explicit = readString(fallbackSource, ['nombre_completo', 'fullName', 'full_name']);
+  const nombres = readString(fallbackSource, ['nombres', 'nombre', 'firstName', 'first_name']);
+  const apellidos = readString(fallbackSource, ['apellidos', 'apellido', 'lastName', 'last_name']);
+  const username = readString(user, ['nombre_usuario', 'username', 'userName', 'usuario', 'email']);
+  const personExplicit = readString(person, ['nombre_completo', 'fullName', 'full_name']);
+  const fullName = explicit || personExplicit || `${nombres} ${apellidos}`.trim();
   return fullName || username || 'Usuario CPA';
+}
+
+function pickNestedUser(data: Record<string, unknown>, root: Record<string, unknown>): Record<string, unknown> {
+  const session = pickRecord(data.session, data.sesion, root.session, root.sesion);
+  const auth = pickRecord(data.auth, root.auth);
+  return pickRecord(
+    data.user,
+    data.usuario,
+    data.persona_usuario,
+    data.currentUser,
+    data.current_user,
+    session.user,
+    session.usuario,
+    auth.user,
+    auth.usuario,
+    root.user,
+    root.usuario,
+    data,
+  );
+}
+
+function pickNestedPerson(data: Record<string, unknown>, user: Record<string, unknown>, root: Record<string, unknown>): Record<string, unknown> {
+  const session = pickRecord(data.session, data.sesion, root.session, root.sesion);
+  return pickRecord(
+    data.persona,
+    data.person,
+    data.datos_persona,
+    user.persona,
+    user.person,
+    user.datos_persona,
+    session.persona,
+    session.person,
+    root.persona,
+    root.person,
+  );
 }
 
 export function mapProfileMeResponse(dto: ProfileMeResponseDto): UserProfile {
   const root = pickRecord(dto);
   const data = pickRecord(root.data, root);
-  const user = pickRecord(data.user, data.usuario, data.persona_usuario, data);
-  const person = pickRecord(data.persona, data.person, user.persona, user.person, data);
+  const user = pickNestedUser(data, root);
+  const person = pickNestedPerson(data, user, root);
   const session = pickRecord(data.session, data.sesion, root.session, root.sesion);
 
-  const email = readString(user, ['email', 'correo', 'correo_electronico'], readString(person, ['email', 'correo', 'correo_electronico']));
-  const username = readString(user, ['nombre_usuario', 'username', 'userName'], email ? email.split('@')[0] : '');
-  const nombres = readString(person, ['nombres', 'nombre', 'firstName', 'first_name']);
-  const apellidos = readString(person, ['apellidos', 'apellido', 'lastName', 'last_name']);
-  const nombreCompleto = buildFullName(person, user);
+  // El backend puede devolver los datos de persona dentro de user, dentro de persona,
+  // o mezclados en data. Se fusionan fuentes para no mostrar "No disponible" si el dato sí vino.
+  const resolved = mergeRecords(data, person, user);
+
+  const email = readString(resolved, ['email', 'correo', 'correo_electronico']);
+  const username = readString(resolved, ['nombre_usuario', 'username', 'userName', 'usuario'], email ? email.split('@')[0] : '');
+  const nombres = readString(resolved, ['nombres', 'nombre', 'firstName', 'first_name']);
+  const apellidos = readString(resolved, ['apellidos', 'apellido', 'lastName', 'last_name']);
+  const tipoUsuario = readString(resolved, ['tipo_usuario', 'tipoUsuario', 'role', 'rol', 'perfil']);
+  const isSuperUser = readBoolean(resolved, ['es_super_usuario', 'esSuperUsuario', 'isSuperUser', 'super_user']);
+
+  const roles = readStringArray(data.roles, data.userRoles, user.roles, user.roles_usuario, resolved.roles, resolved.roles_usuario);
+  if (roles.length === 0 && tipoUsuario) {
+    roles.push(tipoUsuario);
+  }
+  if (isSuperUser && !roles.some((role) => role.toLowerCase().includes('super'))) {
+    roles.unshift('SUPER_ADMIN');
+  }
 
   return {
-    idPersona: readString(user, ['id_persona', 'persona_id'], readString(person, ['id_persona', 'id'])),
+    idPersona: readString(resolved, ['idPersona', 'id_persona', 'persona_id', 'idPersonaUsuario', 'id_persona_usuario', 'id']),
     username,
     email,
     nombres,
     apellidos,
-    nombreCompleto,
-    telefono: readString(person, ['telefono', 'celular', 'phone'], readString(user, ['telefono', 'celular', 'phone'])),
-    tipoUsuario: readString(user, ['tipo_usuario', 'tipoUsuario', 'role', 'rol'], readString(data, ['tipo_usuario', 'role', 'rol'])),
-    estado: readString(user, ['estado_registro', 'estado', 'status'], readString(data, ['estado_registro', 'estado', 'status'], 'Activo')),
-    esSuperUsuario: readBoolean(user, ['es_super_usuario', 'isSuperUser', 'super_user'], readBoolean(data, ['es_super_usuario', 'isSuperUser'])),
-    roles: readStringArray(data.roles, data.userRoles, user.roles, user.roles_usuario),
-    permisos: readStringArray(data.permisos, data.permissions, user.permisos, user.permissions),
+    nombreCompleto: buildFullName(person, user, resolved),
+    telefono: readString(resolved, ['telefono', 'celular', 'phone', 'numero_celular']),
+    tipoUsuario,
+    estado: readString(resolved, ['estado_registro', 'estado', 'status'], 'Activo'),
+    esSuperUsuario: isSuperUser,
+    roles,
+    permisos: readStringArray(data.permisos, data.permissions, user.permisos, user.permissions, resolved.permisos, resolved.permissions),
     rawData: {
       data,
       user,

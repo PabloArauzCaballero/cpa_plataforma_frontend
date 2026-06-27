@@ -1,0 +1,56 @@
+.wrapper {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: linear-gradient(135deg, #eef7fb, #ffffff);
+}
+
+.card {
+  width: min(720px, 100%);
+  border: 1px solid rgba(1, 43, 101, 0.18);
+  border-radius: 28px;
+  padding: 32px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(1, 43, 101, 0.14);
+}
+
+.eyebrow {
+  color: #147fa8;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.card h1 {
+  margin: 8px 0 12px;
+  color: #012b65;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+}
+
+.card p {
+  color: #195687;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.actions button {
+  border: 1px solid #012b65;
+  border-radius: 16px;
+  padding: 12px 18px;
+  font-weight: 900;
+  cursor: pointer;
+  background: #012b65;
+  color: #fff;
+}
+
+.actions button.secondary {
+  background: #fff;
+  color: #012b65;
+}
