@@ -212,6 +212,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   const headerViewModel = useResourceFormViewModel(resource, record);
   const [movements, setMovements] = useState<MovementDraft[]>(() => getRecordMovements(record));
   const [movementDraft, setMovementDraft] = useState<MovementDraft>(emptyMovement);
+  const [editingMovementIndex, setEditingMovementIndex] = useState<number | null>(null);
   const [accountOptions, setAccountOptions] = useState<SelectOption[]>([]);
   const [accountSearchInput, setAccountSearchInput] = useState('');
   const [accountSearch, setAccountSearch] = useState('');
@@ -303,7 +304,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     setAccountSearch('');
   }
 
-  function addMovement() {
+  function saveMovement() {
     if (!movementDraft.cuentaId.trim() || !Number.isFinite(Number(movementDraft.cuentaId)) || Number(movementDraft.cuentaId) <= 0) {
       setError('Debes seleccionar una cuenta válida.');
       return;
@@ -314,8 +315,12 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
       return;
     }
 
-    setMovements((current) => [...current, movementDraft]);
+    setMovements((current) => {
+      if (editingMovementIndex === null) return [...current, movementDraft];
+      return current.map((item, index) => (index === editingMovementIndex ? movementDraft : item));
+    });
     setMovementDraft(emptyMovement);
+    setEditingMovementIndex(null);
     setAccountSearchInput('');
     setAccountSearch('');
     setError(null);
@@ -323,6 +328,34 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
   function removeMovement(index: number) {
     setMovements((current) => current.filter((_, currentIndex) => currentIndex !== index));
+    if (editingMovementIndex === index) {
+      setEditingMovementIndex(null);
+      setMovementDraft(emptyMovement);
+      setAccountSearchInput('');
+      setAccountSearch('');
+      return;
+    }
+    if (editingMovementIndex !== null && index < editingMovementIndex) {
+      setEditingMovementIndex(editingMovementIndex - 1);
+    }
+  }
+
+  function editMovement(index: number) {
+    const movement = movements[index];
+    if (!movement) return;
+    setEditingMovementIndex(index);
+    setMovementDraft(movement);
+    setAccountSearchInput(getOptionLabel(accountOptions, movement.cuentaId));
+    setAccountSearch('');
+    setError(null);
+  }
+
+  function cancelMovementEdition() {
+    setEditingMovementIndex(null);
+    setMovementDraft(emptyMovement);
+    setAccountSearchInput('');
+    setAccountSearch('');
+    setError(null);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -471,7 +504,10 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             <span>Descripción</span>
             <input value={movementDraft.descripcion} onChange={(event) => setMovementField('descripcion', event.target.value)} placeholder="Detalle opcional" />
           </label>
-          <button type="button" onClick={addMovement}>Añadir movimiento</button>
+          <div className={styles.movementActions}>
+            <button type="button" onClick={saveMovement}>{editingMovementIndex === null ? 'Añadir movimiento' : 'Guardar cambios'}</button>
+            {editingMovementIndex !== null ? <button type="button" className={styles.secondaryButton} onClick={cancelMovementEdition}>Cancelar edición</button> : null}
+          </div>
         </div>
 
         <div className={styles.tableWrap}>
@@ -487,12 +523,17 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
             </thead>
             <tbody>
               {movements.length ? movements.map((movement, index) => (
-                <tr key={`${movement.cuentaId}-${movement.tipoMovimiento}-${index}`}>
+                <tr key={`${movement.cuentaId}-${movement.tipoMovimiento}-${index}`} data-editing={editingMovementIndex === index}>
                   <td>{getOptionLabel(accountOptions, movement.cuentaId)}</td>
                   <td>{movement.tipoMovimiento === 'DEBE' ? 'Debe' : 'Haber'}</td>
                   <td>{toMoney(movement.monto).toFixed(2)}</td>
                   <td>{movement.descripcion || '—'}</td>
-                  <td><button type="button" onClick={() => removeMovement(index)}>Quitar</button></td>
+                  <td>
+                    <div className={styles.rowActions}>
+                      <button type="button" className={styles.editButton} onClick={() => editMovement(index)}>Editar</button>
+                      <button type="button" className={styles.removeButton} onClick={() => removeMovement(index)}>Quitar</button>
+                    </div>
+                  </td>
                 </tr>
               )) : (
                 <tr>

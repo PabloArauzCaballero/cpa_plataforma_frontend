@@ -308,3 +308,37 @@
   font-weight: 800;
   line-height: 1.35;
 }
+
+.movementActions {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.secondaryButton {
+  background: var(--color-white) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 45%, var(--color-neutral-light)) !important;
+  box-shadow: none !important;
+}
+
+.rowActions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table .editButton {
+  background: var(--color-primary) !important;
+}
+
+.table .removeButton {
+  background: #991b1b !important;
+}
+
+.table tr[data-editing='true'] {
+  background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-white));
+  outline: 2px solid color-mix(in srgb, var(--color-secondary) 35%, transparent);
+  outline-offset: -2px;
+}
