@@ -96,7 +96,7 @@ export function AppShell({ children }: AppShellProps) {
         </header>
         <main className={styles.content}>{children ?? <Outlet />}</main>
         <footer className={styles.footer}>
-          <span>CPA Plataforma · Versión 1.1.36</span>
+          <span>CPA Plataforma · Versión 1.1.37</span>
           <span>Todos los derechos reservados 2026</span>
         </footer>
       </div>

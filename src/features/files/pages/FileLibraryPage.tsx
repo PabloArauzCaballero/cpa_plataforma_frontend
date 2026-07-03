@@ -18,7 +18,9 @@ import {
   faMagnifyingGlass,
   faRotateRight,
   faServer,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { uploadSingleFile } from '@/shared/services/cloudinaryUpload';
 import type { ServerFileRecord } from '../domain/ServerFile';
 import { listServerFiles, registerServerFile, registerTransactionFile } from '../services/fileServerApi';
@@ -188,6 +190,7 @@ export function FileLibraryPage() {
   const [folders, setFolders] = useState<StorageFolder[]>(() => readStoredFolders());
   const [selectedFolderPath, setSelectedFolderPath] = useState(FILE_FOLDER);
   const [newFolderName, setNewFolderName] = useState('');
+  const [folderPendingDelete, setFolderPendingDelete] = useState<StorageFolder | null>(null);
 
   const availableFolders = useMemo(() => mergeFolders(folders, files), [files, folders]);
   const selectedFolder = availableFolders.find((folder) => folder.path === selectedFolderPath) ?? availableFolders[0];
@@ -266,6 +269,24 @@ export function FileLibraryPage() {
       const resolved = caught instanceof Error ? caught.message : 'No se pudo crear la carpeta.';
       setError(resolved);
     }
+  }
+
+
+  function requestDeleteFolder(folder: StorageFolder) {
+    if (folder.path === FILE_FOLDER) return;
+    setFolderPendingDelete(folder);
+  }
+
+  function confirmDeleteFolder() {
+    if (!folderPendingDelete) return;
+    const folder = folderPendingDelete;
+    const nextFolders = folders.filter((item) => item.path !== folder.path);
+    setFolders(nextFolders);
+    writeStoredFolders(nextFolders);
+    if (selectedFolderPath === folder.path) setSelectedFolderPath(FILE_FOLDER);
+    if (folderFilter === folder.path) setFolderFilter('');
+    setFolderPendingDelete(null);
+    setMessage('Carpeta quitada de la biblioteca local. Los archivos existentes en el servidor no fueron eliminados.');
   }
 
   async function handleUpload() {
@@ -492,17 +513,30 @@ export function FileLibraryPage() {
         ) : null}
 
         <div className={styles.folderSummary}>
-          {availableFolders.map((folder) => (
-            <button
-              key={folder.path}
-              type="button"
-              className={folderFilter === folder.path ? styles.activeFolderChip : ''}
-              onClick={() => setFolderFilter(folderFilter === folder.path ? '' : folder.path)}
-              title={folder.path}
-            >
-              <FontAwesomeIcon icon={folder.path === FILE_FOLDER ? faFolderOpen : faFolder} /> {folder.label}
-            </button>
-          ))}
+          {availableFolders.map((folder) => {
+            const isLocalFolder = folders.some((item) => item.path === folder.path);
+            return (
+              <span key={folder.path} className={folderFilter === folder.path ? styles.activeFolderChip : styles.folderChip} title={folder.path}>
+                <button
+                  type="button"
+                  className={styles.folderFilterButton}
+                  onClick={() => setFolderFilter(folderFilter === folder.path ? '' : folder.path)}
+                >
+                  <FontAwesomeIcon icon={folder.path === FILE_FOLDER ? faFolderOpen : faFolder} /> {folder.label}
+                </button>
+                {isLocalFolder && folder.path !== FILE_FOLDER ? (
+                  <button
+                    type="button"
+                    className={styles.folderDeleteButton}
+                    onClick={() => requestDeleteFolder(folder)}
+                    aria-label={`Eliminar carpeta ${folder.label}`}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                ) : null}
+              </span>
+            );
+          })}
         </div>
 
         <div className={styles.fileGrid}>
@@ -552,6 +586,19 @@ export function FileLibraryPage() {
           <button type="button" disabled={page >= totalPages || isLoading} onClick={() => void loadFiles(page + 1)}>Siguiente</button>
         </div>
       </section>
+
+      <ConfirmDialog
+        isOpen={Boolean(folderPendingDelete)}
+        title="Confirmar eliminación de carpeta"
+        message="La carpeta se quitará de la biblioteca visual y ya no aparecerá como destino rápido de subida."
+        targetLabel={folderPendingDelete ? folderPendingDelete.label : undefined}
+        warning="Esta acción no elimina archivos ya subidos en Cloudinary ni registros guardados en la base de datos."
+        confirmLabel="Sí, quitar carpeta"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onCancel={() => setFolderPendingDelete(null)}
+        onConfirm={confirmDeleteFolder}
+      />
     </div>
   );
 }

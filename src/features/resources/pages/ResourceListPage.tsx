@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { DataTable } from '@/shared/components/DataTable';
+import { DataTable, type TableRecord } from '@/shared/components/DataTable';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { Modal } from '@/shared/components/Modal';
 import { PageState } from '@/shared/components/PageState';
 import { SearchFilterBar } from '@/shared/components/SearchFilterBar';
@@ -13,7 +14,7 @@ import { VentaClaseBatchPage } from './VentaClaseBatchPage';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { useResourceListViewModel } from '../hooks/useResourceListViewModel';
-import { humanizeTitleLabel } from '@/shared/utils/humanize';
+import { humanizeFieldLabel, humanizeTitleLabel } from '@/shared/utils/humanize';
 import { userHasAnyPermission } from '@/shared/auth/session';
 import styles from './ResourceListPage.module.css';
 
@@ -58,6 +59,30 @@ function getHourTone(record: CrudRecord): number | null {
   return hour === null ? null : hour % 8;
 }
 
+
+function resolveDeleteTargetLabel(resource: CrudResourceDefinition, record: CrudRecord): string {
+  const preferredKeys = [
+    'nombre',
+    'nombre_cuenta',
+    'codigo',
+    'concepto',
+    'descripcion',
+    'email',
+    'correo',
+    resource.primaryKey,
+    'id',
+  ];
+
+  for (const key of preferredKeys) {
+    const value = record[key];
+    if (value !== undefined && value !== null && String(value).trim()) {
+      return `${humanizeFieldLabel(key)}: ${String(value)}`;
+    }
+  }
+
+  return humanizeTitleLabel(resource.label, resource.key);
+}
+
 function resolveActionPermission(resource: CrudResourceDefinition, action: 'create' | 'update' | 'delete' | 'export'): string | undefined {
   if (action === 'create') return resource.permissions;
   if (!resource.permissions) return undefined;
@@ -83,6 +108,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
 
   const viewModel = useResourceListViewModel(resource);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [recordPendingDisable, setRecordPendingDisable] = useState<CrudRecord | null>(null);
   const showHourColors = isHourVisualResource(resource);
   const canCreate = userHasAnyPermission(resolveActionPermission(resource, 'create'));
   const canUpdate = userHasAnyPermission(resolveActionPermission(resource, 'update'));
@@ -145,7 +171,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
             primaryKey={resource.primaryKey}
             onEdit={canUpdate ? viewModel.openEdit : undefined}
             canDisable={canDelete ? viewModel.canDisableRecord : undefined}
-            onDisable={canDelete ? (record) => void viewModel.disable(record) : undefined}
+            onDisable={canDelete ? (record: TableRecord) => setRecordPendingDisable(record as CrudRecord) : undefined}
             getRowHourTone={showHourColors ? getHourTone : undefined}
           />
           <div className={styles.pagination}>
@@ -182,6 +208,25 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       />
 
       <HelpGuideModal isOpen={isHelpOpen} resource={resource} onClose={() => setIsHelpOpen(false)} />
+
+      <ConfirmDialog
+        isOpen={Boolean(recordPendingDisable)}
+        title="Confirmar inhabilitación"
+        message="Esta acción cambiará el estado del registro para que deje de estar activo en la operación diaria."
+        targetLabel={recordPendingDisable ? resolveDeleteTargetLabel(resource, recordPendingDisable) : undefined}
+        warning="Revisa que sea el registro correcto antes de continuar."
+        confirmLabel="Sí, inhabilitar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        isLoading={viewModel.isSaving}
+        onCancel={() => setRecordPendingDisable(null)}
+        onConfirm={() => {
+          if (!recordPendingDisable) return;
+          const record = recordPendingDisable;
+          setRecordPendingDisable(null);
+          void viewModel.disable(record);
+        }}
+      />
 
       <Modal
         title={viewModel.editingRecord ? `Editar ${humanizeTitleLabel(resource.label, resource.key)}` : `Crear ${humanizeTitleLabel(resource.label, resource.key)}`}

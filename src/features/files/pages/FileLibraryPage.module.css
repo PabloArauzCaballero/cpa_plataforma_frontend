@@ -450,16 +450,44 @@ button:disabled {
   align-items: center;
 }
 
-.folderSummary button {
-  min-height: 2.4rem;
-  padding: 0.55rem 0.85rem;
-  border-color: color-mix(in srgb, var(--color-primary) 44%, var(--color-neutral-light));
+.folderChip,
+.activeFolderChip {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 44%, var(--color-neutral-light));
+  border-radius: 999px;
   background: color-mix(in srgb, var(--color-secondary) 5%, var(--color-white));
 }
 
-.folderSummary .activeFolderChip {
+.activeFolderChip {
   background: var(--color-primary);
   color: var(--color-white);
+}
+
+.folderFilterButton,
+.folderDeleteButton {
+  min-height: 2.4rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 850;
+}
+
+.folderFilterButton {
+  padding: 0.55rem 0.85rem;
+}
+
+.folderDeleteButton {
+  display: grid;
+  width: 2.35rem;
+  place-items: center;
+  border-left: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.folderDeleteButton:hover {
+  background: rgba(180, 35, 24, 0.12);
+  color: #b42318;
 }
 
 .folderBadge {
