@@ -188,7 +188,9 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
         isOpen={viewModel.isFormOpen}
         onClose={() => viewModel.setIsFormOpen(false)}
       >
-        {resource.composite === 'transaction-with-account-movements' ? (
+        {viewModel.isLoadingEditRecord ? (
+          <PageState title="Cargando registro" message="Estamos cargando el detalle completo antes de editar." />
+        ) : resource.composite === 'transaction-with-account-movements' ? (
           <TransactionForm
             resource={resource}
             record={viewModel.editingRecord}

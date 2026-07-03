@@ -68,31 +68,91 @@ export function humanizeFieldName(name: string): string {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-export function getRecordMovements(record: CrudRecord | null): MovementDraft[] {
-  const candidates = [
-    record?.movimientos,
-    record?.movimientosCuenta,
-    record?.transaccionMovimientoCuenta,
-    record?.transaccion_movimiento_cuenta,
-    record?.detalles,
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function readArray(source: Record<string, unknown>, keys: string[]): unknown[] | undefined {
+  for (const key of keys) {
+    const value = source[key];
+    if (Array.isArray(value)) return value;
+  }
+  return undefined;
+}
+
+function readNestedMovementArray(record: CrudRecord | null): unknown[] | undefined {
+  const root = asRecord(record);
+  const movementKeys = [
+    'movimientos',
+    'movimientos_cuenta',
+    'movimientosCuenta',
+    'movimientos_cuentas',
+    'movimientosContables',
+    'asiento',
+    'asiento_contable',
+    'transaccion_movimiento_cuenta',
+    'transaccion_movimientos_cuenta',
+    'transaccionMovimientoCuenta',
+    'transaccionMovimientoCuentas',
+    'movimiento_cuentas',
+    'movimientoCuenta',
+    'detalle_movimientos',
+    'detalles_movimientos',
+    'items_movimiento',
+    'detalles',
+    'items',
   ];
 
-  const source = candidates.find(Array.isArray) as unknown[] | undefined;
+  const direct = readArray(root, movementKeys);
+  if (direct) return direct;
+
+  const nestedKeys = ['data', 'payload', 'registro', 'transaccion', 'result', 'resultado'];
+  for (const key of nestedKeys) {
+    const nested = asRecord(root[key]);
+    const nestedArray = readArray(nested, movementKeys);
+    if (nestedArray) return nestedArray;
+  }
+
+  return undefined;
+}
+
+function readNumberFrom(row: Record<string, unknown>, keys: string[]): number {
+  for (const key of keys) {
+    const value = row[key];
+    if (value === undefined || value === null || String(value).trim() === '') continue;
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return 0;
+}
+
+function readTextFrom(row: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const value = row[key];
+    if (value !== undefined && value !== null && String(value).trim() !== '') return String(value);
+  }
+  return '';
+}
+
+export function getRecordMovements(record: CrudRecord | null): MovementDraft[] {
+  const source = readNestedMovementArray(record);
   if (!source) return [];
 
   return source.map((item) => {
-    const row = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};
-    const debe = Number(row.debe ?? 0);
-    const haber = Number(row.haber ?? 0);
-    const movementType = String(row.tipoMovimiento ?? row.tipo_movimiento ?? row.tipo ?? (haber > debe ? 'HABER' : 'DEBE')).toUpperCase();
+    const row = asRecord(item);
+    const debe = readNumberFrom(row, ['debe', 'monto_debe', 'importe_debe', 'valor_debe']);
+    const haber = readNumberFrom(row, ['haber', 'monto_haber', 'importe_haber', 'valor_haber']);
+    const explicitType = readTextFrom(row, ['tipoMovimiento', 'tipo_movimiento', 'tipo', 'lado', 'naturaleza']).toUpperCase();
+    const movementType = explicitType === 'HABER' || explicitType === 'CREDITO' || explicitType === 'CRÉDITO' || haber > debe ? 'HABER' : 'DEBE';
+    const amount = readNumberFrom(row, ['monto', 'importe', 'valor', 'amount']) || (movementType === 'HABER' ? haber : debe);
 
     return {
-      cuentaId: String(row.cuentaId ?? row.id_cuenta ?? row.idCuenta ?? row.cuenta ?? ''),
-      tipoMovimiento: movementType === 'HABER' ? 'HABER' : 'DEBE',
-      monto: String(row.monto ?? (movementType === 'HABER' ? haber : debe) ?? ''),
-      descripcion: String(row.descripcion ?? row.observacion ?? ''),
+      cuentaId: readTextFrom(row, ['cuentaId', 'id_cuenta', 'idCuenta', 'cuenta', 'id_plan_cuenta']),
+      tipoMovimiento: movementType,
+      monto: amount > 0 ? String(amount) : '',
+      descripcion: readTextFrom(row, ['descripcion', 'detalle', 'observacion', 'glosa', 'nota']),
     };
-  });
+  }).filter((movement) => movement.cuentaId || movement.monto);
 }
 
 export function toMoney(value: string): number {

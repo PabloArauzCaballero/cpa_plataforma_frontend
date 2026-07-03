@@ -183,12 +183,19 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
       <TransactionDraftActions
         hasDraft={draftViewModel.hasDraft}
+        backendDraftCount={draftViewModel.backendDraftCount}
+        draftPositionLabel={draftViewModel.draftPositionLabel}
+        selectedDraftLabel={draftViewModel.selectedDraftLabel}
+        canGoPreviousDraft={draftViewModel.canGoPreviousDraft}
+        canGoNextDraft={draftViewModel.canGoNextDraft}
         isDraftBusy={draftViewModel.isDraftBusy}
         draftMessage={draftViewModel.draftMessage}
         draftError={draftViewModel.draftError}
         onSaveDraft={draftViewModel.saveDraft}
         onLoadDraft={draftViewModel.loadDraft}
         onDiscardDraft={draftViewModel.discardDraft}
+        onPreviousDraft={draftViewModel.goToPreviousDraft}
+        onNextDraft={draftViewModel.goToNextDraft}
       />
 
       <div className={styles.actions}>

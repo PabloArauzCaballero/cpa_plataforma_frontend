@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter, SelectOption } from '../domain/CrudResource';
+import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { createResource, getResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
 import { listAllLookupOptions } from '../services/lookupApi';
 import { exportRecords } from '../utils/exportRecords';
@@ -8,6 +9,76 @@ import { humanizeFieldLabel } from '@/shared/utils/humanize';
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
+
+
+function resolveRawRecordId(resource: CrudResourceDefinition, record: CrudRecord): string | number | null {
+  if (resource.primaryKeys?.length) return null;
+
+  const candidates = [resource.primaryKey, 'id', ...Object.keys(record).filter((key) => key.startsWith('id_'))];
+  for (const key of candidates) {
+    const value = record[key];
+    if ((typeof value === 'string' || typeof value === 'number') && String(value).trim()) return value;
+  }
+
+  return null;
+}
+
+function valuesAreEqual(left: unknown, right: unknown): boolean {
+  return String(left ?? '').trim() === String(right ?? '').trim();
+}
+
+function hasEmbeddedTransactionMovements(record: CrudRecord): boolean {
+  const candidateKeys = [
+    'movimientos',
+    'movimientos_cuenta',
+    'movimientosCuenta',
+    'movimientos_cuentas',
+    'movimientosContables',
+    'transaccion_movimiento_cuenta',
+    'transaccion_movimientos_cuenta',
+    'transaccionMovimientoCuenta',
+    'transaccionMovimientoCuentas',
+    'detalle_movimientos',
+    'detalles_movimientos',
+    'items_movimiento',
+    'detalles',
+  ];
+
+  return candidateKeys.some((key) => Array.isArray(record[key]) && (record[key] as unknown[]).length > 0);
+}
+
+async function enrichTransactionRecordForEdit(resource: CrudResourceDefinition, record: CrudRecord): Promise<CrudRecord> {
+  if (resource.key !== 'transaccion' || hasEmbeddedTransactionMovements(record)) return record;
+
+  const rawTransactionId = resolveRawRecordId(resource, record);
+  if (rawTransactionId === null) return record;
+
+  const movementResource = findResourceDefinition('contabilidad', 'transaccion-movimiento-cuenta');
+  if (!movementResource) return record;
+
+  try {
+    const movementResult = await listAllResource(movementResource, {
+      page: 1,
+      limit: 200,
+      offset: 0,
+      orderBy: movementResource.primaryKey,
+      orderDir: 'ASC',
+      search: '',
+      filters: { id_transaccion: rawTransactionId },
+    });
+
+    const relatedMovements = movementResult.records.filter((movement) => valuesAreEqual(movement.id_transaccion, rawTransactionId));
+    if (!relatedMovements.length) return record;
+
+    return {
+      ...record,
+      movimientos: relatedMovements,
+      transaccion_movimiento_cuenta: relatedMovements,
+    };
+  } catch {
+    return record;
+  }
+}
 
 function resolveRecordId(resource: CrudResourceDefinition, record: CrudRecord): string | null {
   if (resource.primaryKeys?.length) {
@@ -215,6 +286,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const [orderDir, setOrderDir] = useState<'ASC' | 'DESC'>('ASC');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingEditRecord, setIsLoadingEditRecord] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
@@ -410,16 +482,23 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     setEditingRecord(record);
     setMessage(null);
     setError(null);
+    setIsLoadingEditRecord(true);
 
     const id = resolveRecordId(resource, record);
-    if (!id) return;
+    if (!id) {
+      setIsLoadingEditRecord(false);
+      return;
+    }
 
     try {
       const fullRecord = await getResource(resource, id);
-      setEditingRecord({ ...record, ...fullRecord });
+      const mergedRecord = { ...record, ...fullRecord };
+      setEditingRecord(await enrichTransactionRecordForEdit(resource, mergedRecord));
     } catch {
       // Si el endpoint de detalle no devuelve datos enriquecidos, mantenemos la fila visible.
-      setEditingRecord(record);
+      setEditingRecord(await enrichTransactionRecordForEdit(resource, record));
+    } finally {
+      setIsLoadingEditRecord(false);
     }
   }
 
@@ -542,6 +621,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     orderDir,
     isLoading,
     isSaving,
+    isLoadingEditRecord,
     error,
     message,
     editingRecord,

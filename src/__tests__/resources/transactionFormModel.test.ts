@@ -27,6 +27,24 @@ describe('transactionFormModel', () => {
     ]);
   });
 
+
+
+  it('normaliza movimientos desde detalle enriquecido o endpoint hijo', () => {
+    const movements = getRecordMovements({
+      transaccion: {
+        transaccion_movimientos_cuenta: [
+          { id_cuenta: '20', monto_debe: '75.5', monto_haber: 0, detalle: 'Ajuste debe' },
+          { id_cuenta: '21', monto_debe: 0, monto_haber: '75.5', detalle: 'Ajuste haber' },
+        ],
+      },
+    });
+
+    expect(movements).toEqual([
+      { cuentaId: '20', tipoMovimiento: 'DEBE', monto: '75.5', descripcion: 'Ajuste debe' },
+      { cuentaId: '21', tipoMovimiento: 'HABER', monto: '75.5', descripcion: 'Ajuste haber' },
+    ]);
+  });
+
   it('calcula Debe, Haber y diferencia con precisión contable', () => {
     const movements: MovementDraft[] = [
       { cuentaId: '1', tipoMovimiento: 'DEBE', monto: '100,50', descripcion: '' },

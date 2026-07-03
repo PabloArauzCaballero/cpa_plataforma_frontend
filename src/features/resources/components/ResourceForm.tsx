@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight, faDatabase, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/shared/components/Button';
 import { FormField } from '@/shared/components/FormField';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
@@ -8,7 +10,7 @@ import { CloudinaryUploadField } from './CloudinaryUploadField';
 import { buildResourceDraftKey, deleteLocalDraft, hasLocalDraft, readLocalDraft, saveLocalDraft } from '@/shared/services/localDraftStore';
 import {
   discardBackendDraft,
-  getLatestBackendDraft,
+  listBackendDrafts,
   readDraftPayload,
   saveBackendDraft,
   type BackendDraft,
@@ -46,6 +48,14 @@ function getDraftStatusMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'No se pudo operar el borrador.';
 }
 
+function formatDraftDate(draft: BackendDraft | null): string {
+  const value = draft?.fecha_modificacion ?? draft?.fecha_registro;
+  if (!value) return 'Sin fecha';
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString();
+}
+
 export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }: ResourceFormProps) {
   const viewModel = useResourceFormViewModel(resource, record);
   const isJsonMode = resource.fields.length === 0;
@@ -54,26 +64,45 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
   const draftOperation = getDraftOperation(record);
   const draftKey = buildResourceDraftKey(resource.key, recordId);
   const [localDraftExists, setLocalDraftExists] = useState(() => hasLocalDraft(draftKey));
-  const [backendDraft, setBackendDraft] = useState<BackendDraft<CrudRecord> | null>(null);
+  const [backendDrafts, setBackendDrafts] = useState<Array<BackendDraft<CrudRecord>>>([]);
+  const [selectedDraftIndex, setSelectedDraftIndex] = useState(0);
   const [isDraftBusy, setIsDraftBusy] = useState(false);
   const [draftMessage, setDraftMessage] = useState<string | null>(null);
   const [draftError, setDraftError] = useState<string | null>(null);
 
+  const selectedDraft = backendDrafts[selectedDraftIndex] ?? null;
+  const hasDraft = Boolean(selectedDraft?.id_borrador) || localDraftExists;
+  const draftPositionLabel = backendDrafts.length > 0 ? `${selectedDraftIndex + 1} de ${backendDrafts.length}` : localDraftExists ? 'Respaldo local' : 'Sin borradores';
+
+  async function refreshDrafts(nextSelectedId?: string | number | null) {
+    const drafts = await listBackendDrafts<CrudRecord>(resource, draftOperation, recordId);
+    setBackendDrafts(drafts);
+    if (nextSelectedId) {
+      const nextIndex = drafts.findIndex((draft) => String(draft.id_borrador) === String(nextSelectedId));
+      setSelectedDraftIndex(nextIndex >= 0 ? nextIndex : 0);
+      return drafts;
+    }
+    setSelectedDraftIndex((current) => Math.min(current, Math.max(drafts.length - 1, 0)));
+    return drafts;
+  }
+
   useEffect(() => {
     let isMounted = true;
-    setBackendDraft(null);
+    setBackendDrafts([]);
+    setSelectedDraftIndex(0);
     setLocalDraftExists(hasLocalDraft(draftKey));
     setDraftMessage(null);
     setDraftError(null);
 
-    getLatestBackendDraft<CrudRecord>(resource, draftOperation, recordId)
-      .then((draft) => {
+    listBackendDrafts<CrudRecord>(resource, draftOperation, recordId)
+      .then((drafts) => {
         if (!isMounted) return;
-        setBackendDraft(draft);
+        setBackendDrafts(drafts);
+        setSelectedDraftIndex(0);
       })
       .catch(() => {
         if (!isMounted) return;
-        setBackendDraft(null);
+        setBackendDrafts([]);
       });
 
     return () => {
@@ -102,12 +131,12 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     try {
       const savedDraft = await saveBackendDraft(resource, draftOperation, draftPayload, {
         recordId,
-        existingDraftId: backendDraft?.id_borrador,
+        createNew: true,
       });
-      setBackendDraft(savedDraft);
+      await refreshDrafts(savedDraft.id_borrador ?? null);
       saveLocalDraft(draftKey, draftPayload);
       setLocalDraftExists(true);
-      setDraftMessage('Borrador guardado en base de datos.');
+      setDraftMessage('Nuevo borrador guardado en base de datos.');
     } catch (error) {
       saveLocalDraft(draftKey, draftPayload);
       setLocalDraftExists(true);
@@ -123,12 +152,16 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     setDraftMessage(null);
 
     try {
-      const draft = backendDraft ?? await getLatestBackendDraft<CrudRecord>(resource, draftOperation, recordId);
+      let draft = selectedDraft;
+      if (!draft) {
+        const drafts = await refreshDrafts();
+        draft = drafts[0] ?? null;
+      }
+
       const backendPayload = readDraftPayload(draft);
       if (draft && backendPayload) {
-        setBackendDraft(draft);
         applyDraftPayload(backendPayload);
-        setDraftMessage('Borrador cargado desde base de datos.');
+        setDraftMessage(`Borrador cargado: ${formatDraftDate(draft)}.`);
         return;
       }
 
@@ -159,12 +192,13 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     setDraftMessage(null);
 
     try {
-      if (backendDraft?.id_borrador) {
-        await discardBackendDraft(backendDraft.id_borrador);
+      if (selectedDraft?.id_borrador) {
+        await discardBackendDraft(selectedDraft.id_borrador);
+        await refreshDrafts();
+      } else {
+        deleteLocalDraft(draftKey);
+        setLocalDraftExists(false);
       }
-      setBackendDraft(null);
-      deleteLocalDraft(draftKey);
-      setLocalDraftExists(false);
       setDraftMessage('Borrador descartado.');
     } catch (error) {
       setDraftError(getDraftStatusMessage(error));
@@ -173,7 +207,13 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     }
   }
 
-  const hasDraft = Boolean(backendDraft?.id_borrador) || localDraftExists;
+  function goToPreviousDraft() {
+    setSelectedDraftIndex((current) => Math.max(0, current - 1));
+  }
+
+  function goToNextDraft() {
+    setSelectedDraftIndex((current) => Math.min(Math.max(backendDrafts.length - 1, 0), current + 1));
+  }
 
   return (
     <form
@@ -233,16 +273,33 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
       )}
 
       <div className={styles.draftBar}>
-        <div>
-          <strong>Borrador en base de datos</strong>
-          <span>Guarda formularios incompletos sin afectar las tablas finales. El respaldo local solo se usa si el servidor no responde.</span>
+        <div className={styles.draftInfo}>
+          <strong><FontAwesomeIcon icon={faDatabase} /> Borradores en base de datos</strong>
+          <span>Guarda varios avances sin afectar las tablas finales. Puedes moverte entre borradores antes de cargar uno.</span>
+          <small className={styles.draftMeta}>{backendDrafts.length > 0 ? `Borrador ${draftPositionLabel} · ${formatDraftDate(selectedDraft)}` : draftPositionLabel}</small>
           {draftMessage ? <small className={styles.draftSuccess}>{draftMessage}</small> : null}
           {draftError ? <small className={styles.draftError}>{draftError}</small> : null}
         </div>
         <div className={styles.draftActions}>
-          <Button type="button" variant="ghost" onClick={saveDraft} disabled={isDraftBusy}>{isDraftBusy ? 'Procesando...' : 'Guardar borrador'}</Button>
-          <Button type="button" variant="ghost" onClick={loadDraft} disabled={isDraftBusy || !hasDraft}>Cargar borrador</Button>
-          <Button type="button" variant="ghost" onClick={discardDraft} disabled={isDraftBusy || !hasDraft}>Eliminar borrador</Button>
+          <div className={styles.draftPager} aria-label="Paginación de borradores">
+            <button type="button" onClick={goToPreviousDraft} disabled={isDraftBusy || selectedDraftIndex <= 0} aria-label="Borrador anterior">
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            <span>{draftPositionLabel}</span>
+            <button type="button" onClick={goToNextDraft} disabled={isDraftBusy || selectedDraftIndex >= backendDrafts.length - 1} aria-label="Borrador siguiente">
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+
+          <Button type="button" variant="ghost" onClick={saveDraft} disabled={isDraftBusy}>
+            <FontAwesomeIcon icon={faFloppyDisk} /> {isDraftBusy ? 'Procesando...' : 'Guardar nuevo borrador'}
+          </Button>
+          <Button type="button" variant="ghost" onClick={loadDraft} disabled={isDraftBusy || !hasDraft}>
+            <FontAwesomeIcon icon={faFolderOpen} /> Cargar seleccionado
+          </Button>
+          <Button type="button" variant="ghost" onClick={discardDraft} disabled={isDraftBusy || !hasDraft}>
+            <FontAwesomeIcon icon={faTrash} /> Eliminar seleccionado
+          </Button>
         </div>
       </div>
 

@@ -352,3 +352,60 @@
   color: #a01717;
   font-weight: 800;
 }
+
+.draftInfo {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--color-primary);
+  min-width: 0;
+}
+
+.draftInfo strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.draftMeta {
+  color: var(--color-accent);
+  font-weight: 900;
+}
+
+.draftActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.draftPager {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.draftPager button {
+  min-height: 2.35rem;
+  min-width: 2.35rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 28%, var(--color-neutral-light));
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.draftPager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.draftPager span {
+  min-width: 5.8rem;
+  text-align: center;
+  color: var(--color-primary);
+  font-weight: 900;
+}
