@@ -52,10 +52,16 @@ export function AppShell({ children }: AppShellProps) {
                     Tablero del módulo
                   </NavLink>
                   {module.key === 'contabilidad' ? (
-                    <NavLink to="/contabilidad/catalogos-cuentas-operativas" className={styles.moduleBoardLink}>
-                      <i className="fa-solid fa-sliders" aria-hidden="true" />
-                      Catálogos y cuentas operativas
-                    </NavLink>
+                    <>
+                      <NavLink to="/contabilidad/catalogos-cuentas-operativas" className={styles.moduleBoardLink}>
+                        <i className="fa-solid fa-sliders" aria-hidden="true" />
+                        Catálogos y cuentas operativas
+                      </NavLink>
+                      <NavLink to="/contabilidad/archivos" className={styles.moduleBoardLink}>
+                        <i className="fa-solid fa-folder-open" aria-hidden="true" />
+                        Biblioteca de archivos
+                      </NavLink>
+                    </>
                   ) : null}
                   {visibleResources.map((resource) => (
                     <NavLink to={`/modulos/${module.key}/${resource.key}`} key={resource.key}>
@@ -90,7 +96,7 @@ export function AppShell({ children }: AppShellProps) {
         </header>
         <main className={styles.content}>{children ?? <Outlet />}</main>
         <footer className={styles.footer}>
-          <span>CPA Plataforma · Versión 1.1.25</span>
+          <span>CPA Plataforma · Versión 1.1.35</span>
           <span>Todos los derechos reservados 2026</span>
         </footer>
       </div>

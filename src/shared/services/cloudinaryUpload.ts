@@ -2,6 +2,7 @@ const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_DEFAULT_FOLDER = import.meta.env.VITE_CLOUDINARY_FOLDER || '';
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_GENERIC_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 
 export interface CloudinaryUploadResult {
   url: string;
@@ -9,6 +10,9 @@ export interface CloudinaryUploadResult {
   width?: number;
   height?: number;
   format?: string;
+  bytes?: number;
+  resourceType?: string;
+  originalFilename?: string;
 }
 
 function assertCloudinaryConfig() {
@@ -18,6 +22,14 @@ function assertCloudinaryConfig() {
 
   if (!CLOUDINARY_UPLOAD_PRESET) {
     throw new Error('Falta configurar VITE_CLOUDINARY_UPLOAD_PRESET.');
+  }
+}
+
+function validateGenericFile(file: File) {
+  if (!file) throw new Error('No se envió ningún archivo.');
+
+  if (file.size > MAX_GENERIC_FILE_SIZE_BYTES) {
+    throw new Error('El archivo excede el límite de 25 MB.');
   }
 }
 
@@ -86,6 +98,60 @@ export async function uploadSingleImage(file: File, { folder }: { folder?: strin
     width: typeof body.width === 'number' ? body.width : undefined,
     height: typeof body.height === 'number' ? body.height : undefined,
     format: typeof body.format === 'string' ? body.format : undefined,
+    bytes: typeof body.bytes === 'number' ? body.bytes : undefined,
+    resourceType: typeof body.resource_type === 'string' ? body.resource_type : undefined,
+    originalFilename: typeof body.original_filename === 'string' ? body.original_filename : undefined,
+  };
+}
+
+export async function uploadSingleFile(file: File, { folder }: { folder?: string } = {}): Promise<CloudinaryUploadResult> {
+  assertCloudinaryConfig();
+  validateGenericFile(file);
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  const resolvedFolder = resolveFolder(folder);
+  if (resolvedFolder) {
+    formData.append('folder', resolvedFolder);
+  }
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+
+  let response: Response;
+  try {
+    response = await fetch(endpoint, { method: 'POST', body: formData });
+  } catch {
+    throw new Error('No se pudo subir el archivo por un problema de red.');
+  }
+
+  let body: Record<string, unknown> | null = null;
+  try {
+    body = (await response.json()) as Record<string, unknown>;
+  } catch {
+    body = null;
+  }
+
+  if (!response.ok) {
+    const errorBody = body?.error as { message?: string } | undefined;
+    const detail = errorBody?.message || 'Revisa el upload preset y la configuración de Cloudinary.';
+    throw new Error(`Cloudinary rechazó la subida. ${detail}`);
+  }
+
+  if (!body?.secure_url) {
+    throw new Error('Cloudinary no devolvió una URL usable para el archivo.');
+  }
+
+  return {
+    url: String(body.secure_url),
+    publicId: String(body.public_id ?? ''),
+    width: typeof body.width === 'number' ? body.width : undefined,
+    height: typeof body.height === 'number' ? body.height : undefined,
+    format: typeof body.format === 'string' ? body.format : undefined,
+    bytes: typeof body.bytes === 'number' ? body.bytes : undefined,
+    resourceType: typeof body.resource_type === 'string' ? body.resource_type : undefined,
+    originalFilename: typeof body.original_filename === 'string' ? body.original_filename : undefined,
   };
 }
 
