@@ -25,7 +25,7 @@ export interface BackendDraft<T = unknown> extends BackendDraftPayload<T> {
 }
 
 const DRAFT_ENDPOINT = '/api/administracion/registro-borrador';
-const DRAFT_FRONTEND_VERSION = '1.1.33';
+const DRAFT_FRONTEND_VERSION = '1.1.34';
 
 function encodeQuery(params: Record<string, string | number | boolean | undefined>): string {
   const query = new URLSearchParams();

@@ -143,7 +143,7 @@ export function getRecordMovements(record: CrudRecord | null): MovementDraft[] {
     const debe = readNumberFrom(row, ['debe', 'monto_debe', 'importe_debe', 'valor_debe']);
     const haber = readNumberFrom(row, ['haber', 'monto_haber', 'importe_haber', 'valor_haber']);
     const explicitType = readTextFrom(row, ['tipoMovimiento', 'tipo_movimiento', 'tipo', 'lado', 'naturaleza']).toUpperCase();
-    const movementType = explicitType === 'HABER' || explicitType === 'CREDITO' || explicitType === 'CRÉDITO' || haber > debe ? 'HABER' : 'DEBE';
+    const movementType: MovementDraft['tipoMovimiento'] = explicitType === 'HABER' || explicitType === 'CREDITO' || explicitType === 'CRÉDITO' || haber > debe ? 'HABER' : 'DEBE';
     const amount = readNumberFrom(row, ['monto', 'importe', 'valor', 'amount']) || (movementType === 'HABER' ? haber : debe);
 
     return {
