@@ -15,12 +15,23 @@ Frontend React + TypeScript + Vite para la plataforma interna del Centro de Prep
 - `X-Session-Token` agregado automáticamente cuando existe sesión local.
 - Tokens visuales generados desde `docs/theme/cpa-palette.json`.
 
-## Instalación
+## Instalación con Yarn
+
+Este proyecto usa Yarn Classic como gestor único de dependencias. No mezclar con `npm install`.
 
 ```bash
-npm install
+yarn install --frozen-lockfile
 cp .env.example .env
-npm run dev
+yarn dev
+```
+
+## Calidad
+
+```bash
+yarn typecheck
+yarn test
+yarn build
+yarn quality
 ```
 
 ## Variable de entorno

@@ -342,3 +342,13 @@
   outline: 2px solid color-mix(in srgb, var(--color-secondary) 35%, transparent);
   outline-offset: -2px;
 }
+
+.draftSuccess {
+  color: #17663a;
+  font-weight: 800;
+}
+
+.draftError {
+  color: #a01717;
+  font-weight: 800;
+}

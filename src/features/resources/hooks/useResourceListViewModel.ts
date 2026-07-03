@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceListQuery, ResourceTableFilter, SelectOption } from '../domain/CrudResource';
-import { createResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
+import { createResource, getResource, listAllResource, listResource, updateResource } from '../services/resourceApi';
 import { listAllLookupOptions } from '../services/lookupApi';
 import { exportRecords } from '../utils/exportRecords';
 import { humanizeFieldLabel } from '@/shared/utils/humanize';
@@ -405,10 +405,22 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     setMessage(null);
   }
 
-  function openEdit(record: CrudRecord) {
-    setEditingRecord(record);
+  async function openEdit(record: CrudRecord) {
     setIsFormOpen(true);
+    setEditingRecord(record);
     setMessage(null);
+    setError(null);
+
+    const id = resolveRecordId(resource, record);
+    if (!id) return;
+
+    try {
+      const fullRecord = await getResource(resource, id);
+      setEditingRecord({ ...record, ...fullRecord });
+    } catch {
+      // Si el endpoint de detalle no devuelve datos enriquecidos, mantenemos la fila visible.
+      setEditingRecord(record);
+    }
   }
 
   async function save(payload: CrudRecord) {

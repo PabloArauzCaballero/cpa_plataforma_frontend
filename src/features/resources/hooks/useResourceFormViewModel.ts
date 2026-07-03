@@ -133,6 +133,12 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     setPayload((current) => ({ ...current, [name]: value }));
   }
 
+  function replacePayload(nextPayload: CrudRecord) {
+    setPayload(nextPayload);
+    setJsonPayload(JSON.stringify(nextPayload, null, 2));
+    setErrors({});
+  }
+
   function getFieldOptions(field: ResourceFieldDefinition): Array<string | SelectOption> {
     const conditionalOptions = resolveConditionalOptions(field, payload);
     return mergeOptions(conditionalOptions ?? field.options, relationOptions[field.name]);
@@ -165,6 +171,7 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     jsonPayload,
     errors,
     setField,
+    replacePayload,
     setJsonPayload,
     getPayload,
     getFieldOptions,

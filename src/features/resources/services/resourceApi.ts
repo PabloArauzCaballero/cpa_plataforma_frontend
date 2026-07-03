@@ -114,6 +114,12 @@ export async function listAllResource(resource: CrudResourceDefinition, query: R
   };
 }
 
+
+export async function getResource(resource: CrudResourceDefinition, id: string): Promise<CrudRecord> {
+  const response = await httpClient.get<unknown>(resource.endpoints.detail(id));
+  return normalizeRecordResponse(response);
+}
+
 export async function createResource(resource: CrudResourceDefinition, payload: CrudRecord): Promise<CrudRecord> {
   const response = await httpClient.post<unknown, CrudRecord>(resource.endpoints.create, payload);
   return normalizeRecordResponse(response);

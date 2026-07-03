@@ -25,10 +25,20 @@
         "src/*"
       ]
     },
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "vite/client"
+    ]
   },
   "include": [
     "src"
   ],
-  "references": []
+  "references": [],
+  "exclude": [
+    "src/__tests__",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }
