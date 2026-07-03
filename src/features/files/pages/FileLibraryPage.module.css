@@ -377,3 +377,106 @@ button:disabled {
     width: 100%;
   }
 }
+
+.folderPanel {
+  display: grid;
+  gap: var(--space-3);
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 25%, var(--color-neutral-light));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-secondary) 6%, var(--color-white));
+}
+
+.folderPanel h4,
+.folderPanel p {
+  margin: 0;
+}
+
+.folderPanel h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+  font-size: 1.12rem;
+  text-transform: uppercase;
+}
+
+.folderPanel p,
+.fieldHint {
+  color: var(--color-accent);
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.folderCreator {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.folderCreator input {
+  min-height: 3rem;
+  border: 1px solid color-mix(in srgb, var(--color-neutral-muted) 42%, var(--color-neutral-light));
+  border-radius: 0.9rem;
+  padding: 0.86rem 1rem;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 750;
+}
+
+.folderCreator button,
+.folderSummary button {
+  min-height: 2.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.85rem;
+  padding: 0.72rem 1rem;
+  background: var(--color-white);
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.folderCreator button {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.folderSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.folderSummary button {
+  min-height: 2.4rem;
+  padding: 0.55rem 0.85rem;
+  border-color: color-mix(in srgb, var(--color-primary) 44%, var(--color-neutral-light));
+  background: color-mix(in srgb, var(--color-secondary) 5%, var(--color-white));
+}
+
+.folderSummary .activeFolderChip {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.folderBadge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-white));
+  color: var(--color-secondary-dark);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+@media (max-width: 760px) {
+  .folderCreator {
+    grid-template-columns: 1fr;
+  }
+}

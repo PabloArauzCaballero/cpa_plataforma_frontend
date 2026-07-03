@@ -10,6 +10,8 @@ export interface ServerFileRecord {
   storage_key?: string;
   checksum_sha256?: string;
   metadata_json?: Record<string, unknown> | string | null;
+  carpeta?: string;
+  folder?: string;
   estado_registro?: string;
   fecha_registro?: string;
   fecha_modificacion?: string | null;
@@ -24,6 +26,8 @@ export interface FileUploadPayload {
   storage_provider?: string;
   storage_key?: string;
   metadata_json?: Record<string, unknown>;
+  carpeta?: string;
+  folder?: string;
 }
 
 export interface TransactionFilePayload extends FileUploadPayload {
@@ -36,6 +40,7 @@ export interface FileListFilters {
   q?: string;
   provider?: string;
   mime?: string;
+  folder?: string;
   page?: number;
   limit?: number;
 }

@@ -19,6 +19,10 @@ function buildQuery(filters: FileListFilters): string {
 
   if (filters.provider?.trim()) params.set('storage_provider', filters.provider.trim());
   if (filters.mime?.trim()) params.set('tipo_mime', filters.mime.trim());
+  if (filters.folder?.trim()) {
+    params.set('folder', filters.folder.trim());
+    params.set('carpeta', filters.folder.trim());
+  }
 
   return params.toString();
 }
