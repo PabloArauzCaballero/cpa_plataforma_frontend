@@ -39,7 +39,7 @@ POST /api/contabilidad/venta-clase/registrar-batch
 - Valida fecha, hora de ingreso, hora de salida, estudiante, tutor y materia/producto.
 - Calcula resumen de filas a enviar, total efectivo, total QR y total CxC.
 - Muestra vista previa del payload antes de enviar.
-- Muestra la respuesta del backend después del envío.
+- Muestra la respuesta del sistema después del envío.
 
 ## Payload enviado
 
@@ -66,4 +66,4 @@ POST /api/contabilidad/venta-clase/registrar-batch
 }
 ```
 
-> Nota: el archivo entregado por el usuario solo definía columnas y endpoint. Si el backend exige otra llave distinta a `registros`, se debe ajustar únicamente `src/features/resources/services/ventaClaseApi.ts`.
+> Nota: el archivo entregado por el usuario solo definía columnas y endpoint. Si el sistema exige otra llave distinta a `registros`, se debe ajustar únicamente `src/features/resources/services/ventaClaseApi.ts`.

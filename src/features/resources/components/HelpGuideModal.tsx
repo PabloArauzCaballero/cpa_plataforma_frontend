@@ -59,7 +59,7 @@ function detectTransactionHelp(resource: CrudResourceDefinition): TransactionHel
     return {
       title: 'Esta tabla es la cabecera contable de la operación',
       typeLabel: 'Tipo según operación',
-      description: 'Aquí se registra la transacción principal y sus movimientos contables. El tipo elegido define qué referencias se muestran y cuáles se limpian del payload.',
+      description: 'Aquí se registra la transacción principal y sus movimientos contables. El tipo elegido define qué referencias se muestran y cuáles se limpian antes de guardar.',
       steps: [
         { label: 'Tipo', text: 'Elige GENERAL, COSTO, VENTA, BIEN o DEUDA según el hecho real que estás registrando.' },
         { label: 'Referencia', text: 'Completa solo los campos relacionados con el tipo seleccionado. Por ejemplo, BIEN usa bien o movimiento de inventario; DEUDA usa deuda o pago de deuda.' },
@@ -72,7 +72,7 @@ function detectTransactionHelp(resource: CrudResourceDefinition): TransactionHel
     return {
       title: 'Esta tabla se usa después de crear una transacción',
       typeLabel: 'Comprobante',
-      description: 'Sirve para adjuntar evidencia digital a una transacción ya existente. La imagen se sube a Cloudinary y el enlace se guarda en el payload.',
+      description: 'Sirve para adjuntar evidencia digital a una transacción ya existente. La imagen se sube a Cloudinary y el enlace queda guardado en el registro.',
       steps: [
         { label: 'Primero', text: 'Crea o identifica la transacción contable correspondiente.' },
         { label: 'Luego', text: 'Selecciona la transacción y sube el comprobante como imagen.' },
@@ -141,7 +141,7 @@ function detectTransactionHelp(resource: CrudResourceDefinition): TransactionHel
       steps: [
         { label: 'Servicio', text: 'Registra nombre, tipo de producto, precio base y límites de estudiantes.' },
         { label: 'Venta', text: 'Cuando se cobre el servicio, crea una transacción tipo VENTA relacionada con este producto educativo.' },
-        { label: 'Detalle', text: 'Si una venta incluye muchos servicios/productos, el detalle debe manejarse separado cuando el backend exponga esa entidad.' },
+        { label: 'Detalle', text: 'Si una venta incluye muchos servicios o productos, el detalle debe manejarse en el módulo correspondiente cuando esté disponible.' },
       ],
     };
   }
@@ -198,7 +198,7 @@ function detectTransactionHelp(resource: CrudResourceDefinition): TransactionHel
 }
 
 function getOrderSteps(resource: CrudResourceDefinition): HelpStep[] {
-  const requiredFields = formatFieldList(getRequiredFields(resource), 'No hay campos obligatorios marcados en el frontend para esta tabla.');
+  const requiredFields = formatFieldList(getRequiredFields(resource), 'No hay campos obligatorios configurados para esta tabla.');
   const relations = getRelationshipFields(resource);
   const relationText = relations.length
     ? `Antes de guardar, confirma que estas relaciones ya existan: ${formatFieldList(relations, '')}.`

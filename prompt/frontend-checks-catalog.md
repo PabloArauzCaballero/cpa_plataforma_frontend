@@ -1,6 +1,6 @@
 # Catálogo de checks para frontend CPA
 
-Este catálogo define las validaciones que el frontend debe aplicar antes de construir formularios, validar datos y enviar payloads al backend.
+Este catálogo define las validaciones que el frontend debe aplicar antes de construir formularios, validar datos y enviar payloads al sistema.
 
 ## Regla principal
 
@@ -45,7 +45,7 @@ El frontend **no debe inventar validaciones por intuición ni por mockup**. Para
 
 ## Checks de enums
 
-Los campos con tipo `ENUM` deben renderizarse como `select` con valores exactos. Nunca traducir el valor enviado al backend.
+Los campos con tipo `ENUM` deben renderizarse como `select` con valores exactos. Nunca traducir el valor enviado al sistema.
 
 ```json
 {
@@ -215,7 +215,7 @@ El formulario de transacción debe manejar encabezado y movimientos juntos.
 - Una línea no puede tener `debe > 0` y `haber > 0` al mismo tiempo.
 - Una línea no puede tener ambos en cero.
 - La suma total del Debe debe ser igual a la suma total del Haber.
-- El frontend debe mostrar balance visual, pero el backend conserva la validación final.
+- El frontend debe mostrar balance visual, pero el sistema conserva la validación final.
 
 ## Checks de deuda
 
@@ -263,7 +263,7 @@ El formulario de transacción debe manejar encabezado y movimientos juntos.
 1. No enviar campos vacíos opcionales.
 2. Convertir `number` antes de enviar.
 3. Convertir `boolean` como boolean real.
-4. Enviar enums exactamente como el backend los define.
+4. Enviar enums exactamente como el sistema los define.
 5. No enviar campos de auditoría.
 6. No mostrar ni enviar rutas técnicas desde UI.
 7. No usar campos genéricos como `campo`, `valor`, `name`, `description` si el contrato real usa otro nombre.

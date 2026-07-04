@@ -2,7 +2,7 @@
 
 ## Problema
 
-Al listar tablas, el frontend no enviaba ningún parámetro explícito para indicar si se debían incluir registros inactivos o eliminados. En el DDL del backend varias funciones de listado tienen el parámetro `p_only_activos` con valor por defecto `true`, por lo que el backend podía devolver solamente registros con `estado_registro = 'Activo'` aunque en la pantalla el filtro visual diga `Todos`.
+Al listar tablas, el frontend no enviaba ningún parámetro explícito para indicar si se debían incluir registros inactivos o eliminados. En el DDL del sistema varias funciones de listado tienen el parámetro `p_only_activos` con valor por defecto `true`, por lo que el sistema podía devolver solamente registros con `estado_registro = 'Activo'` aunque en la pantalla el filtro visual diga `Todos`.
 
 ## Corrección
 
@@ -33,4 +33,4 @@ Se corrigió en:
 
 ## Resultado esperado
 
-Al entrar a una tabla con filtro visual `Todos`, deben aparecer activos e inactivos si el backend los devuelve. Solo se listarán exclusivamente activos cuando el usuario elija el filtro `Activo`.
+Al entrar a una tabla con filtro visual `Todos`, deben aparecer activos e inactivos si el sistema los devuelve. Solo se listarán exclusivamente activos cuando el usuario elija el filtro `Activo`.

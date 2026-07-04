@@ -1,6 +1,6 @@
 # Validaciones contables de negocio implementadas en frontend
 
-Este documento resume las validaciones contables añadidas al proyecto React para reducir texto libre y prevenir registros ambiguos antes de enviar payloads al backend.
+Este documento resume las validaciones contables añadidas al proyecto React para reducir texto libre y prevenir registros ambiguos antes de enviar payloads al sistema.
 
 ## Transacciones contables
 

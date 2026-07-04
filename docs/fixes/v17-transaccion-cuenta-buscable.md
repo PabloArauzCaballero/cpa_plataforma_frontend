@@ -1,7 +1,7 @@
 # v17 - Selector buscable de cuentas en transacción
 
 ## Problema
-El formulario de transacción cargaba las cuentas en un `<select>` simple con paginación limitada. Cuando existían más cuentas en el backend, el usuario no podía encontrarlas fácilmente.
+El formulario de transacción cargaba las cuentas en un `<select>` simple con paginación limitada. Cuando existían más cuentas en el sistema, el usuario no podía encontrarlas fácilmente.
 
 ## Corrección
 - Se agregó carga paginada completa para catálogos de lookup mediante `listAllLookupOptions`.

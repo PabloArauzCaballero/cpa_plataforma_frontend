@@ -14,7 +14,7 @@ También deben revisarse los lineamientos generales de:
 ./programacionGeneral.md
 ```
 
-> Nota: este repositorio corresponde al frontend. No debe aplicarse `programacionBackend.md` como prompt principal para esta entrega.
+> Nota: este repositorio corresponde al frontend. No debe aplicarse `programacionSistema.md` como prompt principal para esta entrega.
 
 ## 1. Insumos obligatorios
 

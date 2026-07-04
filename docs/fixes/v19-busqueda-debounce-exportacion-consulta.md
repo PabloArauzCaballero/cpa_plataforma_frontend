@@ -2,11 +2,11 @@
 
 ## Problema corregido
 
-La búsqueda global disparaba consultas al backend en cada tecla. Eso hacía que escribir fuera incómodo porque la tabla se actualizaba demasiado rápido.
+La búsqueda global disparaba consultas al sistema en cada tecla. Eso hacía que escribir fuera incómodo porque la tabla se actualizaba demasiado rápido.
 
 ## Solución implementada
 
-- La búsqueda global ahora usa una espera de 500 ms antes de consultar al backend.
+- La búsqueda global ahora usa una espera de 500 ms antes de consultar al sistema.
 - Mientras el usuario escribe, el input conserva el texto local y muestra un aviso de búsqueda pendiente.
 - La tabla no se desmonta cuando ya hay registros cargados; solo muestra el estado `Actualizando resultados...`.
 
@@ -20,7 +20,7 @@ El modal permite elegir:
 - Búsqueda global.
 - Filtros por campo según el recurso actual.
 
-La exportación no usa solo la página visible. Hace consultas paginadas al backend respetando los filtros elegidos y descarga el archivo en el navegador.
+La exportación no usa solo la página visible. Hace consultas paginadas al sistema respetando los filtros elegidos y descarga el archivo en el navegador.
 
 ## Archivos principales
 

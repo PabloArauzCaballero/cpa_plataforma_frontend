@@ -1,6 +1,6 @@
 # Endpoints CPA Plataforma - descripción y payloads de prueba
 
-Documento generado para frontend, QA y pruebas manuales del backend NestJS privado.
+Documento generado para frontend, QA y pruebas manuales del sistema NestJS privado.
 
 > Nota importante: los payloads son ejemplos mínimos de prueba derivados del registry de recursos y del DDL. Los campos `id_*` que sean FK deben existir previamente en la base de datos. Para pruebas iniciales usa el seed demo y crea datos base antes de entidades dependientes.
 
@@ -9,7 +9,7 @@ Documento generado para frontend, QA y pruebas manuales del backend NestJS priva
 - Base URL local sugerida: `http://localhost:3000`.
 - Prefijo API: `/api`.
 - Todos los endpoints privados requieren `X-Session-Token`.
-- Los campos de auditoría se gestionan desde backend cuando aplica: `id_usuario_creador`, `id_usuario_modificacion`, `fecha_registro`, `fecha_modificacion`, `version_registro`.
+- Los campos de auditoría se gestionan desde sistema cuando aplica: `id_usuario_creador`, `id_usuario_modificacion`, `fecha_registro`, `fecha_modificacion`, `version_registro`.
 - `GET list` acepta filtros por columnas reales de la tabla y controles: `page`, `limit`, `offset`, `orderBy`, `orderDir`.
 - En modo smoke con `SMOKE_DRY_RUN_CRUD_WRITES=true`, los writes devuelven `400` controlado para confirmar que el endpoint fue alcanzado sin contaminar la base.
 
@@ -4277,4 +4277,4 @@ PATCH /api/seguridad/usuario-rol/900001/1
 - No muestres las rutas de API en pantalla al usuario final.
 - Usa este documento para construir `crudResources.ts` o `crud-resources.contract.json`.
 - Si un payload contiene `id_*`, valida que el registro relacionado exista antes de enviar el formulario.
-- Si el backend responde `400` por FK o `NOT NULL`, el formulario debe mostrar un mensaje amigable y no exponer SQL.
+- Si el sistema responde `400` por FK o `NOT NULL`, el formulario debe mostrar un mensaje amigable y no exponer SQL.

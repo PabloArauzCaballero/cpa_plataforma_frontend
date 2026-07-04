@@ -5,7 +5,7 @@ Las tablas cargaban registros sin paginación funcional, el buscador dependía d
 
 ## Cambios implementados
 
-- `listResource` ahora envía al backend:
+- `listResource` ahora envía al sistema:
   - `page`
   - `limit`
   - `offset`
@@ -32,7 +32,7 @@ Las tablas cargaban registros sin paginación funcional, el buscador dependía d
 - `ResourceListPage` ahora muestra controles de paginación debajo de cada tabla.
 
 ## Regla funcional
-Toda tabla debe consultar el backend con paginación real y filtros por columna. No se debe simular paginación únicamente en el cliente.
+Toda tabla debe consultar el sistema con paginación real y filtros por columna. No se debe simular paginación únicamente en el cliente.
 
 ## Nota sobre búsqueda global
-El frontend envía `q=<texto>` para búsqueda global. Si un endpoint específico no implementa `q`, el frontend aplica un filtro local de respaldo sobre la página actual, pero el comportamiento correcto debe estar soportado por el backend para búsqueda global completa.
+El frontend envía `q=<texto>` para búsqueda global. Si un endpoint específico no implementa `q`, el frontend aplica un filtro local de respaldo sobre la página actual, pero el comportamiento correcto debe estar soportado por el sistema para búsqueda global completa.

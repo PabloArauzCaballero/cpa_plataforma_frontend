@@ -1,6 +1,6 @@
 # profile
 
-Vista de perfil conectada al backend.
+Vista de perfil conectada al sistema.
 
 - Consume `GET /api/auth/privateAuth/me` usando el `httpClient` centralizado.
 - Usa `X-Session-Token` desde `localStorage`, igual que el resto del frontend.

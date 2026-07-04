@@ -17,7 +17,7 @@ La carpeta `docs/template` se usó como guía estructural, no como fuente de imp
 - Se migró la intención visual a componentes React fraccionados.
 - No se copiaron estilos crudos del template.
 - Los colores finales salen de `docs/theme/cpa-palette.json`.
-- La UI queda preparada para datos reales del backend mediante servicios y ViewModels.
+- La UI queda preparada para datos reales del sistema mediante servicios y ViewModels.
 - Se incorporó el patrón del componente compartido `GeneralFormAndTableBody` como referencia de tabla/formulario/modal, pero la implementación final está normalizada en React + TypeScript.
 - `contabilidad/transaccion` deja de comportarse como CRUD plano y usa formulario compuesto con movimientos de cuenta fusionados.
 

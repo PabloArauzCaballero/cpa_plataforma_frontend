@@ -4,7 +4,7 @@
 
 Cuando una tabla tenía más registros que los visibles en pantalla, por ejemplo más de 700, la exportación podía quedarse solo con 200 registros.
 
-La causa era que el backend podía devolver menos registros que el `limit` solicitado. El frontend avanzaba el `offset` usando el tamaño solicitado, no la cantidad real recibida. Eso podía saltar bloques de registros durante la exportación.
+La causa era que el sistema podía devolver menos registros que el `limit` solicitado. El frontend avanzaba el `offset` usando el tamaño solicitado, no la cantidad real recibida. Eso podía saltar bloques de registros durante la exportación.
 
 Además, si el usuario no seleccionaba filtros, la exportación podía descargar todos los registros sin una advertencia clara.
 
@@ -14,7 +14,7 @@ Además, si el usuario no seleccionaba filtros, la exportación podía descargar
 
 `listAllResource` ahora avanza el `offset` con la cantidad real de registros recibidos en cada consulta.
 
-Esto evita saltos cuando el backend limita internamente la respuesta a 200 registros.
+Esto evita saltos cuando el sistema limita internamente la respuesta a 200 registros.
 
 ### 2. Confirmación cuando no hay filtros
 

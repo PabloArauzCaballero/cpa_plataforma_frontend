@@ -22,6 +22,6 @@ El formulario de estudiante ahora permite registrar en el mismo payload:
 
 `id_persona` queda como campo opcional para edición/vinculación de un registro existente.
 
-## Contrato backend
+## Contrato de integración
 
-El ajuste mantiene el flujo esperado por el backend: al crear estudiante desde `/api/personas/estudiante`, el backend crea/asocia las cuentas automáticas de estudiante como `ESTUDIANTE_CXC` y `ESTUDIANTE_PAQUETE_DIFERIDO`.
+El ajuste mantiene el flujo esperado por el sistema: al crear estudiante desde `/api/personas/estudiante`, el sistema crea/asocia las cuentas automáticas de estudiante como `ESTUDIANTE_CXC` y `ESTUDIANTE_PAQUETE_DIFERIDO`.

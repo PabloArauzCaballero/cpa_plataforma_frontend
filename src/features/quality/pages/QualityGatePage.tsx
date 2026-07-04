@@ -2,12 +2,12 @@ import styles from './QualityGatePage.module.css';
 
 const gates = [
   {
-    title: 'Contrato backend',
-    description: 'Login, sesión opaca, aulas, venta-clase batch, catálogos y cuentas operativas alineados con el contrato actual.',
+    title: 'Contrato de integración',
+    description: 'Ingreso, sesión segura, aulas, registro de clases en lote, catálogos y cuentas operativas alineados con la operación actual.',
   },
   {
     title: 'Permisos reales',
-    description: 'La UI respeta permisos cuando el backend los devuelve; si no llegan, no inventa bloqueos falsos y el backend sigue siendo autoridad.',
+    description: 'La pantalla respeta los permisos activos del usuario y evita mostrar accesos de prueba.',
   },
   {
     title: 'UX administrativa',
@@ -15,15 +15,15 @@ const gates = [
   },
   {
     title: 'Resiliencia',
-    description: 'Normalizadores defensivos, manejo de 401/403, Error Boundary global y mensajes amigables sin exponer rutas sensibles.',
+    description: 'Manejo de errores, recuperación visual y mensajes amigables sin exponer rutas sensibles.',
   },
   {
     title: 'Flujos críticos',
-    description: 'Parte de clases pasadas no arma contabilidad manual: envía payload y el backend genera clase, venta, detalle y asiento.',
+    description: 'Parte de clases pasadas no requiere contabilidad manual: envía los datos y el sistema genera clase, venta, detalle y asiento.',
   },
   {
     title: 'Preparación para producción',
-    description: 'Build TypeScript validado, variables de entorno documentadas, Cloudinary configurado y descargas masivas confirmadas.',
+    description: 'Configuración validada, carga de archivos lista y descargas masivas confirmadas.',
   },
 ];
 
@@ -32,9 +32,9 @@ export function QualityGatePage() {
     <section className={styles.page}>
       <div className={styles.hero}>
         <span>Control de calidad</span>
-        <h2>FRONTEND 10/10</h2>
+        <h2>VERIFICACIÓN DEL PORTAL</h2>
         <p>
-          Panel de verificación funcional para dejar claro qué puntos críticos ya cubre el frontend antes de probarlo contra producción.
+          Panel de verificación funcional para revisar los puntos críticos antes de usar el portal en producción.
         </p>
       </div>
 
@@ -49,8 +49,8 @@ export function QualityGatePage() {
       </div>
 
       <ul className={styles.list}>
-        <li>Ejecutar: npm run build</li>
-        <li>Probar login con pablo.admin o pablo.admin@cpa.com.</li>
+        <li>Validar ingreso con una cuenta autorizada.</li>
+        <li>Confirmar que el perfil muestre roles y permisos reales.</li>
         <li>Probar venta-clase con estudiante, tutor, aula, materia, tema, subtema y producto educativo.</li>
         <li>Probar exportación con filtros y confirmación de descarga completa.</li>
       </ul>

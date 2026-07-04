@@ -40,7 +40,7 @@ yarn quality
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-El backend documenta rutas con prefijo `/api`, por lo que la URL base no debe repetir `/api`.
+El sistema documenta rutas con prefijo `/api`, por lo que la URL base no debe repetir `/api`.
 
 ## Credenciales demo documentadas
 
@@ -53,7 +53,7 @@ PabloAdmin2026!
 
 ## Nota técnica
 
-El `prompt/index.md` original estaba orientado a backend. En esta entrega se corrigió para frontend y se aplicó `prompt/programacionFrontend.md` como prompt específico del proyecto.
+El `prompt/index.md` original estaba orientado a sistema. En esta entrega se corrigió para frontend y se aplicó `prompt/programacionFrontend.md` como prompt específico del proyecto.
 
 
 ## Corrección aplicada al batch

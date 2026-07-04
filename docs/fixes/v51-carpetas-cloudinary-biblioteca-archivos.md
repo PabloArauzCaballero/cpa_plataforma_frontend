@@ -28,7 +28,7 @@ Por eso la UI permite:
 - Badge de carpeta en cada tarjeta de archivo.
 - Las carpetas locales se guardan en `localStorage` hasta que existan archivos registrados con metadata de carpeta.
 
-## Backend
+## Sistema
 
 No se inventó endpoint nuevo. Se mantiene el contrato actual:
 

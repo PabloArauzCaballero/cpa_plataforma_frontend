@@ -170,14 +170,14 @@
       "type": "enum",
       "enumRef": "persona.tipo_estudiante",
       "ui": "select",
-      "message": "Seleccione el tipo de estudiante permitido por el backend.",
+      "message": "Seleccione el tipo de estudiante permitido por el sistema.",
       "source": "ddl_check"
     },
     "tipo_estudiante_especialidad": {
       "type": "enum",
       "enumRef": "persona.tipo_estudiante",
       "ui": "select",
-      "message": "Seleccione el tipo de estudiante permitido por el backend.",
+      "message": "Seleccione el tipo de estudiante permitido por el sistema.",
       "source": "ddl_check"
     },
     "nivel_experiencia": {
@@ -962,7 +962,7 @@
         "type": "enum",
         "enumRef": "persona.tipo_estudiante",
         "ui": "select",
-        "message": "Seleccione el tipo de estudiante permitido por el backend.",
+        "message": "Seleccione el tipo de estudiante permitido por el sistema.",
         "source": "ddl_check"
       },
       "nivel_actual": {
@@ -1655,7 +1655,7 @@
         "type": "url",
         "ui": "hiddenMirror",
         "check": "url",
-        "message": "Campo espejo interno para compatibilidad con backend."
+        "message": "Campo espejo interno para compatibilidad con sistema."
       }
     }
   }

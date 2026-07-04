@@ -86,8 +86,8 @@ Se agregó una pestaña de flujo recomendado:
 3. Productos educativos.
 4. Personas.
 5. Parte de clases.
-6. Backend contable.
+6. Motor contable.
 
 ## Regla importante
 
-El frontend no arma la contabilidad manualmente. Captura datos y configuración, y el backend resuelve cuentas, venta, detalle, clase, transacción y movimientos.
+El frontend no arma la contabilidad manualmente. Captura datos y configuración, y el sistema resuelve cuentas, venta, detalle, clase, transacción y movimientos.

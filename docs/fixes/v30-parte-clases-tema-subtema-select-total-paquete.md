@@ -2,7 +2,7 @@
 
 ## Cambio aplicado
 
-Se ajustó la pantalla especial **Parte de Clases Pasadas** para que el formulario respete mejor el parte físico y la carga relacionada desde backend.
+Se ajustó la pantalla especial **Parte de Clases Pasadas** para que el formulario respete mejor el parte físico y la carga relacionada desde sistema.
 
 ## Reglas implementadas
 
@@ -13,7 +13,7 @@ Se ajustó la pantalla especial **Parte de Clases Pasadas** para que el formular
   - `/api/servicios_educativos/producto-educativo`
 - `Tema` ahora es select, no input libre.
 - `Subtema` ahora es select, no input libre.
-- Al seleccionar una materia del árbol, se autocompletan `tema` y `subtema` si el backend los devuelve.
+- Al seleccionar una materia del árbol, se autocompletan `tema` y `subtema` si el sistema los devuelve.
 - Si el usuario cambia `tema`, se limpia `subtema` para evitar combinaciones inconsistentes.
 - El select de `subtema` se filtra según el `tema` elegido cuando hay relación disponible.
 - `Paq.` se mantiene como textfield porque el usuario indicó que no debe ser select ni monto numérico.

@@ -83,7 +83,7 @@ Esta carpeta sirve como referencia estructural para entender:
 Pero **no debe usarse como fuente final de arquitectura, colores o estilos**.
 
 ### 3. Carpeta de endpoints documentados
-En otra carpeta estarán documentados los endpoints disponibles del backend. La ubicación esperada puede ser una de estas:
+En otra carpeta estarán documentados los endpoints disponibles del sistema. La ubicación esperada puede ser una de estas:
 
 ```txt
 endpoints/endpoints.md
@@ -137,7 +137,7 @@ Si el template está mal organizado, debes **reinterpretarlo y mejorarlo** respe
 ---
 
 ## Regla fundamental sobre la documentación de endpoints
-La carpeta de endpoints debe tratarse como la **fuente oficial del contrato con el backend**.
+La carpeta de endpoints debe tratarse como la **fuente oficial del contrato con el sistema**.
 
 Debes usar los endpoints documentados para:
 
@@ -297,7 +297,7 @@ Debe existir una capa de dominio o servicio encargada de:
 - Encapsular llamadas HTTP.
 - Transformar datos si la API no coincide con lo que necesita la UI.
 - Centralizar errores de API.
-- Evitar que los componentes conozcan detalles técnicos del backend.
+- Evitar que los componentes conozcan detalles técnicos del sistema.
 
 Estructura sugerida:
 
@@ -385,7 +385,7 @@ Importante:
 - No usar URLs hardcodeadas como `http://localhost:3000` dentro de componentes.
 - No repetir la URL base en diferentes archivos.
 - No exponer secretos reales en variables `VITE_`, porque las variables del frontend pueden ser visibles en el navegador.
-- Si se necesita ocultar realmente una API privada, debe usarse un backend intermedio, proxy o Backend For Frontend.
+- Si se necesita ocultar realmente una API privada, debe usarse un sistema intermedio, proxy o Sistema For Frontend.
 
 ---
 
@@ -789,7 +789,7 @@ Desarrolla el frontend en React siguiendo estrictamente estas reglas:
 3. Si un componente es reutilizable entre varias pantallas, debe ir en `src/shared`.
 4. Crea una capa de dominio por feature para definir entidades, tipos y contratos.
 5. Crea una capa de servicios para consumir la API usando un `httpClient` centralizado.
-6. Usa la carpeta de endpoints documentados como fuente oficial del contrato con el backend, por ejemplo `endpoints/endpoints.md`.
+6. Usa la carpeta de endpoints documentados como fuente oficial del contrato con el sistema, por ejemplo `endpoints/endpoints.md`.
 7. No inventes rutas, métodos, bodies ni responses si ya están definidos en la documentación de endpoints.
 8. Separa DTOs, mappers y entidades de dominio cuando el contrato de API no coincida con lo que necesita la UI.
 9. No consumas la API directamente desde componentes visuales.
@@ -952,7 +952,7 @@ Flujo obligatorio:
    - `VITE_CLOUDINARY_FOLDER` opcional.
 3. Validar que el archivo sea imagen y que no supere 10 MB.
 4. Tomar `secure_url` devuelto por Cloudinary.
-5. Enviar ese link en el payload del backend como `link_achivo` y, por compatibilidad, también como `link_archivo` cuando el campo exista.
+5. Enviar ese link en el payload del sistema como `link_achivo` y, por compatibilidad, también como `link_archivo` cuando el campo exista.
 6. Mostrar errores amigables si faltan variables de entorno, si Cloudinary rechaza la subida o si hay problema de red.
 7. No exponer configuración sensible. El upload preset debe ser unsigned y restringido desde Cloudinary.
 
@@ -976,7 +976,7 @@ Los campos ocultos no deben enviarse en el payload. Si el usuario cambia `tipo_t
 
 `sub_tipo_transaccion` debe renderizarse como `select` y sus opciones deben depender de `tipo_transaccion`.
 
-## Regla obligatoria adicional: perfil conectado al backend
+## Regla obligatoria adicional: perfil conectado al sistema
 
 La pantalla de perfil no debe usar mockups ni construir datos desde `localStorage` salvo para mantener la sesión. Debe consumir el endpoint documentado de sesión actual (`privateAuth/me`) mediante un servicio/hook real. Si no existe endpoint documentado para actualizar perfil, la vista debe ser de solo lectura y mostrar un mensaje funcional; no se debe simular guardado local ni inventar actividad, permisos, preferencias o roles.
 
@@ -992,7 +992,7 @@ En el formulario de `contabilidad.transaccion`, el campo `id_cuenta` de los movi
 
 ## Regla obligatoria de listados, paginación y filtros
 
-Todas las tablas CRUD deben implementar paginación real contra backend. No basta con cargar todos los registros y paginar en frontend.
+Todas las tablas CRUD deben implementar paginación real contra sistema. No basta con cargar todos los registros y paginar en frontend.
 
 Cada listado debe enviar como mínimo:
 
@@ -1004,13 +1004,13 @@ orderBy
 orderDir
 ```
 
-Además, cuando exista búsqueda global, debe enviarse `q` si el backend lo soporta. Cuando el usuario filtre por campos específicos, cada filtro debe enviarse como query param con el nombre real de la columna/campo documentado.
+Además, cuando exista búsqueda global, debe enviarse `q` si el sistema lo soporta. Cuando el usuario filtre por campos específicos, cada filtro debe enviarse como query param con el nombre real de la columna/campo documentado.
 
 Cada tabla debe mostrar filtros dinámicos según los campos propios del recurso. Los campos `select`, enums y catálogos deben renderizar filtros tipo select; los booleanos deben renderizar filtros Sí/No; fechas y números deben usar inputs acordes al tipo.
 
 La UI debe mostrar:
 
-- total de registros devuelto por backend,
+- total de registros devuelto por sistema,
 - página actual,
 - total de páginas,
 - selector de filas por página,
@@ -1041,7 +1041,7 @@ El frontend debe normalizar respuestas como:
 
 En todas las tablas administrativas el buscador global no debe ejecutar la consulta en cada tecla. Debe usar debounce mínimo de 400 ms y recomendado de 500 ms para no dificultar la escritura.
 
-Toda tabla debe incluir una opción de exportación mediante modal de consulta. Ese modal debe permitir seleccionar formato CSV, Excel o JSON y debe permitir configurar búsqueda global y filtros por campos propios del recurso. La exportación debe respetar esos filtros y no limitarse únicamente a los registros visibles en la página actual. Si el backend pagina, el frontend debe consultar las páginas necesarias hasta traer los registros correspondientes a la consulta o hasta un límite seguro.
+Toda tabla debe incluir una opción de exportación mediante modal de consulta. Ese modal debe permitir seleccionar formato CSV, Excel o JSON y debe permitir configurar búsqueda global y filtros por campos propios del recurso. La exportación debe respetar esos filtros y no limitarse únicamente a los registros visibles en la página actual. Si el sistema pagina, el frontend debe consultar las páginas necesarias hasta traer los registros correspondientes a la consulta o hasta un límite seguro.
 
 ## Regla de navegación v20
 
@@ -1049,7 +1049,7 @@ Cuando el usuario seleccione un módulo desde el inicio, el frontend NO debe red
 
 ## Regla v23 - Exportación completa y confirmación sin filtros
 
-Cuando se exporten registros desde una tabla, el frontend debe traer todas las páginas reales del backend hasta completar el total informado por la respuesta. No debe asumir que el backend respeta exactamente el `limit` solicitado; debe avanzar el `offset` con la cantidad real recibida.
+Cuando se exporten registros desde una tabla, el frontend debe traer todas las páginas reales del sistema hasta completar el total informado por la respuesta. No debe asumir que el sistema respeta exactamente el `limit` solicitado; debe avanzar el `offset` con la cantidad real recibida.
 
 Si el usuario intenta exportar sin búsqueda global y sin filtros activos, el sistema debe mostrar una confirmación previa indicando que se descargarán todos los registros de la tabla. La descarga solo debe ejecutarse si el usuario confirma explícitamente.
 
@@ -1059,7 +1059,7 @@ Si el usuario intenta exportar sin búsqueda global y sin filtros activos, el si
 - El footer debe mostrar `CPA Plataforma · Versión 1.1.23` y `Todos los derechos reservados 2026`.
 - Las vistas relacionadas a aula o clase por hora deben ordenarse visualmente por hora y mostrar color por bloque horario.
 - Cada tabla debe tener un botón de ayuda interactiva con flujos operativos reales.
-- No se deben inventar tablas o endpoints. Para ventas con varios productos/servicios, el detalle de venta debe manejarse aparte cuando el backend lo exponga/documente.
+- No se deben inventar tablas o endpoints. Para ventas con varios productos/servicios, el detalle de venta debe manejarse aparte cuando el sistema lo exponga/documente.
 
 ## Regla v25 - Ayuda operativa por tabla real
 
@@ -1076,7 +1076,7 @@ La ayuda debe distinguir casos como:
 - Cuentas, grupos, asignaciones, centros de costo y conceptos: estructura previa para movimientos contables.
 - Archivos transacción: carga posterior de comprobante a Cloudinary para una transacción existente.
 
-No se debe inventar venta detalle si el backend no tiene endpoint documentado. La ayuda debe explicar que el detalle de venta debe quedar separado cuando el backend lo exponga.
+No se debe inventar venta detalle si el sistema no tiene endpoint documentado. La ayuda debe explicar que el detalle de venta debe quedar separado cuando el sistema lo exponga.
 
 ## Regla visual v26 - Ayuda y título del shell
 
@@ -1108,11 +1108,11 @@ La pantalla puede mostrar selects o controles buscables, pero el payload debe se
 
 En la pantalla especial `Parte Clases Pasadas`:
 
-- `Estudiante`, `Tutor`, `Materia / Producto`, `Tema` y `Subtema` deben ser controles de selección cuando existan datos del backend.
+- `Estudiante`, `Tutor`, `Materia / Producto`, `Tema` y `Subtema` deben ser controles de selección cuando existan datos del sistema.
 - `Tema` y `Subtema` no deben quedar como texto libre por defecto.
 - Al elegir `Materia / Producto`, si la opción trae `tema` y `subtema`, estos se autocompletan.
 - Si cambia `Tema`, debe limpiarse `Subtema` para evitar una combinación incorrecta.
-- `Subtema` debe filtrarse según el `Tema` seleccionado cuando el backend permita inferir esa relación.
+- `Subtema` debe filtrarse según el `Tema` seleccionado cuando el sistema permita inferir esa relación.
 - `Paq.` debe mantenerse como campo de texto.
 - Las tarjetas resumen deben mostrar también `Total paquete`.
 - No cambiar el endpoint real de envío: `POST /api/contabilidad/venta-clase/registrar-batch`.
@@ -1132,4 +1132,4 @@ Cuando se trabaje el flujo de parte de clases pasadas, no basta con el formulari
 - Debe mostrar productos educativos desde `producto-educativo`.
 - Debe mostrar unidades educativas desde `unidad-educativa`.
 - El formulario de parte de clases debe enlazar a esta pantalla.
-- El frontend no debe armar movimientos contables manualmente para venta-clase; el backend resuelve la contabilidad.
+- El frontend no debe armar movimientos contables manualmente para venta-clase; el sistema resuelve la contabilidad.

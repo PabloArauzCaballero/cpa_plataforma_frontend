@@ -1,6 +1,6 @@
 # v50 - Biblioteca gráfica de archivos
 
-Se agregó una pantalla profesional para operar el flujo real de archivos del backend.
+Se agregó una pantalla profesional para operar el flujo real de archivos del sistema.
 
 ## Nueva ruta
 
@@ -11,7 +11,7 @@ Se agregó una pantalla profesional para operar el flujo real de archivos del ba
 ## Funcionalidades
 
 - Subida visual de archivos usando el storage configurado en Cloudinary.
-- Registro posterior en el backend con:
+- Registro posterior en el sistema con:
   - `POST /api/contabilidad/archivo/registrar`
 - Asociación opcional a una transacción con:
   - `POST /api/contabilidad/archivo-transaccion/registrar`
@@ -19,9 +19,9 @@ Se agregó una pantalla profesional para operar el flujo real de archivos del ba
   - `GET /api/contabilidad/archivo`
 - Vista tipo galería con preview de imágenes, iconos por tipo de archivo, metadatos, copia de enlace y apertura externa.
 
-## Payload alineado al backend
+## Payload alineado al sistema
 
-El frontend envía al backend:
+El frontend envía al sistema:
 
 ```json
 {

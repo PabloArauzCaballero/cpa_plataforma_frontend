@@ -8,7 +8,7 @@ Al editar una transacción, el encabezado se cargaba pero la tabla de movimiento
 
 - El modal de edición muestra un estado de carga mientras obtiene el detalle completo.
 - Si el detalle de transacción no trae movimientos, el frontend consulta `transaccion-movimiento-cuenta` filtrando por `id_transaccion`.
-- Se normalizan más aliases de backend: `movimientos`, `transaccion_movimiento_cuenta`, `transaccion_movimientos_cuenta`, `movimientos_cuenta`, `detalles_movimientos`, entre otros.
+- Se normalizan más aliases de sistema: `movimientos`, `transaccion_movimiento_cuenta`, `transaccion_movimientos_cuenta`, `movimientos_cuenta`, `detalles_movimientos`, entre otros.
 - Los movimientos recuperados cargan en la tabla y pueden editarse con el botón Editar.
 
 ## Resultado

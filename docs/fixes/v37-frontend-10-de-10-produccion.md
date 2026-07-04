@@ -11,9 +11,9 @@ Esta versión sube el frontend de MVP avanzado a una base más cercana a producc
    - 401 limpia sesión local para evitar estados falsos.
 
 2. **Permisos reales de UI**
-   - El frontend lee roles/permisos si el backend los devuelve.
+   - El frontend lee roles/permisos si el sistema los devuelve.
    - Si `es_super_usuario=true`, permite operar todo.
-   - Si el backend no devuelve matriz de permisos, no inventa bloqueos falsos; el backend sigue siendo autoridad.
+   - Si el sistema no devuelve matriz de permisos, no inventa bloqueos falsos; el sistema sigue siendo autoridad.
    - Cuando hay permisos, oculta acciones no autorizadas.
 
 3. **Error Boundary global**
@@ -22,7 +22,7 @@ Esta versión sube el frontend de MVP avanzado a una base más cercana a producc
 
 4. **Calidad operativa**
    - Nueva pantalla `/calidad`.
-   - Checklist visible de contrato backend, sesión, permisos, UX, resiliencia y producción.
+   - Checklist visible de contrato sistema, sesión, permisos, UX, resiliencia y producción.
 
 5. **Optimización de carga**
    - Rutas principales con `React.lazy` y `Suspense`.

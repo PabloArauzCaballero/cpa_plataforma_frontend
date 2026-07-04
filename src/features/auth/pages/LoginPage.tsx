@@ -10,7 +10,7 @@ export function LoginPage() {
           <span>CPA Plataforma</span>
           <h2>Gestión académica, administrativa y financiera en un solo lugar.</h2>
           <p>
-            Frontend modular para consultar recursos, crear registros, editar información operativa y revisar la trazabilidad del centro.
+            Portal administrativo para consultar recursos, crear registros, editar información operativa y revisar la trazabilidad del centro.
           </p>
         </div>
         <LoginForm />

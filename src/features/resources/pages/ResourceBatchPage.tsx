@@ -84,7 +84,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
       setValidation(result);
     } catch (currentError) {
       setValidation(null);
-      setError(currentError instanceof Error ? currentError.message : 'No se pudo validar el archivo batch.');
+      setError(currentError instanceof Error ? currentError.message : 'No se pudo validar el archivo de carga masiva.');
     } finally {
       setIsValidating(false);
     }
@@ -99,7 +99,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
       const result = await processBatchResource(resource, file, mode, validation.importId);
       setProcessResult(result);
     } catch (currentError) {
-      setError(currentError instanceof Error ? currentError.message : 'No se pudo procesar el archivo batch.');
+      setError(currentError instanceof Error ? currentError.message : 'No se pudo procesar el archivo de carga masiva.');
     } finally {
       setIsProcessing(false);
     }
@@ -216,7 +216,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={4}>El backend no devolvió detalle por fila. Revisa el resumen del lote.</td>
+                    <td colSpan={4}>El sistema no devolvió detalle por fila. Revisa el resumen del lote.</td>
                   </tr>
                 )}
               </tbody>

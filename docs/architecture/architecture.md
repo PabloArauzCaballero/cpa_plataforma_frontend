@@ -6,7 +6,7 @@ El proyecto se implementa como frontend React + TypeScript + Vite con arquitectu
 
 ## Insumos revisados
 
-- `prompt/index.md`: tenía referencias backend; se ajustó a frontend.
+- `prompt/index.md`: tenía referencias sistema; se ajustó a frontend.
 - `prompt/programacionFrontend.md`: reglas específicas de React, arquitectura modular, separación por capas y uso de paleta.
 - `docs/endpoints/endpoints.md`: fuente oficial de contratos HTTP.
 - `docs/theme/cpa-palette.json`: fuente oficial de colores, gradientes, radios, sombras y tipografía.

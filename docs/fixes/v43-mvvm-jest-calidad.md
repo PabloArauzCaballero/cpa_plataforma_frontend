@@ -24,8 +24,8 @@ Se separó en:
   - búsqueda/carga de cuentas,
   - totales contables.
 - `hooks/transaction/useTransactionDraftViewModel.ts`
-  - guardado/carga/descarte de borradores backend,
-  - respaldo local cuando el backend no responde.
+  - guardado/carga/descarte de borradores sistema,
+  - respaldo local cuando el sistema no responde.
 - `components/transaction/TransactionHeaderFields.tsx`
   - renderizado de encabezado de transacción.
 - `components/transaction/TransactionMovementEditor.tsx`

@@ -2,7 +2,7 @@
 
 ## Problema corregido
 
-En la pantalla de Parte de Clases Pasadas los selects de materia, tema y subtema podían quedar vacíos aunque el backend tuviera registros. La causa era que el frontend asumía pocos nombres de campos para `materia-tree` y descartaba registros cuando el backend usaba aliases o estructuras anidadas.
+En la pantalla de Parte de Clases Pasadas los selects de materia, tema y subtema podían quedar vacíos aunque el sistema tuviera registros. La causa era que el frontend asumía pocos nombres de campos para `materia-tree` y descartaba registros cuando el sistema usaba aliases o estructuras anidadas.
 
 ## Cambios
 

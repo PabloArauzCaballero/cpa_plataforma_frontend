@@ -2,9 +2,9 @@
 
 ## Rol que debe asumir la IA
 
-Actúa como **arquitecto de software backend senior**, especialista en sistemas empresariales, API RESTful, NestJS, diseño modular, dominio educativo, contabilidad operativa, gestión de empleados, tutores, estudiantes, pagos, deudas, horarios, aulas, auditoría y seguridad.
+Actúa como **arquitecto de software sistema senior**, especialista en sistemas empresariales, API RESTful, NestJS, diseño modular, dominio educativo, contabilidad operativa, gestión de empleados, tutores, estudiantes, pagos, deudas, horarios, aulas, auditoría y seguridad.
 
-Tu trabajo no es generar un CRUD académico de estudiantes, clases y pagos. Tu trabajo es diseñar y construir un backend profesional para un **centro de clases personalizadas** que necesita controlar de forma integrada:
+Tu trabajo no es generar un CRUD académico de estudiantes, clases y pagos. Tu trabajo es diseñar y construir un sistema profesional para un **centro de clases personalizadas** que necesita controlar de forma integrada:
 
 ```txt
 Personas
@@ -44,7 +44,7 @@ TRANSACCIÓN OPERATIVA != ASIENTO CONTABLE VALIDADO
 
 ## Contexto del proyecto
 
-El sistema corresponde a una plataforma backend para un **centro de clases personalizadas y servicios educativos**, con módulos administrativos, educativos, contables, financieros, de infraestructura, inventario, seguridad y reportes.
+El sistema corresponde a una plataforma sistema para un **centro de clases personalizadas y servicios educativos**, con módulos administrativos, educativos, contables, financieros, de infraestructura, inventario, seguridad y reportes.
 
 El proyecto puede tomar como referencia una estructura modular existente con dominios como:
 
@@ -87,7 +87,7 @@ El sistema debe permitir administrar:
 - Inventario de bienes o materiales.
 - Roles, permisos, sesiones y auditoría.
 
-El backend debe resolver problemas típicos de un centro educativo que crece y deja de poder manejar todo en Excel:
+El sistema debe resolver problemas típicos de un centro educativo que crece y deja de poder manejar todo en Excel:
 
 - Baja trazabilidad sobre quién registró pagos, clases, asistencias o cambios de horario.
 - Dificultad para saber qué clases fueron vendidas, programadas, dictadas, reprogramadas o pendientes.
@@ -313,7 +313,7 @@ No debes forzar el diseño a la estructura vieja si afecta la claridad del domin
 
 ## Arquitectura requerida
 
-El sistema debe diseñarse como backend modular con capacidad de evolucionar a backend distribuido.
+El sistema debe diseñarse como sistema modular con capacidad de evolucionar a sistema distribuido.
 
 Puede implementarse inicialmente como monorepo modular en NestJS, pero los límites de dominio deben quedar claros.
 
@@ -1591,7 +1591,7 @@ El diseño debe incluir como mínimo:
 7. Diagrama de despliegue.
 ```
 
-Los diagramas deben reflejar que el sistema es modular, backend-first y preparado para crecer.
+Los diagramas deben reflejar que el sistema es modular, sistema-first y preparado para crecer.
 
 Diagramas recomendados específicos:
 
@@ -1694,7 +1694,7 @@ No sacrifiques reglas de negocio por rapidez.
 
 No conviertas el sistema en CRUD plano.
 
-El backend debe quedar preparado para soportar:
+El sistema debe quedar preparado para soportar:
 
 - Portal administrativo.
 - Portal de tutores.

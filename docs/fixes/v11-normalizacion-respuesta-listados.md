@@ -2,7 +2,7 @@
 
 ## Problema detectado
 
-Algunos endpoints del backend CPA sí devolvían registros correctamente, por ejemplo:
+Algunos endpoints del sistema CPA sí devolvían registros correctamente, por ejemplo:
 
 ```json
 {
@@ -24,7 +24,7 @@ Algunos endpoints del backend CPA sí devolvían registros correctamente, por ej
 }
 ```
 
-El frontend mostraba `0 de 0 registros` porque el normalizador solo leía `data.items`, `response.rows`, `response.items` o arrays directos, pero no contemplaba el formato real principal del backend:
+El frontend mostraba `0 de 0 registros` porque el normalizador solo leía `data.items`, `response.rows`, `response.items` o arrays directos, pero no contemplaba el formato real principal del sistema:
 
 ```ts
 response.data.rows

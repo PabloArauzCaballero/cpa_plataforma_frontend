@@ -154,7 +154,7 @@ export function userHasAnyPermission(required: string | string[] | undefined): b
     : parsePermissionString(required);
   if (requiredPermissions.length === 0) return true;
 
-  // Modo seguro práctico: si el backend todavía no envía matriz de permisos,
+  // Modo seguro práctico: si el sistema todavía no envía matriz de permisos,
   // el frontend no inventa bloqueos. Cuando sí llegan permisos, se respetan.
   if (session.permisos.length === 0) return true;
 

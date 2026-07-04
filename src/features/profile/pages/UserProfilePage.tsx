@@ -49,7 +49,7 @@ export function UserProfilePage() {
       <section className={styles.pageHeader}>
         <div>
           <h1>PERFIL DE USUARIO</h1>
-          <p>Información real de la sesión autenticada, obtenida desde el backend CPA.</p>
+          <p>Información de tu cuenta, roles y permisos activos dentro del sistema CPA.</p>
         </div>
 
         <div className={styles.headerActions}>
@@ -103,7 +103,7 @@ export function UserProfilePage() {
 
               <span className={`${styles.badge} ${styles.badgeInfo}`}>
                 <i className="fa-solid fa-database" aria-hidden="true" />
-                Backend
+                Sesión
               </span>
             </div>
 
@@ -123,7 +123,7 @@ export function UserProfilePage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Roles reales</h2>
-                <p>Roles devueltos por el endpoint de sesión. Si el backend no los envía, se muestra vacío.</p>
+                <p>Roles asignados a tu usuario. Si no existen roles activos, esta sección queda vacía.</p>
               </div>
             </div>
 
@@ -132,7 +132,7 @@ export function UserProfilePage() {
                 {profile.roles.map((role) => <span className={`${styles.badge} ${styles.badgeInfo}`} key={role}>{role}</span>)}
               </div>
             ) : (
-              <p className={styles.emptyText}>El backend no devolvió roles en la respuesta de sesión.</p>
+              <p className={styles.emptyText}>No hay roles activos para esta sesión.</p>
             )}
           </section>
 
@@ -140,7 +140,7 @@ export function UserProfilePage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Permisos reales</h2>
-                <p>Permisos devueltos por el endpoint de sesión. No se usa una matriz de permisos simulada.</p>
+                <p>Permisos activos de tu sesión. No se muestran permisos de prueba.</p>
               </div>
             </div>
 
@@ -164,7 +164,7 @@ export function UserProfilePage() {
                 </table>
               </div>
             ) : (
-              <p className={styles.emptyText}>El backend no devolvió permisos en la respuesta de sesión.</p>
+              <p className={styles.emptyText}>No hay permisos activos para esta sesión.</p>
             )}
           </section>
 
@@ -172,7 +172,7 @@ export function UserProfilePage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Respuesta de sesión</h2>
-                <p>Resumen técnico mínimo para confirmar que la vista está leyendo el backend. No expone token ni rutas.</p>
+                <p>Resumen de sesión para soporte. No expone token ni rutas internas.</p>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ export function UserProfilePage() {
               <ReadOnlyField label="Fuente" value="Sesión autenticada" />
               <ReadOnlyField label="Datos de usuario" value={profile.username || profile.idPersona ? 'Disponible' : 'No disponible'} />
               <ReadOnlyField label="Datos de persona" value={profile.nombreCompleto || profile.nombres || profile.apellidos ? 'Disponible' : 'No disponible'} />
-              <ReadOnlyField label="Datos de sesión" value={Object.keys((profile.rawData.session as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No devuelto por backend'} />
+              <ReadOnlyField label="Datos de sesión" value={Object.keys((profile.rawData.session as Record<string, unknown>) ?? {}).length > 0 ? 'Disponible' : 'No disponible'} />
             </div>
           </section>
         </section>

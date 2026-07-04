@@ -11,7 +11,7 @@ Type 'string' is not assignable to type '"DEBE" | "HABER"'.
 
 ## Causa
 
-TypeScript infería `tipoMovimiento` como `string` al normalizar movimientos recuperados del backend para edición de transacción.
+TypeScript infería `tipoMovimiento` como `string` al normalizar movimientos recuperados del sistema para edición de transacción.
 
 ## Corrección
 
@@ -27,4 +27,4 @@ Esto mantiene el contrato estricto del ViewModel y permite compilar en CI/CD.
 
 - El build ya no falla por TS2322.
 - Se conserva la edición de movimientos en transacciones.
-- Se conserva la compatibilidad con aliases del backend para movimientos embebidos o recuperados por endpoint separado.
+- Se conserva la compatibilidad con aliases del sistema para movimientos embebidos o recuperados por endpoint separado.

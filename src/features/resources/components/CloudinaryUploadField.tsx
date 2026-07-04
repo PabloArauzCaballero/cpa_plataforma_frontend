@@ -63,7 +63,7 @@ export function CloudinaryUploadField({
           ? 'Subiendo imagen a Cloudinary...'
           : fileName
             ? `Archivo seleccionado: ${fileName}`
-            : 'Selecciona una imagen. Se subirá a Cloudinary y se enviará su enlace en el payload.'}
+            : 'Selecciona una imagen. Se subirá a Cloudinary y se guardará su enlace en el formulario.'}
       </small>
 
       {value ? (

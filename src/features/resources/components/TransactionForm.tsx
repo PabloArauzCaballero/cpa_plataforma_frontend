@@ -18,7 +18,7 @@ import {
   validateMovementBusinessRules,
   validateTransactionHeaderBusinessRules,
 } from '../domain/transaction/transactionFormModel';
-import type { DraftOperation } from '../services/backendDraftApi';
+import type { DraftOperation } from '../services/persistentDraftApi';
 import styles from './TransactionForm.module.css';
 
 interface TransactionFormProps {
@@ -183,7 +183,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
       <TransactionDraftActions
         hasDraft={draftViewModel.hasDraft}
-        backendDraftCount={draftViewModel.backendDraftCount}
+        storedDraftCount={draftViewModel.storedDraftCount}
         draftPositionLabel={draftViewModel.draftPositionLabel}
         selectedDraftLabel={draftViewModel.selectedDraftLabel}
         canGoPreviousDraft={draftViewModel.canGoPreviousDraft}

@@ -5,7 +5,7 @@ import styles from '../TransactionForm.module.css';
 
 interface TransactionDraftActionsProps {
   hasDraft: boolean;
-  backendDraftCount: number;
+  storedDraftCount: number;
   draftPositionLabel: string;
   selectedDraftLabel: string;
   canGoPreviousDraft: boolean;
@@ -22,7 +22,7 @@ interface TransactionDraftActionsProps {
 
 export function TransactionDraftActions({
   hasDraft,
-  backendDraftCount,
+  storedDraftCount,
   draftPositionLabel,
   selectedDraftLabel,
   canGoPreviousDraft,
@@ -39,10 +39,10 @@ export function TransactionDraftActions({
   return (
     <div className={styles.draftBar}>
       <div className={styles.draftInfo}>
-        <strong><FontAwesomeIcon icon={faDatabase} /> Borradores en base de datos</strong>
+        <strong><FontAwesomeIcon icon={faDatabase} /> Borradores guardados</strong>
         <span>Guarda varios avances sin crear la transacción final. Puedes moverte entre borradores antes de cargar uno.</span>
         <small className={styles.draftMeta}>
-          {backendDraftCount > 0 ? `Borrador ${draftPositionLabel} · ${selectedDraftLabel}` : draftPositionLabel}
+          {storedDraftCount > 0 ? `Borrador ${draftPositionLabel} · ${selectedDraftLabel}` : draftPositionLabel}
         </small>
         {draftMessage ? <small className={styles.draftSuccess}>{draftMessage}</small> : null}
         {draftError ? <small className={styles.draftError}>{draftError}</small> : null}

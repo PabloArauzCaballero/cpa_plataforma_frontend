@@ -9,13 +9,13 @@ import { humanizeFieldLabel } from '@/shared/utils/humanize';
 import { CloudinaryUploadField } from './CloudinaryUploadField';
 import { buildResourceDraftKey, deleteLocalDraft, hasLocalDraft, readLocalDraft, saveLocalDraft } from '@/shared/services/localDraftStore';
 import {
-  discardBackendDraft,
-  listBackendDrafts,
+  discardPersistentDraft,
+  listPersistentDrafts,
   readDraftPayload,
-  saveBackendDraft,
-  type BackendDraft,
+  savePersistentDraft,
+  type PersistentDraft,
   type DraftOperation,
-} from '../services/backendDraftApi';
+} from '../services/persistentDraftApi';
 import styles from './ResourceForm.module.css';
 
 interface ResourceFormProps {
@@ -48,7 +48,7 @@ function getDraftStatusMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'No se pudo operar el borrador.';
 }
 
-function formatDraftDate(draft: BackendDraft | null): string {
+function formatDraftDate(draft: PersistentDraft | null): string {
   const value = draft?.fecha_modificacion ?? draft?.fecha_registro;
   if (!value) return 'Sin fecha';
   const date = new Date(String(value));
@@ -64,19 +64,19 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
   const draftOperation = getDraftOperation(record);
   const draftKey = buildResourceDraftKey(resource.key, recordId);
   const [localDraftExists, setLocalDraftExists] = useState(() => hasLocalDraft(draftKey));
-  const [backendDrafts, setBackendDrafts] = useState<Array<BackendDraft<CrudRecord>>>([]);
+  const [persistentDrafts, setPersistentDrafts] = useState<Array<PersistentDraft<CrudRecord>>>([]);
   const [selectedDraftIndex, setSelectedDraftIndex] = useState(0);
   const [isDraftBusy, setIsDraftBusy] = useState(false);
   const [draftMessage, setDraftMessage] = useState<string | null>(null);
   const [draftError, setDraftError] = useState<string | null>(null);
 
-  const selectedDraft = backendDrafts[selectedDraftIndex] ?? null;
+  const selectedDraft = persistentDrafts[selectedDraftIndex] ?? null;
   const hasDraft = Boolean(selectedDraft?.id_borrador) || localDraftExists;
-  const draftPositionLabel = backendDrafts.length > 0 ? `${selectedDraftIndex + 1} de ${backendDrafts.length}` : localDraftExists ? 'Respaldo local' : 'Sin borradores';
+  const draftPositionLabel = persistentDrafts.length > 0 ? `${selectedDraftIndex + 1} de ${persistentDrafts.length}` : localDraftExists ? 'Respaldo local' : 'Sin borradores';
 
   async function refreshDrafts(nextSelectedId?: string | number | null) {
-    const drafts = await listBackendDrafts<CrudRecord>(resource, draftOperation, recordId);
-    setBackendDrafts(drafts);
+    const drafts = await listPersistentDrafts<CrudRecord>(resource, draftOperation, recordId);
+    setPersistentDrafts(drafts);
     if (nextSelectedId) {
       const nextIndex = drafts.findIndex((draft) => String(draft.id_borrador) === String(nextSelectedId));
       setSelectedDraftIndex(nextIndex >= 0 ? nextIndex : 0);
@@ -88,21 +88,21 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
 
   useEffect(() => {
     let isMounted = true;
-    setBackendDrafts([]);
+    setPersistentDrafts([]);
     setSelectedDraftIndex(0);
     setLocalDraftExists(hasLocalDraft(draftKey));
     setDraftMessage(null);
     setDraftError(null);
 
-    listBackendDrafts<CrudRecord>(resource, draftOperation, recordId)
+    listPersistentDrafts<CrudRecord>(resource, draftOperation, recordId)
       .then((drafts) => {
         if (!isMounted) return;
-        setBackendDrafts(drafts);
+        setPersistentDrafts(drafts);
         setSelectedDraftIndex(0);
       })
       .catch(() => {
         if (!isMounted) return;
-        setBackendDrafts([]);
+        setPersistentDrafts([]);
       });
 
     return () => {
@@ -129,14 +129,14 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     setDraftMessage(null);
 
     try {
-      const savedDraft = await saveBackendDraft(resource, draftOperation, draftPayload, {
+      const savedDraft = await savePersistentDraft(resource, draftOperation, draftPayload, {
         recordId,
         createNew: true,
       });
       await refreshDrafts(savedDraft.id_borrador ?? null);
       saveLocalDraft(draftKey, draftPayload);
       setLocalDraftExists(true);
-      setDraftMessage('Nuevo borrador guardado en base de datos.');
+      setDraftMessage('Nuevo borrador guardado.');
     } catch (error) {
       saveLocalDraft(draftKey, draftPayload);
       setLocalDraftExists(true);
@@ -158,9 +158,9 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
         draft = drafts[0] ?? null;
       }
 
-      const backendPayload = readDraftPayload(draft);
-      if (draft && backendPayload) {
-        applyDraftPayload(backendPayload);
+      const sistemaPayload = readDraftPayload(draft);
+      if (draft && sistemaPayload) {
+        applyDraftPayload(sistemaPayload);
         setDraftMessage(`Borrador cargado: ${formatDraftDate(draft)}.`);
         return;
       }
@@ -193,7 +193,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
 
     try {
       if (selectedDraft?.id_borrador) {
-        await discardBackendDraft(selectedDraft.id_borrador);
+        await discardPersistentDraft(selectedDraft.id_borrador);
         await refreshDrafts();
       } else {
         deleteLocalDraft(draftKey);
@@ -212,7 +212,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
   }
 
   function goToNextDraft() {
-    setSelectedDraftIndex((current) => Math.min(Math.max(backendDrafts.length - 1, 0), current + 1));
+    setSelectedDraftIndex((current) => Math.min(Math.max(persistentDrafts.length - 1, 0), current + 1));
   }
 
   return (
@@ -226,7 +226,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     >
       {isJsonMode ? (
         <label className={styles.jsonField}>
-          <span>Payload JSON</span>
+          <span>Datos JSON</span>
           <textarea value={viewModel.jsonPayload} onChange={(event) => viewModel.setJsonPayload(event.target.value)} rows={12} />
           {viewModel.errors.json ? <small>{viewModel.errors.json}</small> : null}
         </label>
@@ -274,9 +274,9 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
 
       <div className={styles.draftBar}>
         <div className={styles.draftInfo}>
-          <strong><FontAwesomeIcon icon={faDatabase} /> Borradores en base de datos</strong>
+          <strong><FontAwesomeIcon icon={faDatabase} /> Borradores guardados</strong>
           <span>Guarda varios avances sin afectar las tablas finales. Puedes moverte entre borradores antes de cargar uno.</span>
-          <small className={styles.draftMeta}>{backendDrafts.length > 0 ? `Borrador ${draftPositionLabel} · ${formatDraftDate(selectedDraft)}` : draftPositionLabel}</small>
+          <small className={styles.draftMeta}>{persistentDrafts.length > 0 ? `Borrador ${draftPositionLabel} · ${formatDraftDate(selectedDraft)}` : draftPositionLabel}</small>
           {draftMessage ? <small className={styles.draftSuccess}>{draftMessage}</small> : null}
           {draftError ? <small className={styles.draftError}>{draftError}</small> : null}
         </div>
@@ -286,7 +286,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <span>{draftPositionLabel}</span>
-            <button type="button" onClick={goToNextDraft} disabled={isDraftBusy || selectedDraftIndex >= backendDrafts.length - 1} aria-label="Borrador siguiente">
+            <button type="button" onClick={goToNextDraft} disabled={isDraftBusy || selectedDraftIndex >= persistentDrafts.length - 1} aria-label="Borrador siguiente">
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>

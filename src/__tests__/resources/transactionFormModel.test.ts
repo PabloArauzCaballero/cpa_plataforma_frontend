@@ -13,7 +13,7 @@ import {
 } from '../../features/resources/domain/transaction/transactionFormModel';
 
 describe('transactionFormModel', () => {
-  it('normaliza movimientos existentes desde distintos aliases del backend', () => {
+  it('normaliza movimientos existentes desde distintos aliases del sistema', () => {
     const movements = getRecordMovements({
       movimientos: [
         { id_cuenta: 10, debe: 120, haber: 0, descripcion: 'Caja' },
@@ -65,7 +65,7 @@ describe('transactionFormModel', () => {
     expect(validateMovementBusinessRules(movements)).toContain('No repitas');
   });
 
-  it('genera payload Debe/Haber compatible con backend', () => {
+  it('genera payload Debe/Haber compatible con sistema', () => {
     expect(getMovementPayload({ cuentaId: '9', tipoMovimiento: 'HABER', monto: '33.5', descripcion: 'Venta' })).toEqual({
       id_cuenta: 9,
       debe: 0,

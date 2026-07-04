@@ -30,7 +30,7 @@ function resolveOnlyActiveFilter(filters: ResourceListQuery['filters']): boolean
 function appendVisibilityParams(params: URLSearchParams, query: ResourceListQuery): void {
   const onlyActive = resolveOnlyActiveFilter(query.filters);
 
-  // Muchas funciones del backend/DDL tienen p_only_activos DEFAULT true.
+  // Muchas funciones del sistema/DDL tienen p_only_activos DEFAULT true.
   // Por eso, si el usuario no eligió explícitamente Activo, pedimos todos los estados.
   params.set('onlyActivos', onlyActive ? 'true' : 'false');
   params.set('only_activos', onlyActive ? 'true' : 'false');
@@ -79,7 +79,7 @@ export async function listResource(resource: CrudResourceDefinition, query: Reso
 }
 
 export async function listAllResource(resource: CrudResourceDefinition, query: ResourceListQuery, maxRows = 50000): Promise<ResourceListResult> {
-  // El backend puede limitar internamente la cantidad devuelta aunque se pida un limit mayor.
+  // El sistema puede limitar internamente la cantidad devuelta aunque se pida un limit mayor.
   // Por eso avanzamos el offset con la cantidad REAL recibida y no con el limit solicitado.
   const pageSize = 200;
   let offset = 0;

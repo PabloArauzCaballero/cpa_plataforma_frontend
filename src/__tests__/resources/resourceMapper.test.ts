@@ -18,7 +18,7 @@ describe('resourceMapper', () => {
     expect(result.page).toBe(3);
   });
 
-  it('normaliza aliases de listados del backend', () => {
+  it('normaliza aliases de listados del sistema', () => {
     expect(normalizeListResponse({ data: [{ id: 1 }] })).toEqual([{ id: 1 }]);
     expect(normalizeListResponse({ rows: [{ id: 2 }] })).toEqual([{ id: 2 }]);
     expect(normalizeListResponse({ data: { records: [{ id: 3 }] } })).toEqual([{ id: 3 }]);

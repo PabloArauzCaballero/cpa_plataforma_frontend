@@ -148,7 +148,7 @@ export function CatalogosOperativosPage() {
   }
 
   if (state === 'loading' || state === 'idle') {
-    return <PageState title="Cargando catálogos" message="Consultando cuentas operativas y catálogos académicos desde el backend." />;
+    return <PageState title="Cargando catálogos" message="Consultando cuentas operativas y catálogos académicos desde la plataforma." />;
   }
 
   if (state === 'error') {
@@ -162,7 +162,7 @@ export function CatalogosOperativosPage() {
           <span>Configuración previa · Venta clase</span>
           <h2>CATÁLOGOS Y CUENTAS OPERATIVAS</h2>
           <p>
-            Diseña y valida los catálogos que alimentan el parte de clases pasadas. El frontend solo captura datos; el backend resuelve la contabilidad, las ventas, los detalles y la trazabilidad.
+            Diseña y valida los catálogos que alimentan el parte de clases pasadas. La pantalla captura los datos y el sistema resuelve la contabilidad, las ventas, los detalles y la trazabilidad.
           </p>
         </div>
         <div className={styles.heroActions}>
@@ -173,7 +173,7 @@ export function CatalogosOperativosPage() {
 
       <div className={styles.metrics}>
         <div><strong>{configuredAccounts}/4</strong><span>Cuentas operativas configuradas</span></div>
-        <div><strong>{materias.length}</strong><span>Registros materia-tree</span></div>
+        <div><strong>{materias.length}</strong><span>Materias y temas</span></div>
         <div><strong>{productos.length}</strong><span>Productos educativos</span></div>
         <div><strong>{unidades.length}</strong><span>Unidades educativas</span></div>
       </div>
@@ -198,7 +198,7 @@ export function CatalogosOperativosPage() {
           <div className={styles.panelHeader}>
             <div>
               <h3>Configuración de cuentas operativas</h3>
-              <p>Estas cuentas se seleccionan desde base de datos. No se configuran desde variables de entorno.</p>
+              <p>Estas cuentas se administran desde el sistema para evitar cambios manuales o configuraciones dispersas.</p>
             </div>
             <Link to="/modulos/contabilidad/cuenta">Administrar plan de cuentas</Link>
           </div>
@@ -253,7 +253,7 @@ export function CatalogosOperativosPage() {
               <h3>Materias, temas y subtemas</h3>
               <p>Este catálogo alimenta los selects dependientes de materia, tema y subtema en parte de clases pasadas.</p>
             </div>
-            <Link to="/modulos/servicios_educativos/materia-tree">Administrar materia tree</Link>
+            <Link to="/modulos/servicios_educativos/materia-tree">Administrar materias y temas</Link>
           </div>
 
           <div className={styles.materiaGrid}>
@@ -277,7 +277,7 @@ export function CatalogosOperativosPage() {
           <div className={styles.panelHeader}>
             <div>
               <h3>Productos educativos</h3>
-              <p>Se usan para el detalle de venta que genera el backend: clases, cursos, paquetes y productos académicos.</p>
+              <p>Se usan para el detalle de venta que genera el sistema: clases, cursos, paquetes y productos académicos.</p>
             </div>
             <Link to="/modulos/servicios_educativos/producto-educativo">Administrar productos educativos</Link>
           </div>
@@ -334,16 +334,16 @@ export function CatalogosOperativosPage() {
           <div className={styles.panelHeader}>
             <div>
               <h3>Orden recomendado antes de registrar clases pasadas</h3>
-              <p>Este diseño evita datos sueltos y permite que el backend genere la transacción completa sin que el frontend arme contabilidad manual.</p>
+              <p>Este diseño evita datos sueltos y permite que el sistema genere la transacción completa sin armar contabilidad manual en pantalla.</p>
             </div>
           </div>
           <div className={styles.flowGrid}>
             <article><strong>1</strong><h4>Plan de cuentas</h4><p>Crea grupos y cuentas contables. Luego selecciona las cuentas de efectivo, QR, IVA e ingreso por clases.</p></article>
-            <article><strong>2</strong><h4>Catálogos académicos</h4><p>Registra materia, tema y subtema en materia-tree. Esto alimenta los selects del parte.</p></article>
-            <article><strong>3</strong><h4>Productos educativos</h4><p>Crea Clases de Matemáticas, Física, Química, cursos y paquetes. El backend los usa para el detalle de venta.</p></article>
-            <article><strong>4</strong><h4>Personas</h4><p>Registra estudiantes y tutores. El backend asocia cuentas CxC, paquete diferido y CxP tutor cuando corresponde.</p></article>
+            <article><strong>2</strong><h4>Catálogos académicos</h4><p>Registra materia, tema y subtema. Esto alimenta las listas del parte.</p></article>
+            <article><strong>3</strong><h4>Productos educativos</h4><p>Crea Clases de Matemáticas, Física, Química, cursos y paquetes. El sistema los usa para el detalle de venta.</p></article>
+            <article><strong>4</strong><h4>Personas</h4><p>Registra estudiantes y tutores. El sistema asocia cuentas CxC, paquete diferido y CxP tutor cuando corresponde.</p></article>
             <article><strong>5</strong><h4>Parte de clases</h4><p>Captura fecha, horas, estudiante, tutor, aula, materia, tema, subtema, producto y montos.</p></article>
-            <article><strong>6</strong><h4>Backend contable</h4><p>El backend genera clase, venta, detalle, transacción, movimientos y guarda trazabilidad.</p></article>
+            <article><strong>6</strong><h4>Motor contable</h4><p>El sistema genera clase, venta, detalle, transacción, movimientos y guarda trazabilidad.</p></article>
           </div>
         </div>
       ) : null}

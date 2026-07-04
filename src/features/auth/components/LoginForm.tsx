@@ -17,7 +17,7 @@ export function LoginForm() {
       <div className={styles.heading}>
         <span>Acceso privado</span>
         <h1>Ingresar a CPA</h1>
-        <p>Usa las credenciales seed del backend o las credenciales reales configuradas para el sistema.</p>
+        <p>Usa las credenciales asignadas por administración para ingresar al sistema.</p>
       </div>
       <FormField id="email" label="Usuario o correo" type="text" value={viewModel.email} onChange={(value) => viewModel.setEmail(String(value))} required />
       <FormField id="password" label="Contraseña" type="password" value={viewModel.password} onChange={(value) => viewModel.setPassword(String(value))} required />

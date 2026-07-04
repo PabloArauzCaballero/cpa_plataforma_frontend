@@ -177,7 +177,7 @@ export function VentaClaseBatchPage() {
   const [materiaTreeOptions, setMateriaTreeOptions] = useState<MateriaTreeOption[]>([]);
   const [productoOptions, setProductoOptions] = useState<ProductoEducativoOption[]>([]);
   const [defaultProductoId, setDefaultProductoId] = useState('');
-  const [lookupStatus, setLookupStatus] = useState('Cargando catálogos desde el backend...');
+  const [lookupStatus, setLookupStatus] = useState('Cargando catálogos desde la plataforma...');
   const [lookupError, setLookupError] = useState('');
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export function VentaClaseBatchPage() {
 
     async function loadLookups() {
       setLookupError('');
-      setLookupStatus('Cargando estudiantes, tutores, aulas, materias, temas, subtemas y productos desde el backend...');
+      setLookupStatus('Cargando estudiantes, tutores, aulas, materias, temas, subtemas y productos desde la plataforma...');
       try {
         const [estudiantes, tutores, aulas, materias, productos] = await Promise.all([
           listEstudianteOptions(),
@@ -200,7 +200,7 @@ export function VentaClaseBatchPage() {
         setAulaOptions(aulas);
         setMateriaTreeOptions(materias);
         setProductoOptions(productos);
-        setLookupStatus(`Catálogos cargados desde el backend: ${estudiantes.length} estudiantes, ${tutores.length} tutores, ${aulas.length} aulas, ${materias.length} materia/tema/subtema y ${productos.length} productos educativos.`);
+        setLookupStatus(`Catálogos cargados desde la plataforma: ${estudiantes.length} estudiantes, ${tutores.length} tutores, ${aulas.length} aulas, ${materias.length} materia/tema/subtema y ${productos.length} productos educativos.`);
       } catch (error) {
         if (!active) return;
         const message = error instanceof Error ? error.message : 'No se pudieron cargar los datos relacionados.';
@@ -349,7 +349,7 @@ export function VentaClaseBatchPage() {
     setIsSaving(true);
     try {
       const response = await registrarVentaClaseBatch(batchPayload);
-      setSuccessMessage(`Se enviaron ${payloadRows.length} clases pasadas correctamente. Si el backend devolvió advertencias por fila, revísalas abajo.`);
+      setSuccessMessage(`Se registraron ${payloadRows.length} clases pasadas correctamente. Si hubo observaciones por fila, revísalas abajo.`);
       setResponsePreview(JSON.stringify(response, null, 2));
     } catch (error) {
       setErrors([explainVentaClaseError(error)]);
@@ -369,7 +369,7 @@ export function VentaClaseBatchPage() {
           <span>Contabilidad · clases pasadas</span>
           <h2>PARTE DE CLASES PASADAS</h2>
           <p>
-            Registra en lote las clases ya realizadas. El frontend captura datos; el backend genera la clase, venta,
+            Registra en lote las clases ya realizadas. La pantalla captura los datos y el sistema genera la clase, venta,
             detalle, transacción, movimientos contables y trazabilidad.
           </p>
         </div>
@@ -377,7 +377,7 @@ export function VentaClaseBatchPage() {
 
       <div className={styles.noticeRow}>
         <div className={styles.notice}>
-          No registres movimientos contables manuales para este flujo. Efectivo, QR, CxC y paquete se resuelven con la configuración y cuentas asociadas desde el backend.
+          No registres movimientos contables manuales para este flujo. Efectivo, QR, CxC y paquete se resuelven con la configuración y cuentas asociadas desde la plataforma.
         </div>
         <Link className={styles.catalogLink} to="/contabilidad/catalogos-cuentas-operativas">Configurar catálogos y cuentas</Link>
       </div>
@@ -413,7 +413,7 @@ export function VentaClaseBatchPage() {
         <div className={styles.panelHeader}>
           <div>
             <h3>Tabla editable</h3>
-            <p>Completa solo las filas necesarias. Las filas vacías no se envían al backend.</p>
+            <p>Completa solo las filas necesarias. Las filas vacías no se envían al sistema.</p>
           </div>
           <div className={styles.actions}>
             <Button type="button" variant="ghost" onClick={clearRows}>Limpiar</Button>
@@ -533,8 +533,8 @@ export function VentaClaseBatchPage() {
       <div className={styles.panel}>
         <div className={styles.panelHeader}>
           <div>
-            <h3>Vista previa del payload</h3>
-            <p>Se envía como batch con llave <strong>items</strong>. El backend arma la contabilidad.</p>
+            <h3>Vista previa de datos a enviar</h3>
+            <p>Se procesará como lote. El sistema arma la contabilidad automáticamente.</p>
           </div>
         </div>
         <pre className={styles.preview}>{JSON.stringify(batchPayload, null, 2)}</pre>
@@ -544,8 +544,8 @@ export function VentaClaseBatchPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <div>
-              <h3>Respuesta del backend</h3>
-              <p>Resultado devuelto por el registro batch. Revisa advertencias por fila si existen.</p>
+              <h3>Resultado del registro</h3>
+              <p>Resultado devuelto por el registro en lote. Revisa observaciones por fila si existen.</p>
             </div>
           </div>
           <pre className={styles.preview}>{responsePreview}</pre>

@@ -47,12 +47,12 @@ export const REQUIRED_ACCOUNT_CONFIGS = [
   {
     codigo: 'CANAL_COBRO_EFECTIVO',
     nombre: 'Canal de cobro efectivo',
-    descripcion: 'Cuenta contable usada por el backend para cobros en efectivo en parte de clases pasadas.',
+    descripcion: 'Cuenta contable usada por el sistema para cobros en efectivo en parte de clases pasadas.',
   },
   {
     codigo: 'CANAL_COBRO_QR',
     nombre: 'Canal de cobro QR',
-    descripcion: 'Cuenta contable usada por el backend para cobros por QR en parte de clases pasadas.',
+    descripcion: 'Cuenta contable usada por el sistema para cobros por QR en parte de clases pasadas.',
   },
   {
     codigo: 'IVA_DEBITO_FISCAL',
@@ -62,7 +62,7 @@ export const REQUIRED_ACCOUNT_CONFIGS = [
   {
     codigo: 'INGRESO_CLASE_POR_HORA',
     nombre: 'Ingreso clases por hora',
-    descripcion: 'Cuenta de ingreso que usa el backend al generar la venta de clases por hora.',
+    descripcion: 'Cuenta de ingreso que usa el sistema al generar la venta de clases por hora.',
   },
 ] as const;
 

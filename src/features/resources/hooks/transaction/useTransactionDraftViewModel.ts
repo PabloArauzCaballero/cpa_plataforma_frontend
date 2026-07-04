@@ -3,13 +3,13 @@ import type { CrudRecord, CrudResourceDefinition } from '../../domain/CrudResour
 import type { MovementDraft } from '../../domain/transaction/transactionFormModel';
 import { buildResourceDraftKey, deleteLocalDraft, hasLocalDraft, readLocalDraft, saveLocalDraft } from '@/shared/services/localDraftStore';
 import {
-  discardBackendDraft,
-  listBackendDrafts,
+  discardPersistentDraft,
+  listPersistentDrafts,
   readDraftPayload,
-  saveBackendDraft,
-  type BackendDraft,
+  savePersistentDraft,
+  type PersistentDraft,
   type DraftOperation,
-} from '../../services/backendDraftApi';
+} from '../../services/persistentDraftApi';
 
 export interface TransactionDraftPayload {
   header?: CrudRecord;
@@ -24,7 +24,7 @@ interface UseTransactionDraftViewModelArgs {
   applyDraftPayload: (payload: TransactionDraftPayload) => void;
 }
 
-function getDraftDateLabel(draft: BackendDraft<unknown> | null): string {
+function getDraftDateLabel(draft: PersistentDraft<unknown> | null): string {
   const value = draft?.fecha_modificacion ?? draft?.fecha_registro;
   if (!value) return 'Sin fecha';
   const date = new Date(String(value));
@@ -41,17 +41,17 @@ export function useTransactionDraftViewModel({
 }: UseTransactionDraftViewModelArgs) {
   const draftKey = buildResourceDraftKey(resource.key, recordId);
   const [localDraftExists, setLocalDraftExists] = useState(() => hasLocalDraft(draftKey));
-  const [backendDrafts, setBackendDrafts] = useState<Array<BackendDraft<TransactionDraftPayload>>>([]);
+  const [persistentDrafts, setPersistentDrafts] = useState<Array<PersistentDraft<TransactionDraftPayload>>>([]);
   const [selectedDraftIndex, setSelectedDraftIndex] = useState(0);
   const [isDraftBusy, setIsDraftBusy] = useState(false);
   const [draftMessage, setDraftMessage] = useState<string | null>(null);
   const [draftError, setDraftError] = useState<string | null>(null);
 
-  const selectedDraft = backendDrafts[selectedDraftIndex] ?? null;
+  const selectedDraft = persistentDrafts[selectedDraftIndex] ?? null;
 
   async function refreshDrafts(nextSelectedId?: string | number | null) {
-    const drafts = await listBackendDrafts<TransactionDraftPayload>(resource, operation, recordId);
-    setBackendDrafts(drafts);
+    const drafts = await listPersistentDrafts<TransactionDraftPayload>(resource, operation, recordId);
+    setPersistentDrafts(drafts);
     if (nextSelectedId) {
       const nextIndex = drafts.findIndex((draft) => String(draft.id_borrador) === String(nextSelectedId));
       setSelectedDraftIndex(nextIndex >= 0 ? nextIndex : 0);
@@ -63,21 +63,21 @@ export function useTransactionDraftViewModel({
 
   useEffect(() => {
     let isMounted = true;
-    setBackendDrafts([]);
+    setPersistentDrafts([]);
     setSelectedDraftIndex(0);
     setLocalDraftExists(hasLocalDraft(draftKey));
     setDraftMessage(null);
     setDraftError(null);
 
-    listBackendDrafts<TransactionDraftPayload>(resource, operation, recordId)
+    listPersistentDrafts<TransactionDraftPayload>(resource, operation, recordId)
       .then((drafts) => {
         if (!isMounted) return;
-        setBackendDrafts(drafts);
+        setPersistentDrafts(drafts);
         setSelectedDraftIndex(0);
       })
       .catch(() => {
         if (!isMounted) return;
-        setBackendDrafts([]);
+        setPersistentDrafts([]);
       });
 
     return () => {
@@ -92,7 +92,7 @@ export function useTransactionDraftViewModel({
     setDraftError(null);
 
     try {
-      const savedDraft = await saveBackendDraft(resource, operation, payload, {
+      const savedDraft = await savePersistentDraft(resource, operation, payload, {
         recordId,
         createNew: true,
         metadata: {
@@ -102,7 +102,7 @@ export function useTransactionDraftViewModel({
       await refreshDrafts(savedDraft.id_borrador ?? null);
       saveLocalDraft(draftKey, payload);
       setLocalDraftExists(true);
-      setDraftMessage('Nuevo borrador guardado en base de datos.');
+      setDraftMessage('Nuevo borrador guardado.');
     } catch (currentError) {
       saveLocalDraft(draftKey, payload);
       setLocalDraftExists(true);
@@ -125,9 +125,9 @@ export function useTransactionDraftViewModel({
         draft = drafts[0] ?? null;
       }
 
-      const backendPayload = readDraftPayload(draft);
-      if (draft && backendPayload) {
-        applyDraftPayload(backendPayload);
+      const sistemaPayload = readDraftPayload(draft);
+      if (draft && sistemaPayload) {
+        applyDraftPayload(sistemaPayload);
         setDraftMessage(`Borrador cargado: ${getDraftDateLabel(draft)}.`);
         return;
       }
@@ -160,7 +160,7 @@ export function useTransactionDraftViewModel({
 
     try {
       if (selectedDraft?.id_borrador) {
-        await discardBackendDraft(selectedDraft.id_borrador);
+        await discardPersistentDraft(selectedDraft.id_borrador);
         await refreshDrafts();
       }
       if (!selectedDraft?.id_borrador) {
@@ -180,22 +180,22 @@ export function useTransactionDraftViewModel({
   }
 
   function goToNextDraft() {
-    setSelectedDraftIndex((current) => Math.min(Math.max(backendDrafts.length - 1, 0), current + 1));
+    setSelectedDraftIndex((current) => Math.min(Math.max(persistentDrafts.length - 1, 0), current + 1));
   }
 
   const draftPositionLabel = useMemo(() => {
-    if (backendDrafts.length === 0) return localDraftExists ? 'Respaldo local' : 'Sin borradores';
-    return `${selectedDraftIndex + 1} de ${backendDrafts.length}`;
-  }, [backendDrafts.length, localDraftExists, selectedDraftIndex]);
+    if (persistentDrafts.length === 0) return localDraftExists ? 'Respaldo local' : 'Sin borradores';
+    return `${selectedDraftIndex + 1} de ${persistentDrafts.length}`;
+  }, [persistentDrafts.length, localDraftExists, selectedDraftIndex]);
 
   return {
     hasDraft: Boolean(selectedDraft?.id_borrador || localDraftExists),
-    backendDraftCount: backendDrafts.length,
+    storedDraftCount: persistentDrafts.length,
     selectedDraftIndex,
     selectedDraftLabel: getDraftDateLabel(selectedDraft),
     draftPositionLabel,
     canGoPreviousDraft: selectedDraftIndex > 0,
-    canGoNextDraft: selectedDraftIndex < backendDrafts.length - 1,
+    canGoNextDraft: selectedDraftIndex < persistentDrafts.length - 1,
     isDraftBusy,
     draftMessage,
     draftError,

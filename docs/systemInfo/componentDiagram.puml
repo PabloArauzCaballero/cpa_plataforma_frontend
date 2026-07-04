@@ -2,7 +2,7 @@
 skinparam componentStyle rectangle
 left to right direction
 
-title Diagrama de Componentes - Backend Modular
+title Diagrama de Componentes - Sistema Modular
 
 package "Clientes" {
   [Portal Administrativo]
@@ -16,7 +16,7 @@ package "Capa de Entrada" {
   [API Gateway]
 }
 
-package "Backend NestJS Modular" {
+package "Sistema NestJS Modular" {
   [Seguridad]
   [Personas]
   [Administracion RRHH]

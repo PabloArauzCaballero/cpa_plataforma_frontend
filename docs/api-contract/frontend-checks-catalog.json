@@ -1,0 +1,509 @@
+{
+"version": "1.0.0",
+"name": "CPA Frontend Field Validation Check Catalog",
+"purpose": "Catálogo obligatorio de validaciones para formularios React. Los formularios deben leer este catálogo antes de renderizar, validar y serializar payloads.",
+"sourcePriority": [
+"1. docs/validation/frontend-checks-catalog.md o JSON equivalente generado desde DDL/CHECK constraints",
+"2. docs/endpoints/endpoints.md para campos, payloads y obligatoriedad",
+"3. Postman collection solo como prueba de rutas, no como contrato de payload cuando use cuerpos genéricos"
+],
+"globalRules": {
+"required": "Campo obligatorio según NOT NULL sin default, payload mínimo o CHECK explícito.",
+"optionalEmpty": "Campo opcional vacío no se envía en el payload.",
+"id": "Campos id_* deben ser enteros positivos. Si hay catálogo/lookup disponible, validar existencia por selector.",
+"text": "Trim al enviar. Si el campo es obligatorio, no permitir cadena vacía.",
+"varchar": "Respetar longitud máxima si el DDL define character varying(n).",
+"enum": "Renderizar como select con valores exactos del enum o CHECK ANY.",
+"date": "Usar input date y validar relaciones de inicio/fin cuando existan.",
+"time": "Usar input time o datetime-local según tipo real.",
+"boolean": "Renderizar como switch/check; serializar boolean real, no string.",
+"number": "Serializar como number. Nunca enviar números como string.",
+"money": "Usar decimal >= 0 salvo que el CHECK indique > 0.",
+"percent": "Validar 0 <= valor <= 100.",
+"latitude": "Validar -90 <= latitud <= 90.",
+"longitude": "Validar -180 <= longitud <= 180.",
+"audit": "No mostrar ni enviar campos de auditoría: id_usuario_creador, id_usuario_modificacion, fecha_registro, fecha_modificacion, version_registro.",
+"technicalVisibility": "No mostrar rutas de endpoint, nombres de tabla, PK, token ni detalles técnicos en la UI."
+},
+"fieldPatternRules": [
+{
+"pattern": "^id_",
+"check": "positiveInteger",
+"message": "Debe seleccionar un registro válido."
+},
+{
+"pattern": "email|correo",
+"check": "email",
+"message": "Ingrese un correo válido."
+},
+{
+"pattern": "telefono|celular|phone",
+"check": "phoneLoose",
+"message": "Ingrese un teléfono válido."
+},
+{
+"pattern": "link_|url",
+"check": "url",
+"message": "Ingrese un enlace válido."
+},
+{
+"pattern": "fecha_inicio|vigente_desde|periodo_inicio|hora_inicio",
+"check": "startTemporal",
+"message": "Debe ser una fecha/hora de inicio válida."
+},
+{
+"pattern": "fecha_fin|vigente_hasta|periodo_fin|hora_fin|hora_salida",
+"check": "endTemporal",
+"message": "Debe ser posterior o igual al inicio cuando aplique."
+},
+{
+"pattern": "monto|precio|costo|pago|subtotal|total|capital|interes|seguro|recargo|valor",
+"check": "nonNegativeDecimal",
+"message": "No puede ser negativo."
+},
+{
+"pattern": "porcentaje|tasa",
+"check": "percentOrRate",
+"message": "Debe estar dentro del rango permitido."
+},
+{
+"pattern": "cantidad|plazo|pisos|capacidad|horas|vida_util",
+"check": "positiveIntegerOrDecimal",
+"message": "Debe ser mayor a cero cuando el negocio lo exige."
+},
+{
+"pattern": "latitud",
+"check": "latitude",
+"message": "Latitud debe estar entre -90 y 90."
+},
+{
+"pattern": "longitud",
+"check": "longitude",
+"message": "Longitud debe estar entre -180 y 180."
+},
+{
+"pattern": "estado_registro",
+"check": "status",
+"message": "Usar estados permitidos por el recurso."
+},
+{
+"pattern": "curso|grado|curso_escolar",
+"check": "cursoEscolar",
+"message": "Debe seleccionar un curso válido."
+},
+{
+"pattern": "nivel|nivel_academico|nivel_estudiante|nivel_estudiante_especialidad",
+"check": "nivelAcademico",
+"message": "Debe seleccionar un nivel académico válido."
+},
+{
+"pattern": "tipo_estudiante|tipo_estudiante_especialidad|tipo_alumno",
+"check": "tipoEstudiante",
+"message": "Debe seleccionar un tipo de estudiante válido."
+},
+{
+"pattern": "nivel_experiencia",
+"check": "nivelExperienciaTutor",
+"message": "Debe seleccionar un nivel de experiencia válido."
+},
+{
+"pattern": "nombre|descripcion|detalle|observacion|glosa",
+"check": "trimmedText",
+"message": "El texto no puede estar vacío cuando el campo es obligatorio."
+},
+{
+"pattern": "codigo|sigla|abreviatura",
+"check": "trimmedCode",
+"message": "Ingrese un código válido sin espacios innecesarios."
+}
+],
+"fieldDefinitions": {
+"curso": {
+"type": "enum",
+"enumRef": "academico.curso",
+"ui": "select",
+"values": [
+"PRIMERO",
+"SEGUNDO",
+"TERCERO",
+"CUARTO",
+"QUINTO",
+"SEXTO"
+],
+"message": "Seleccione el curso correspondiente."
+},
+"grado": {
+"type": "enum",
+"enumRef": "academico.curso",
+"ui": "select",
+"values": [
+"PRIMERO",
+"SEGUNDO",
+"TERCERO",
+"CUARTO",
+"QUINTO",
+"SEXTO"
+],
+"message": "Seleccione el grado correspondiente."
+},
+"nivel": {
+"type": "enum",
+"enumRef": "academico.nivel",
+"ui": "select",
+"values": [
+"PRIMARIA",
+"SECUNDARIA",
+"UNIVERSIDAD"
+],
+"message": "Seleccione el nivel académico."
+},
+"nivel_academico": {
+"type": "enum",
+"enumRef": "academico.nivel",
+"ui": "select",
+"values": [
+"PRIMARIA",
+"SECUNDARIA",
+"UNIVERSIDAD"
+],
+"message": "Seleccione el nivel académico."
+},
+"nivel_estudiante_especialidad": {
+"type": "enum",
+"enumRef": "academico.nivel",
+"ui": "select",
+"values": [
+"PRIMARIA",
+"SECUNDARIA",
+"UNIVERSIDAD"
+],
+"message": "Seleccione el nivel del estudiante."
+},
+"tipo_estudiante": {
+"type": "enum",
+"enumRef": "persona.tipo_estudiante",
+"ui": "select",
+"values": [
+"UNIVERSITARIO",
+"INICIAL",
+"COLEGIAL"
+],
+"message": "Seleccione el tipo de estudiante."
+},
+"tipo_estudiante_especialidad": {
+"type": "enum",
+"enumRef": "persona.tipo_estudiante",
+"ui": "select",
+"values": [
+"UNIVERSITARIO",
+"INICIAL",
+"COLEGIAL"
+],
+"message": "Seleccione el tipo de estudiante."
+},
+"nivel_experiencia": {
+"type": "enum",
+"enumRef": "persona.nivel_experiencia_tutor",
+"ui": "select",
+"values": [
+"RECLUTA",
+"EXPERIMENTADO",
+"SENIOR"
+],
+"message": "Seleccione el nivel de experiencia del tutor."
+},
+"pago_por_hora": {
+"type": "money",
+"check": "nonNegativeDecimal",
+"message": "El pago por hora no puede ser negativo."
+},
+"fecha_inicio": {
+"type": "date",
+"check": "startTemporal",
+"message": "Seleccione una fecha de inicio válida."
+},
+"fecha_fin": {
+"type": "date",
+"check": "endTemporal",
+"message": "La fecha de fin debe ser posterior o igual a la fecha de inicio."
+},
+"hora_inicio": {
+"type": "time",
+"check": "startTemporal",
+"message": "Seleccione una hora de inicio válida."
+},
+"hora_fin": {
+"type": "time",
+"check": "endTemporal",
+"message": "La hora de fin debe ser posterior a la hora de inicio."
+}
+},
+"domainChecks": {
+"dateRanges": [
+{
+"fields": [
+"fecha_inicio",
+"fecha_fin"
+],
+"rule": "fecha_fin >= fecha_inicio if fecha_fin exists"
+},
+{
+"fields": [
+"fecha_ingreso",
+"fecha_salida"
+],
+"rule": "fecha_salida >= fecha_ingreso if fecha_salida exists"
+},
+{
+"fields": [
+"vigente_desde",
+"vigente_hasta"
+],
+"rule": "vigente_hasta >= vigente_desde if vigente_hasta exists"
+}
+],
+"timeRanges": [
+{
+"fields": [
+"hora_inicio",
+"hora_fin"
+],
+"rule": "hora_fin > hora_inicio if both fields exist"
+},
+{
+"fields": [
+"hora_ingreso",
+"hora_salida"
+],
+"rule": "hora_salida > hora_ingreso if both fields exist"
+}
+],
+"accountingTransaction": {
+"resource": "contabilidad.transaccion + contabilidad.transaccion_movimiento_cuenta",
+"headerRequired": [
+"tipo_transaccion"
+],
+"lineRequired": [
+"id_cuenta"
+],
+"rules": [
+"movimientos must be non-empty array",
+"each line must have id_cuenta",
+"debe and haber must be >= 0",
+"a line cannot have debe > 0 and haber > 0 at the same time",
+"each line must have either debe > 0 or haber > 0",
+"sum(debe) must equal sum(haber) when validation is enabled"
+]
+},
+"debtPayment": {
+"resource": "deuda.pago",
+"rules": [
+"capital_amortizado/interes_pagado/seguro_desgravamen_pagado/otros_recargos_pagados >= 0",
+"sum of payment components > 0"
+]
+},
+"tutor": {
+"resource": "persona.persona_tutor",
+"fields": {
+"pago_por_hora": {
+"type": "money",
+"check": "pago_por_hora >= 0"
+},
+"nivel_experiencia": {
+"type": "enum",
+"enumRef": "persona.nivel_experiencia_tutor"
+},
+"tipo_estudiante_especialidad": {
+"type": "enum",
+"enumRef": "persona.tipo_estudiante"
+},
+"nivel_estudiante_especialidad": {
+"type": "enum",
+"enumRef": "academico.nivel"
+},
+"curso": {
+"type": "enum",
+"enumRef": "academico.curso"
+}
+},
+"rules": [
+"pago_por_hora >= 0",
+"nivel_experiencia in RECLUTA|EXPERIMENTADO|SENIOR",
+"tipo_estudiante_especialidad in UNIVERSITARIO|INICIAL|COLEGIAL",
+"nivel_estudiante_especialidad in PRIMARIA|SECUNDARIA|UNIVERSIDAD when present",
+"curso in PRIMERO|SEGUNDO|TERCERO|CUARTO|QUINTO|SEXTO when present",
+"if tipo_estudiante_especialidad = UNIVERSITARIO then nivel_estudiante_especialidad must be UNIVERSIDAD or null depending on payload contract",
+"if tipo_estudiante_especialidad = UNIVERSITARIO then curso should be null",
+"if tipo_estudiante_especialidad = COLEGIAL then nivel_estudiante_especialidad is required and must be PRIMARIA or SECUNDARIA",
+"if tipo_estudiante_especialidad = COLEGIAL then curso is required",
+"if tipo_estudiante_especialidad = INICIAL then nivel_estudiante_especialidad should be null unless sistema explicitly supports INICIAL as nivel",
+"if tipo_estudiante_especialidad = INICIAL then curso should be null unless sistema explicitly supports curso for inicial"
+]
+},
+"assetBien": {
+"resource": "inventario.bien",
+"rules": [
+"dimensions/weights/costs/prices/value fields cannot be negative",
+"factor_conversion > 0",
+"vida_util_meses > 0 when present",
+"if tipo = ACTIVO_FIJO then valor_origen, vida_util_meses and metodo_depreciacion are required",
+"inventory flags must respect business XOR rule by tipo"
+]
+}
+},
+"enums": {
+"academico.curso": [
+"PRIMERO",
+"SEGUNDO",
+"TERCERO",
+"CUARTO",
+"QUINTO",
+"SEXTO"
+],
+"academico.nivel": [
+"PRIMARIA",
+"SECUNDARIA",
+"UNIVERSIDAD"
+],
+"persona.tipo_estudiante": [
+"UNIVERSITARIO",
+"INICIAL",
+"COLEGIAL"
+],
+"persona.nivel_experiencia_tutor": [
+"RECLUTA",
+"EXPERIMENTADO",
+"SENIOR"
+],
+"administracion.direccion_kpi": [
+"ASC",
+"DESC"
+],
+"administracion.estado_okr": [
+"PLANIFICADO",
+"EN_PROGRESO",
+"COMPLETADO",
+"CANCELADO"
+],
+"administracion.frecuencia_kpi": [
+"DIARIA",
+"SEMANAL",
+"MENSUAL",
+"TRIMESTRAL"
+],
+"administracion.frecuencia_pago": [
+"MENSUAL",
+"QUINCENAL",
+"SEMANAL"
+],
+"administracion.jornada_laboral": [
+"FULL_TIME",
+"PART_TIME"
+],
+"administracion.tipo_contrato": [
+"INDEFINIDO",
+"PLAZO_FIJO",
+"HONORARIOS"
+],
+"administracion.tipo_esquema_pago": [
+"SUELDO",
+"POR_HORA",
+"COMISION",
+"MIXTO"
+],
+"administracion.tipo_kpi": [
+"INPUT",
+"OUTPUT",
+"OUTCOME"
+],
+"contabilidad.naturaleza_costo": [
+"FIJO",
+"VARIABLE"
+],
+"contabilidad.tipo_costo": [
+"DIRECTO",
+"INDIRECTO"
+],
+"contabilidad.tipo_transaccion": [
+"GENERAL",
+"COSTO",
+"VENTA",
+"BIEN",
+"DEUDA"
+],
+"infraestructura.categoria_sala": [
+"OFICINA",
+"CONFERENCIA",
+"REUNION",
+"ESPERA",
+"TIENDA",
+"OTRA"
+],
+"infraestructura.tipo_aula": [
+"TEORIA",
+"LABORATORIO",
+"COMPUTACION",
+"MULTIUSO"
+],
+"infraestructura.tipo_espacio": [
+"AULA",
+"SALA"
+],
+"inventario.metodo_depreciacion": [
+"LINEA_RECTA",
+"SDD",
+"UNIDADES"
+],
+"inventario.metodo_valuacion": [
+"PEPS",
+"UEPS",
+"PROM"
+],
+"inventario.seguimiento_bien": [
+"NINGUNO",
+"LOTE",
+"SERIE"
+],
+"inventario.tipo_bien": [
+"MERCADERIA",
+"MATERIA_PRIMA",
+"SUMINISTRO",
+"SERVICIO",
+"ACTIVO_FIJO"
+],
+"societario.instrumento_emision": [
+"AUMENTO_CAPITAL",
+"CONVERSION",
+"PLAN_OPCIONES",
+"EMISION_SECUNDARIA",
+"OTRO"
+],
+"societario.tipo_origen_tenencia": [
+"EMISION",
+"TRANSFERENCIA",
+"CONVERSION",
+"EJERCICIO_OPCION",
+"AJUSTE"
+],
+"societario.tipo_ronda": [
+"FOUNDERS",
+"ANGEL",
+"SEED",
+"A",
+"B",
+"C",
+"D",
+"PUENTE",
+"OTRA"
+],
+"societario.tipo_titulo_societario": [
+"ACCION",
+"CUOTA",
+"PARTICIPACION",
+"BONO_CONVERTIBLE",
+"SAFE",
+"WARRANT",
+"OPCION"
+]
+}
+}

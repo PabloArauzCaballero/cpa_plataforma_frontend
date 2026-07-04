@@ -98,7 +98,7 @@ export async function listAllLookupOptions(relation: ResourceLookupRelation, pag
     if (records.length === 0) break;
     if (total !== null && collected.length >= total) break;
 
-    // El backend puede capar internamente el limit solicitado.
+    // El sistema puede capar internamente el limit solicitado.
     // Avanzamos por la cantidad REAL recibida para no quedarnos solo con los primeros 100 registros.
     offset += records.length;
   }

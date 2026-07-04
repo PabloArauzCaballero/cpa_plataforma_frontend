@@ -125,7 +125,7 @@ export function mapProfileMeResponse(dto: ProfileMeResponseDto): UserProfile {
   const person = pickNestedPerson(data, user, root);
   const session = pickRecord(data.session, data.sesion, root.session, root.sesion);
 
-  // El backend puede devolver los datos de persona dentro de user, dentro de persona,
+  // El sistema puede devolver los datos de persona dentro de user, dentro de persona,
   // o mezclados en data. Se fusionan fuentes para no mostrar "No disponible" si el dato sí vino.
   const resolved = mergeRecords(data, person, user);
 

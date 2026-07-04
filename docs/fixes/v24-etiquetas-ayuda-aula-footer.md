@@ -23,4 +23,4 @@
 
 ## Venta detalle
 
-La ayuda documenta que la venta con muchos productos o servicios debe manejarse con cabecera y detalle separados. En la documentación disponible del backend no aparece un endpoint específico de `venta_detalle`, por lo que no se creó una tabla ficticia ni se inventó payload.
+La ayuda documenta que la venta con muchos productos o servicios debe manejarse con cabecera y detalle separados. En la documentación disponible del sistema no aparece un endpoint específico de `venta_detalle`, por lo que no se creó una tabla ficticia ni se inventó payload.

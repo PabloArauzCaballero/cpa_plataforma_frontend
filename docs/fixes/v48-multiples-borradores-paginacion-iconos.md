@@ -6,7 +6,7 @@ Permitir que un usuario guarde más de un borrador por formulario/recurso, sin p
 
 ## Cambios
 
-- `saveBackendDraft` ahora crea un borrador nuevo cuando se usa `createNew: true`.
+- `savePersistentDraft` ahora crea un borrador nuevo cuando se usa `createNew: true`.
 - La clave cliente mantiene un prefijo estable por módulo/recurso/operación y agrega un sufijo único por borrador.
 - Los formularios genéricos y el formulario de transacción listan varios borradores activos.
 - Se agregó mini paginación de borradores:
@@ -15,7 +15,7 @@ Permitir que un usuario guarde más de un borrador por formulario/recurso, sin p
   - posición actual,
   - fecha del borrador seleccionado.
 - Cargar y eliminar actúan sobre el borrador seleccionado.
-- Se mantiene respaldo local solo como fallback si el backend no responde.
+- Se mantiene respaldo local solo como fallback si el sistema no responde.
 - Se agregaron iconos Font Awesome para:
   - guardar,
   - cargar,

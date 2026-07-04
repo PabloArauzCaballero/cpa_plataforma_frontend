@@ -12,7 +12,7 @@ El flujo correcto es:
 4. El frontend coloca esa URL en el payload como:
    - `link_achivo`
    - `link_archivo`
-5. El backend recibe el link y guarda el registro normalmente.
+5. El sistema recibe el link y guarda el registro normalmente.
 
 ## Variables requeridas
 
@@ -42,4 +42,4 @@ VITE_CLOUDINARY_FOLDER=cpa/archivos-transaccion
 
 ## Nota sobre `link_achivo`
 
-El backend conserva el campo histórico `link_achivo`. Para compatibilidad, el frontend envía tanto `link_achivo` como `link_archivo` con la misma URL cuando se sube la imagen.
+El sistema conserva el campo histórico `link_achivo`. Para compatibilidad, el frontend envía tanto `link_achivo` como `link_archivo` con la misma URL cuando se sube la imagen.

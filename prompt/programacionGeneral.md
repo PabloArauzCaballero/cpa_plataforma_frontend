@@ -763,7 +763,7 @@ Debe incluir:
 * Diagramas, documentación o scripts generados.
 * Estado actual del entregable.
 
-No escribas frases genéricas como “se avanzó en el backend”. Debes indicar avances concretos y verificables.
+No escribas frases genéricas como “se avanzó en el sistema”. Debes indicar avances concretos y verificables.
 
 ### 2. Riesgos detectados
 

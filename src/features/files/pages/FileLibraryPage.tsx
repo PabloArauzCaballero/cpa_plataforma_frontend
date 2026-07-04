@@ -159,7 +159,7 @@ function mergeFolders(localFolders: StorageFolder[], files: ServerFileRecord[]):
     map.set(path, {
       label: resolveFolderLabel(file),
       path,
-      createdAt: 'backend',
+      createdAt: 'sistema',
     });
   }
 
@@ -286,7 +286,7 @@ export function FileLibraryPage() {
     if (selectedFolderPath === folder.path) setSelectedFolderPath(FILE_FOLDER);
     if (folderFilter === folder.path) setFolderFilter('');
     setFolderPendingDelete(null);
-    setMessage('Carpeta quitada de la biblioteca local. Los archivos existentes en el servidor no fueron eliminados.');
+    setMessage('Carpeta quitada de la biblioteca local. Los archivos ya subidos no fueron eliminados.');
   }
 
   async function handleUpload() {
@@ -384,7 +384,7 @@ export function FileLibraryPage() {
         <div className={styles.panelHeader}>
           <div>
             <h3><FontAwesomeIcon icon={faCloudArrowUp} /> Subir archivo</h3>
-            <p>El archivo se sube al storage configurado y se registra en base de datos con su URL segura y carpeta.</p>
+            <p>El archivo se sube al almacenamiento configurado y queda registrado con su enlace seguro y carpeta.</p>
           </div>
           <div className={styles.modeSwitch}>
             <button type="button" className={uploadMode === 'archivo' ? styles.activeMode : ''} onClick={() => setUploadMode('archivo')}>
@@ -468,7 +468,7 @@ export function FileLibraryPage() {
         <div className={styles.panelHeader}>
           <div>
             <h3><FontAwesomeIcon icon={faFile} /> Archivos registrados</h3>
-            <p>Consulta, abre y copia enlaces de los archivos que ya existen en el servidor.</p>
+            <p>Consulta, abre y copia enlaces de los archivos disponibles en la biblioteca digital.</p>
           </div>
           <button type="button" onClick={() => void loadFiles(page)} disabled={isLoading} className={styles.secondaryButton}>
             <FontAwesomeIcon icon={faRotateRight} /> Actualizar
@@ -592,7 +592,7 @@ export function FileLibraryPage() {
         title="Confirmar eliminación de carpeta"
         message="La carpeta se quitará de la biblioteca visual y ya no aparecerá como destino rápido de subida."
         targetLabel={folderPendingDelete ? folderPendingDelete.label : undefined}
-        warning="Esta acción no elimina archivos ya subidos en Cloudinary ni registros guardados en la base de datos."
+        warning="Esta acción no elimina archivos ya subidos en Cloudinary ni registros guardados."
         confirmLabel="Sí, quitar carpeta"
         cancelLabel="Cancelar"
         variant="danger"

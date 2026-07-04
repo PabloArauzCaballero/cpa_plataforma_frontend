@@ -43,9 +43,9 @@ function pickRowsAndMeta(response: unknown): { rows: CrudRecord[]; meta: Record<
 }
 
 /**
- * Normaliza las respuestas reales del backend CPA.
+ * Normaliza las respuestas reales del sistema CPA.
  *
- * El formato principal del backend NestJS es:
+ * El formato principal del sistema NestJS es:
  * { success, message, data: { rows, count, limit, offset }, pagination }
  */
 export function normalizeListResponse(response: unknown): CrudRecord[] {
@@ -61,8 +61,8 @@ export function normalizeListResult(response: unknown, fallbackLimit = 20, fallb
   const limit = firstNumber(meta, ['limit', 'pageSize'], firstNumber(pagination, ['limit', 'pageSize'], firstNumber(paging, ['limit', 'pageSize'], fallbackLimit)));
   const offset = firstNumber(meta, ['offset'], firstNumber(pagination, ['offset'], firstNumber(paging, ['offset'], fallbackOffset)));
   const count = firstNumber(meta, ['count', 'total'], firstNumber(pagination, ['count', 'total'], firstNumber(paging, ['count', 'total'], rows.length)));
-  const pageFromBackend = firstNumber(meta, ['page'], firstNumber(pagination, ['page'], 0));
-  const page = pageFromBackend > 0 ? pageFromBackend : Math.floor(offset / Math.max(limit, 1)) + 1;
+  const pageFromResponse = firstNumber(meta, ['page'], firstNumber(pagination, ['page'], 0));
+  const page = pageFromResponse > 0 ? pageFromResponse : Math.floor(offset / Math.max(limit, 1)) + 1;
 
   return {
     records: rows,

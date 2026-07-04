@@ -12,7 +12,7 @@ Se ajustó la pantalla especial **Parte de clases pasadas** según el contrato `
 - Aula sale desde `/api/infraestructura/aula`.
 - Paquete se maneja como monto numérico y se envía como `paquete`.
 - Se validan montos, CxC/paquete con estudiante, fechas y horas.
-- No se envían cuentas para efectivo, QR, CxC ni paquete. Eso lo resuelve backend desde configuración y cuentas asociadas.
+- No se envían cuentas para efectivo, QR, CxC ni paquete. Eso lo resuelve sistema desde configuración y cuentas asociadas.
 
 ## Endpoints usados
 
