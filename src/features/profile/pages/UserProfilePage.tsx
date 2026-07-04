@@ -98,11 +98,11 @@ export function UserProfilePage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Información personal</h2>
-                <p>Datos devueltos por la sesión actual. Esta pantalla no inventa información local.</p>
+                <p>Datos devueltos por la sesión actual.</p>
               </div>
 
               <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                <i className="fa-solid fa-database" aria-hidden="true" />
+                <i className="fa-solid fa-user" aria-hidden="true" />
                 Sesión
               </span>
             </div>
@@ -122,7 +122,7 @@ export function UserProfilePage() {
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <div>
-                <h2>Roles reales</h2>
+                <h2>Roles</h2>
                 <p>Roles asignados a tu usuario. Si no existen roles activos, esta sección queda vacía.</p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export function UserProfilePage() {
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <div>
-                <h2>Permisos reales</h2>
+                <h2>Permisos</h2>
                 <p>Permisos activos de tu sesión. No se muestran permisos de prueba.</p>
               </div>
             </div>
@@ -171,8 +171,8 @@ export function UserProfilePage() {
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <div>
-                <h2>Respuesta de sesión</h2>
-                <p>Resumen de sesión para soporte. No expone token ni rutas internas.</p>
+                <h2>Sesión</h2>
+                <p>Resumen de sesión para soporte</p>
               </div>
             </div>
 
