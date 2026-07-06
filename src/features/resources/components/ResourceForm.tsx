@@ -59,7 +59,7 @@ function formatDraftDate(draft: PersistentDraft | null): string {
 export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }: ResourceFormProps) {
   const viewModel = useResourceFormViewModel(resource, record);
   const isJsonMode = resource.fields.length === 0;
-  const visibleFields = resource.fields.filter((field) => !shouldHideTechnicalMirrorField(resource, field.name));
+  const visibleFields = resource.fields.filter((field) => !shouldHideTechnicalMirrorField(resource, field.name) && viewModel.isFieldVisible(field));
   const recordId = resolveDraftRecordId(resource, record);
   const draftOperation = getDraftOperation(record);
   const draftKey = buildResourceDraftKey(resource.key, recordId);

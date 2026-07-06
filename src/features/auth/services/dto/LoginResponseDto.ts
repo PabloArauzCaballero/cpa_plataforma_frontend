@@ -3,6 +3,11 @@ export interface LoginResponseDto {
   message?: string;
   data?: {
     sessionToken?: string;
+    session_token?: string;
+    idSesion?: string | number;
+    id_sesion?: string | number;
+    sessionId?: string | number;
+    session_id?: string | number;
     token?: string;
     tokenType?: string;
     user?: Record<string, unknown>;
@@ -12,6 +17,11 @@ export interface LoginResponseDto {
     permissions?: unknown[];
   };
   sessionToken?: string;
+  session_token?: string;
+  idSesion?: string | number;
+  id_sesion?: string | number;
+  sessionId?: string | number;
+  session_id?: string | number;
   token?: string;
   user?: Record<string, unknown>;
   usuario?: Record<string, unknown>;

@@ -35,6 +35,7 @@ export interface ResourceFieldDefinition {
   helpText?: string;
   conditionalOptions?: ConditionalSelectOptions;
   requiredWhen?: Record<string, string | number | boolean>;
+  visibleWhen?: Record<string, string | number | boolean>;
   exclusiveGroup?: string;
 }
 
@@ -118,4 +119,3 @@ export interface ResourceListResult {
   offset: number;
   page: number;
 }
-

@@ -1,5 +1,6 @@
 export interface StoredUserSession {
   sessionToken: string;
+  idSesion?: string;
   email: string;
   nombreUsuario?: string;
   nombreCompleto?: string;
@@ -63,7 +64,11 @@ function readStoredJson(): StoredUserSession | null {
 }
 
 export function getSessionToken(): string | null {
-  return TOKEN_KEYS.map((key) => window.localStorage.getItem(key)).find((value): value is string => Boolean(value?.trim())) ?? null;
+  const tokenFromKeys = TOKEN_KEYS.map((key) => window.localStorage.getItem(key)).find((value): value is string => Boolean(value?.trim()));
+  if (tokenFromKeys) return tokenFromKeys.trim();
+
+  const session = readStoredJson();
+  return session?.sessionToken?.trim() || session?.idSesion?.trim() || null;
 }
 
 export function getStoredSession(): StoredUserSession | null {
@@ -104,8 +109,9 @@ export function buildStoredSessionFromLoginResponse(response: unknown, fallbackL
         ? root.user
         : {};
 
-  const sessionToken = readFirstString(data.sessionToken, data.token, root.sessionToken, root.token);
-  if (!sessionToken) throw new Error('La respuesta de login no incluye data.sessionToken.');
+  const idSesion = readFirstString(data.idSesion, data.id_sesion, data.sessionId, data.session_id, root.idSesion, root.id_sesion, root.sessionId, root.session_id);
+  const sessionToken = readFirstString(data.sessionToken, data.token, data.session_token, root.sessionToken, root.token, root.session_token, idSesion);
+  if (!sessionToken) throw new Error('La respuesta de login no incluye data.sessionToken ni data.id_sesion.');
 
   const nombres = readFirstString(user.nombres, user.nombre, user.firstName);
   const apellidos = readFirstString(user.apellidos, user.apellido, user.lastName);
@@ -120,6 +126,7 @@ export function buildStoredSessionFromLoginResponse(response: unknown, fallbackL
 
   return {
     sessionToken,
+    idSesion,
     email,
     nombreUsuario,
     nombreCompleto,

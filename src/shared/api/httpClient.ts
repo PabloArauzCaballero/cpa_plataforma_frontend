@@ -70,6 +70,11 @@ function resolveErrorMessage(payload: unknown, status: number): string {
   return fallbackErrorMessage(status);
 }
 
+function appendSessionHeaders(headers: Record<string, string>, token: string | null): void {
+  if (!token) return;
+  headers['X-Session-Token'] = token;
+}
+
 export async function request<TResponse, TBody = unknown>(
   path: string,
   options: RequestOptions<TBody> = {},
@@ -85,9 +90,7 @@ export async function request<TResponse, TBody = unknown>(
     headers['Content-Type'] = 'application/json';
   }
 
-  if (token) {
-    headers['X-Session-Token'] = token;
-  }
+  appendSessionHeaders(headers, token);
 
   const response = await fetch(`${env.apiBaseUrl}${normalizePath(path)}`, {
     method: options.method ?? 'GET',
@@ -116,9 +119,7 @@ export async function upload<TResponse>(
     Accept: 'application/json',
   };
 
-  if (token) {
-    headers['X-Session-Token'] = token;
-  }
+  appendSessionHeaders(headers, token);
 
   const response = await fetch(`${env.apiBaseUrl}${normalizePath(path)}`, {
     method,

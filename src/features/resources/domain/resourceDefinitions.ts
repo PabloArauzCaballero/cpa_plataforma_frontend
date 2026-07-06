@@ -68,12 +68,12 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
       { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular un registro ya existente." },
       { name: "codigo_estudiante", label: "Código estudiante", type: "text" },
       { name: "id_unidad_educativa", label: "Unidad educativa", type: "number" },
-      { name: "tipo", label: "Tipo estudiante", type: "text" },
-      { name: "nivel_actual", label: "Nivel actual", type: "text" },
-      { name: "curso_actual", label: "Curso actual", type: "text" },
-      { name: "turno_actual", label: "Turno actual", type: "text" },
-      { name: "carrera", label: "Carrera", type: "text" },
-      { name: "anio_ingreso", label: "Año ingreso", type: "number" }
+      { name: "tipo", label: "Tipo estudiante", type: "select", required: true, options: ["UNIVERSITARIO", "COLEGIAL"] },
+      { name: "nivel_actual", label: "Nivel actual", type: "text", requiredWhen: { tipo: "COLEGIAL" }, visibleWhen: { tipo: "COLEGIAL" } },
+      { name: "curso_actual", label: "Curso actual", type: "text", requiredWhen: { tipo: "COLEGIAL" }, visibleWhen: { tipo: "COLEGIAL" } },
+      { name: "turno_actual", label: "Turno actual", type: "text", requiredWhen: { tipo: "COLEGIAL" }, visibleWhen: { tipo: "COLEGIAL" } },
+      { name: "carrera", label: "Carrera", type: "text", requiredWhen: { tipo: "UNIVERSITARIO" }, visibleWhen: { tipo: "UNIVERSITARIO" } },
+      { name: "anio_ingreso", label: "Año ingreso", type: "number", requiredWhen: { tipo: "UNIVERSITARIO" }, visibleWhen: { tipo: "UNIVERSITARIO" } }
     ],
   },
   {

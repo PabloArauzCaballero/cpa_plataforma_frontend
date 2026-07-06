@@ -39,6 +39,7 @@ function normalizeFieldValue(field: ResourceFieldDefinition, value: unknown): un
 }
 
 function normalizeResourceSpecificPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
+  if (resource.key === 'estudiante') return normalizeStudentPayload(payload);
   if (resource.key !== 'archivos-transaccion') return payload;
 
   const link = payload.link_achivo ?? payload.link_archivo;
@@ -49,6 +50,58 @@ function normalizeResourceSpecificPayload(resource: CrudResourceDefinition, payl
     link_achivo: link,
     link_archivo: link,
   };
+}
+
+function normalizeComparableValue(value: unknown): string {
+  return String(value ?? '').trim().toUpperCase();
+}
+
+function conditionMatches(payload: CrudRecord, condition: Record<string, string | number | boolean>): boolean {
+  return Object.entries(condition).every(([name, expected]) => normalizeComparableValue(payload[name]) === normalizeComparableValue(expected));
+}
+
+function normalizeStudentPayload(payload: CrudRecord): CrudRecord {
+  const tipo = normalizeComparableValue(payload.tipo);
+  const nextPayload = { ...payload };
+
+  if (tipo === 'UNIVERSITARIO') {
+    nextPayload.nivel_actual = undefined;
+    nextPayload.curso_actual = undefined;
+    nextPayload.turno_actual = undefined;
+  } else if (tipo === 'COLEGIAL') {
+    nextPayload.carrera = undefined;
+    nextPayload.anio_ingreso = undefined;
+  } else {
+    nextPayload.nivel_actual = undefined;
+    nextPayload.curso_actual = undefined;
+    nextPayload.turno_actual = undefined;
+    nextPayload.carrera = undefined;
+    nextPayload.anio_ingreso = undefined;
+  }
+
+  return nextPayload;
+}
+
+function resetStudentDependentFields(name: string, value: unknown, current: CrudRecord): CrudRecord {
+  if (name !== 'tipo') return { ...current, [name]: value };
+
+  const tipo = normalizeComparableValue(value);
+  const nextPayload: CrudRecord = { ...current, tipo };
+  if (tipo === 'UNIVERSITARIO') {
+    nextPayload.nivel_actual = '';
+    nextPayload.curso_actual = '';
+    nextPayload.turno_actual = '';
+  } else if (tipo === 'COLEGIAL') {
+    nextPayload.carrera = '';
+    nextPayload.anio_ingreso = '';
+  } else {
+    nextPayload.nivel_actual = '';
+    nextPayload.curso_actual = '';
+    nextPayload.turno_actual = '';
+    nextPayload.carrera = '';
+    nextPayload.anio_ingreso = '';
+  }
+  return nextPayload;
 }
 
 function buildCleanPayload(resource: CrudResourceDefinition, payload: CrudRecord): CrudRecord {
@@ -130,7 +183,7 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
   }, [resource]);
 
   function setField(name: string, value: unknown) {
-    setPayload((current) => ({ ...current, [name]: value }));
+    setPayload((current) => (resource.key === 'estudiante' ? resetStudentDependentFields(name, value, current) : { ...current, [name]: value }));
   }
 
   function replacePayload(nextPayload: CrudRecord) {
@@ -146,6 +199,11 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
 
   function isLoadingFieldOptions(field: ResourceFieldDefinition): boolean {
     return Boolean(loadingRelationFields[field.name]);
+  }
+
+  function isFieldVisible(field: ResourceFieldDefinition): boolean {
+    if (!field.visibleWhen) return true;
+    return conditionMatches(payload, field.visibleWhen);
   }
 
   function getPayload(): CrudRecord | null {
@@ -176,5 +234,6 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     getPayload,
     getFieldOptions,
     isLoadingFieldOptions,
+    isFieldVisible,
   };
 }
