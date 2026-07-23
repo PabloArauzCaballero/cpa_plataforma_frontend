@@ -21,8 +21,9 @@
 .hero h2 {
   margin: 8px 0 12px;
   color: #012b65;
-  font-size: clamp(2.8rem, 7vw, 6rem);
-  line-height: 0.95;
+  font-size: var(--font-display);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 

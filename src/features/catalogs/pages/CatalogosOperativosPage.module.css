@@ -28,10 +28,10 @@
 .hero h2 {
   margin: 0.35rem 0;
   color: var(--color-primary);
-  font-size: clamp(2.25rem, 5vw, 4.2rem);
-  line-height: 0.95;
+  font-size: var(--font-display);
+  line-height: 1.05;
   text-transform: uppercase;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.02em;
 }
 
 .hero p {

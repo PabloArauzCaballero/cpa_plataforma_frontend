@@ -1,0 +1,91 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b7280;
+  cursor: help;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  color: #2563eb;
+  outline: none;
+}
+
+.bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 60;
+  width: max-content;
+  max-width: 18rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.5rem;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #111827;
+}
+
+.wrapper:hover .bubble,
+.trigger:focus-visible + .bubble,
+.wrapper[data-pinned='true'] .bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Cerca del borde izquierdo la burbuja se alinea a la izquierda para no cortarse. */
+@media (max-width: 640px) {
+  .bubble {
+    left: 0;
+    transform: translateX(0) translateY(4px);
+    max-width: 14rem;
+  }
+
+  .bubble::after {
+    left: 0.5rem;
+  }
+
+  .wrapper:hover .bubble,
+  .trigger:focus-visible + .bubble,
+  .wrapper[data-pinned='true'] .bubble {
+    transform: translateX(0) translateY(0);
+  }
+}

@@ -54,7 +54,7 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
   {
     key: "estudiante", module: "personas", moduleLabel: "Personas", label: "Estudiante",
     table: "persona.persona_estudiante", primaryKey: "id_persona",
-    endpoints: { list: "/api/personas/estudiante", detail: (id: string) => `/api/personas/estudiante/${id}`, create: "/api/personas/estudiante", update: (id: string) => `/api/personas/estudiante/${id}` },
+    endpoints: { list: "/api/personas/estudiante", detail: (id: string) => `/api/personas/estudiante/${id}`, create: "/api/personas/estudiante/registrar", update: (id: string) => `/api/personas/estudiante/${id}` },
     permissions: "create=PERSONAS.PERSONA_ESTUDIANTE.CREATE",
     fields: [
       { name: "nombres", label: "Nombres", type: "text", required: true },
@@ -100,9 +100,20 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
   {
     key: "tutor", module: "personas", moduleLabel: "Personas", label: "Tutor",
     table: "persona.persona_tutor", primaryKey: "id_tutor",
-    endpoints: { list: "/api/personas/tutor", detail: (id: string) => `/api/personas/tutor/${id}`, create: "/api/personas/tutor", update: (id: string) => `/api/personas/tutor/${id}` },
+    endpoints: { list: "/api/personas/tutor", detail: (id: string) => `/api/personas/tutor/${id}`, create: "/api/personas/tutor/registrar", update: (id: string) => `/api/personas/tutor/${id}` },
     permissions: "create=PERSONAS.PERSONA_TUTOR.CREATE",
-    fields: [{ name: "id_persona", label: "id_persona", type: "number", required: true }, { name: "pago_por_hora", label: "pago_por_hora", type: "number", required: true }, { name: "nivel_experiencia", label: "nivel_experiencia", type: "text", required: true }, { name: "tipo_estudiante_especialidad", label: "tipo_estudiante_especialidad", type: "text", required: true }, { name: "nivel_estudiante_especialidad", label: "nivel_estudiante_especialidad", type: "text" }],
+    fields: [
+      { name: "nombres", label: "Nombres", type: "text", required: true, helpText: "Datos de la persona base del tutor. Se crea automáticamente junto al tutor; no necesitas registrar la persona por separado." },
+      { name: "apellidos", label: "Apellidos", type: "text", required: true },
+      { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
+      { name: "telefono", label: "Teléfono", type: "text" },
+      { name: "email", label: "Correo electrónico", type: "email" },
+      { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular a una persona ya registrada." },
+      { name: "pago_por_hora", label: "Pago por hora (BOB)", type: "number", required: true, helpText: "Tarifa que se paga al tutor por hora de clase. Debe ser mayor o igual a 0." },
+      { name: "nivel_experiencia", label: "Nivel de experiencia", type: "select", required: true, options: ["RECLUTA", "EXPERIMENTADO", "SENIOR"], helpText: "RECLUTA: recién incorporado. EXPERIMENTADO: con trayectoria. SENIOR: referente del área." },
+      { name: "tipo_estudiante_especialidad", label: "Especialidad (tipo)", type: "select", required: true, options: ["UNIVERSITARIO", "COLEGIAL"], helpText: "A qué tipo de estudiantes enseña. Si es COLEGIAL, debes indicar el nivel." },
+      { name: "nivel_estudiante_especialidad", label: "Nivel (especialidad colegial)", type: "select", options: ["PRIMARIA", "SECUNDARIA"], requiredWhen: { tipo_estudiante_especialidad: "COLEGIAL" }, visibleWhen: { tipo_estudiante_especialidad: "COLEGIAL" }, helpText: "Solo aplica cuando la especialidad es COLEGIAL." },
+    ],
   },
   {
     key: "unidad-educativa", module: "personas", moduleLabel: "Personas", label: "Unidad Educativa",
@@ -114,9 +125,20 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
   {
     key: "usuario", module: "personas", moduleLabel: "Personas", label: "Usuario",
     table: "persona.persona_usuario", primaryKey: "id_persona",
-    endpoints: { list: "/api/personas/usuario", detail: (id: string) => `/api/personas/usuario/${id}`, create: "/api/personas/usuario", update: (id: string) => `/api/personas/usuario/${id}` },
+    endpoints: { list: "/api/personas/usuario", detail: (id: string) => `/api/personas/usuario/${id}`, create: "/api/personas/usuario/registrar", update: (id: string) => `/api/personas/usuario/${id}` },
     permissions: "create=PERSONAS.PERSONA_USUARIO.CREATE",
-    fields: [{ name: "id_persona", label: "id_persona", type: "number", required: true }, { name: "nombre_usuario", label: "nombre_usuario", type: "text", required: true }, { name: "contrasena_hash", label: "contrasena_hash", type: "text", required: true }, { name: "tipo_usuario", label: "tipo_usuario", type: "text" }, { name: "es_super_usuario", label: "es_super_usuario", type: "checkbox" }],
+    fields: [
+      { name: "nombres", label: "Nombres", type: "text", required: true, helpText: "Datos de la persona base del usuario. Se crea automáticamente junto a la cuenta; no necesitas registrar la persona por separado." },
+      { name: "apellidos", label: "Apellidos", type: "text", required: true },
+      { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
+      { name: "telefono", label: "Teléfono", type: "text" },
+      { name: "email", label: "Correo electrónico", type: "email" },
+      { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular a una persona ya registrada." },
+      { name: "nombre_usuario", label: "Nombre de usuario", type: "text", required: true, helpText: "Identificador único para iniciar sesión (por ejemplo, nombre.apellido)." },
+      { name: "password", label: "Contraseña", type: "password", required: true, helpText: "Se envía en texto plano por HTTPS y el servidor la almacena cifrada (hash). Usa una contraseña robusta." },
+      { name: "tipo_usuario", label: "Tipo de usuario", type: "text", helpText: "Rol funcional del usuario (por ejemplo, USUARIO_INTERNO, OPERADOR, ADMIN). Por defecto: USUARIO_INTERNO." },
+      { name: "es_super_usuario", label: "¿Es superusuario?", type: "checkbox", helpText: "Otorga acceso total. Solo un superusuario puede crear otros superusuarios." },
+    ],
   },
   {
     key: "asistencia-clase-curso", module: "servicios_educativos", moduleLabel: "Servicios educativos", label: "Asistencia Clase Curso",

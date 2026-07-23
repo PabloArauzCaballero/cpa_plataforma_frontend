@@ -50,9 +50,9 @@
 }
 
 .heroCopy h2 {
-  font-size: clamp(2.35rem, 5vw, 3.7rem);
-  line-height: 0.98;
-  letter-spacing: -0.045em;
+  font-size: var(--font-display);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 

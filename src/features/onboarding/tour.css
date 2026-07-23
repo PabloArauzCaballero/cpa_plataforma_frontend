@@ -1,0 +1,39 @@
+/* Ajustes de marca para los popovers de driver.js */
+.driver-popover {
+  border-radius: 12px;
+  padding: 1rem 1.15rem 1.1rem;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
+}
+
+.driver-popover-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.driver-popover-description {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.driver-popover-progress-text {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.driver-popover-navigation-btns button {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.driver-popover-next-btn {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  text-shadow: none !important;
+}
+
+.driver-popover-next-btn:hover {
+  background: #1d4ed8 !important;
+}

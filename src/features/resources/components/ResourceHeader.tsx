@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { CrudResourceDefinition } from '../domain/CrudResource';
 import { humanizeTitleLabel } from '@/shared/utils/humanize';
+import { TutorialButton } from '@/features/onboarding/TutorialButton';
 import styles from './ResourceHeader.module.css';
 
 interface ResourceHeaderProps {
@@ -19,6 +20,7 @@ export function ResourceHeader({ resource, total, visible, onHelpOpen }: Resourc
         <p>{visible} de {total} registros visibles · Gestiona esta información desde una vista segura y operativa.</p>
       </div>
       <div className={styles.actions}>
+        <TutorialButton moduleKey={resource.module} />
         {onHelpOpen ? (
           <button type="button" onClick={onHelpOpen}>
             <i className="fa-solid fa-circle-question" aria-hidden="true" />

@@ -1,5 +1,6 @@
 import frontendCheckCatalogRaw from '../../../../docs/validation/frontend-checks-catalog.json';
 import type { CrudResourceDefinition, ResourceFieldDefinition, ConditionalSelectOptions } from './CrudResource';
+import { getFieldTooltip } from './fieldTooltips';
 
 type FieldCatalogPatch = Partial<ResourceFieldDefinition>;
 
@@ -4751,7 +4752,14 @@ export function applyResourceFieldCatalog(resources: CrudResourceDefinition[]): 
     fields: resource.fields.map((field) => {
       const generatedPatch = resourceFieldCatalog[`${resource.key}.${field.name}`];
       const catalogPatch = getCatalogPatch(resource.key, field.name);
-      return mergeFieldPatches(field, generatedPatch, catalogPatch);
+      const merged = mergeFieldPatches(field, generatedPatch, catalogPatch);
+      // Un helpText explícito (inline o de catálogo) gana; si no hay, usamos el
+      // tooltip de negocio centralizado como aclaración por defecto.
+      if (!merged.helpText) {
+        const tooltip = getFieldTooltip(resource.key, field.name);
+        if (tooltip) merged.helpText = tooltip;
+      }
+      return merged;
     }),
   }));
 }

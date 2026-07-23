@@ -1,3 +1,4 @@
+import { InfoHint } from '../Tooltip';
 import styles from './FormField.module.css';
 
 export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox' | 'select' | 'url' | 'tel';
@@ -50,8 +51,10 @@ export function FormField({
           disabled={disabled}
           onChange={(event) => onChange(event.target.checked)}
         />
-        <span>{label}</span>
-        {helpText ? <small>{helpText}</small> : null}
+        <span>
+          {label}
+          {helpText ? <InfoHint text={helpText} label={`Ayuda: ${label}`} /> : null}
+        </span>
         {error ? <small className={styles.error}>{error}</small> : null}
       </label>
     );
@@ -65,6 +68,7 @@ export function FormField({
         <span>
           {label}
           {required ? <strong> *</strong> : null}
+          {helpText ? <InfoHint text={helpText} label={`Ayuda: ${label}`} /> : null}
         </span>
         <select
           id={id}
@@ -77,7 +81,6 @@ export function FormField({
             <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
           ))}
         </select>
-        {helpText ? <small>{helpText}</small> : null}
         {error ? <small className={styles.error}>{error}</small> : null}
       </label>
     );
@@ -88,6 +91,7 @@ export function FormField({
       <span>
         {label}
         {required ? <strong> *</strong> : null}
+        {helpText ? <InfoHint text={helpText} label={`Ayuda: ${label}`} /> : null}
       </span>
       {type === 'textarea' ? (
         <textarea
@@ -108,7 +112,6 @@ export function FormField({
           onChange={(event) => onChange(type === 'number' ? (event.target.value === '' ? '' : Number(event.target.value)) : event.target.value)}
         />
       )}
-      {helpText ? <small>{helpText}</small> : null}
       {error ? <small className={styles.error}>{error}</small> : null}
     </label>
   );

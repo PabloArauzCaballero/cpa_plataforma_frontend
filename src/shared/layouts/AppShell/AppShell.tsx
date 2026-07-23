@@ -1,8 +1,10 @@
-import type { ReactNode } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
 import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
+import { TutorialButton } from '@/features/onboarding/TutorialButton';
+import { useFirstRunOnboarding } from '@/features/onboarding/useFirstRunOnboarding';
 import styles from './AppShell.module.css';
 
 interface AppShellProps {
@@ -11,7 +13,27 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const email = getSessionDisplayName();
+  const [navOpen, setNavOpen] = useState(false);
+
+  // Recorrido de bienvenida automático la primera vez que el usuario entra.
+  useFirstRunOnboarding(true);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setNavOpen(false);
+  }, [location.pathname]);
+
+  // Prevent the page behind the mobile drawer from scrolling while it is open.
+  useEffect(() => {
+    if (!navOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [navOpen]);
 
   function logout() {
     clearStoredSession();
@@ -19,8 +41,15 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className={styles.shell}>
-      <aside className={styles.sidebar}>
+    <div className={styles.shell} data-nav-open={navOpen}>
+      <button
+        type="button"
+        className={styles.overlay}
+        aria-label="Cerrar menú de navegación"
+        hidden={!navOpen}
+        onClick={() => setNavOpen(false)}
+      />
+      <aside id="app-sidebar" className={styles.sidebar} data-open={navOpen}>
         <div className={styles.brand}>
           <span className={styles.brandTitle}>CPA Plataforma</span>
           <span>Centro de Preparación Académica</span>
@@ -36,7 +65,11 @@ export function AppShell({ children }: AppShellProps) {
             if (visibleResources.length === 0) return null;
 
             return (
-              <details key={module.key} open={module.key === 'personas' || module.key === 'servicios_educativos'}>
+              <details
+                key={module.key}
+                data-tour={module.key === 'personas' ? 'module-personas' : undefined}
+                open={module.key === 'personas' || module.key === 'servicios_educativos'}
+              >
                 <summary>
                   <span className={styles.moduleSummaryIcon}>
                     <i className={meta.icon} aria-hidden="true" />
@@ -77,6 +110,16 @@ export function AppShell({ children }: AppShellProps) {
       <div className={styles.mainArea}>
         <header className={styles.header}>
           <div className={styles.headerBrand}>
+            <button
+              type="button"
+              className={styles.menuButton}
+              aria-label={navOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={navOpen}
+              aria-controls="app-sidebar"
+              onClick={() => setNavOpen((open) => !open)}
+            >
+              <i className={navOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'} aria-hidden="true" />
+            </button>
             <img src="/logo.png" alt="CPA Centro de Preparación Académica" className={styles.headerLogo} />
             <div>
               <p>Plataforma interna</p>
@@ -84,6 +127,7 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           </div>
           <div className={styles.userBox}>
+            <TutorialButton />
             <NavLink to="/perfil">
               <i className="fa-solid fa-user-circle" aria-hidden="true" />
               {email}
@@ -94,7 +138,11 @@ export function AppShell({ children }: AppShellProps) {
             </button>
           </div>
         </header>
-        <main className={styles.content}>{children ?? <Outlet />}</main>
+        <main className={styles.content}>
+          <div key={location.pathname} className={styles.routeTransition}>
+            {children ?? <Outlet />}
+          </div>
+        </main>
         <footer className={styles.footer}>
           <span>CPA Plataforma · Versión 1.1.37</span>
           <span>Todos los derechos reservados 2026</span>
