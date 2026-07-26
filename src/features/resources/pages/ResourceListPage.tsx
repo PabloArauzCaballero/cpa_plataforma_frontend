@@ -229,6 +229,24 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       />
 
       <Modal
+        title={viewModel.disableResult?.title ?? ''}
+        isOpen={Boolean(viewModel.disableResult)}
+        onClose={viewModel.clearDisableResult}
+      >
+        {viewModel.disableResult ? (
+          <div className={styles.feedback} data-status={viewModel.disableResult.status}>
+            <span className={styles.feedbackIcon} aria-hidden="true">
+              <i className={viewModel.disableResult.status === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'} />
+            </span>
+            <p>{viewModel.disableResult.text}</p>
+            <div className={styles.feedbackActions}>
+              <button type="button" onClick={viewModel.clearDisableResult}>Entendido</button>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
+      <Modal
         title={viewModel.editingRecord ? `Editar ${humanizeTitleLabel(resource.label, resource.key)}` : `Crear ${humanizeTitleLabel(resource.label, resource.key)}`}
         isOpen={viewModel.isFormOpen}
         onClose={() => viewModel.setIsFormOpen(false)}

@@ -29,6 +29,19 @@ const genericFieldTooltips: Record<string, string> = {
   nombres: 'Nombre(s) de pila de la persona.',
   apellidos: 'Apellidos de la persona.',
   fecha_nacimiento: 'Fecha de nacimiento. Se usa para clasificaciones académicas y de edad.',
+
+  // Campos comunes que aparecen en muchos recursos de todos los módulos.
+  codigo: 'Código único para identificar el registro. Debe ser irrepetible dentro de su catálogo.',
+  nombre: 'Nombre con el que se identifica el registro en listas y reportes.',
+  direccion: 'Domicilio o ubicación de referencia.',
+  categoria: 'Clasificación del registro. Agrupa elementos similares para filtrar y reportar.',
+  moneda: 'Moneda en la que se expresa el monto (por ejemplo, BOB o USD).',
+  monto: 'Importe en dinero. Usa punto decimal y no incluyas separadores de miles.',
+  fecha_inicio: 'Fecha desde la que aplica o entra en vigencia el registro.',
+  fecha_fin: 'Fecha hasta la que aplica. Déjala vacía si sigue vigente.',
+  cantidad: 'Número de unidades. Debe ser un valor mayor o igual a cero.',
+  estado: 'Estado operativo actual del registro dentro de su flujo.',
+  prioridad: 'Orden de preferencia cuando hay varias opciones válidas. Menor número = mayor prioridad.',
 };
 
 /**
@@ -108,9 +121,28 @@ const resourceFieldTooltips: Record<string, Record<string, string>> = {
 };
 
 /**
+ * Genera un tooltip razonable para campos de clave foránea (`id_...`) que no tienen uno
+ * explícito. Son los más confusos para el usuario, así que aclaramos que referencian a
+ * otro registro que debe existir antes. Devuelve undefined para el resto de campos.
+ */
+function generateForeignKeyTooltip(fieldName: string): string | undefined {
+  if (!/^id_/.test(fieldName)) return undefined;
+  const entidad = fieldName
+    .replace(/^id_/, '')
+    .replace(/_/g, ' ')
+    .trim();
+  if (!entidad) return undefined;
+  return `Referencia a "${entidad}". Debe existir previamente en su propio módulo; selecciónalo o ingresa su identificador.`;
+}
+
+/**
  * Devuelve el tooltip de negocio para un campo, o undefined si no hay uno definido.
- * Primero busca el específico del recurso, luego el genérico por nombre de campo.
+ * Precedencia: específico del recurso → genérico por nombre → generado para claves foráneas.
  */
 export function getFieldTooltip(resourceKey: string, fieldName: string): string | undefined {
-  return resourceFieldTooltips[resourceKey]?.[fieldName] ?? genericFieldTooltips[fieldName];
+  return (
+    resourceFieldTooltips[resourceKey]?.[fieldName] ??
+    genericFieldTooltips[fieldName] ??
+    generateForeignKeyTooltip(fieldName)
+  );
 }

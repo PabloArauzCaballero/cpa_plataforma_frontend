@@ -74,6 +74,63 @@
   color: var(--color-primary);
 }
 
+.feedback {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  text-align: center;
+}
+
+.feedbackIcon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  font-size: 1.9rem;
+}
+
+.feedback[data-status='success'] .feedbackIcon {
+  color: #166534;
+  background: color-mix(in srgb, #16a34a 14%, var(--color-white));
+}
+
+.feedback[data-status='error'] .feedbackIcon {
+  color: #b42318;
+  background: color-mix(in srgb, #b42318 12%, var(--color-white));
+}
+
+.feedback p {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--color-primary);
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+.feedbackActions {
+  display: flex;
+  justify-content: center;
+}
+
+.feedbackActions button {
+  min-height: 2.85rem;
+  padding: 0.7rem 1.6rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-base);
+}
+
+.feedbackActions button:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
 .hourLegend strong {
   font-weight: 900;
 }

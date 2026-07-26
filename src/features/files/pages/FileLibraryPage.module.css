@@ -306,7 +306,14 @@ button:disabled {
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-lg);
   background: var(--color-white);
-  box-shadow: 0 12px 28px rgba(0, 37, 95, 0.07);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.fileCard:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--color-secondary) 42%, var(--color-neutral-light));
+  box-shadow: var(--shadow-md);
 }
 
 .preview {

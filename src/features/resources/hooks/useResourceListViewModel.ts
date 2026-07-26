@@ -289,6 +289,7 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const [isLoadingEditRecord, setIsLoadingEditRecord] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [disableResult, setDisableResult] = useState<{ status: 'success' | 'error'; title: string; text: string } | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterInputs, setFilterInputs] = useState<Record<string, string | number | boolean>>({});
@@ -528,19 +529,48 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
 
   async function disable(record: CrudRecord) {
     const id = resolveRecordId(resource, record);
-    if (!id || !canDisable(record)) return;
 
+    // Nunca fallar en silencio: si no se puede inhabilitar, avísale al usuario con un modal.
+    if (!id) {
+      setDisableResult({
+        status: 'error',
+        title: 'No se pudo inhabilitar',
+        text: 'No se encontró un identificador válido para este registro. Recarga la lista e inténtalo de nuevo.',
+      });
+      return;
+    }
+    if (!canDisable(record)) {
+      setDisableResult({
+        status: 'error',
+        title: 'Este registro no puede inhabilitarse',
+        text: 'El registro no tiene un campo de estado (por ejemplo "estado_registro" o "es_activo") que permita inhabilitarlo desde aquí.',
+      });
+      return;
+    }
+
+    const payload = buildDisablePayload(record);
     try {
       setIsSaving(true);
-      setError(null);
-      await updateResource(resource, id, buildDisablePayload(record));
-      setMessage('Registro inhabilitado correctamente.');
+      await updateResource(resource, id, payload);
       await load();
+      setDisableResult({
+        status: 'success',
+        title: 'Registro inhabilitado',
+        text: 'El registro se marcó como inactivo (borrado lógico). Ya no participa en la operación diaria y ahora aparece como "Inactivo" en la lista; sigue disponible como historial.',
+      });
     } catch (currentError) {
-      setError(currentError instanceof Error ? currentError.message : 'No se pudo inhabilitar el registro.');
+      setDisableResult({
+        status: 'error',
+        title: 'No se pudo inhabilitar',
+        text: currentError instanceof Error ? currentError.message : 'Ocurrió un error al inhabilitar el registro. Inténtalo de nuevo.',
+      });
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function clearDisableResult() {
+    setDisableResult(null);
   }
 
 
@@ -624,6 +654,8 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
     isLoadingEditRecord,
     error,
     message,
+    disableResult,
+    clearDisableResult,
     editingRecord,
     isFormOpen,
     isExportModalOpen,

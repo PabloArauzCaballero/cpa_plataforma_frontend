@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PageState } from '@/shared/components/PageState';
 import { humanizeFieldLabel, humanizeTitleLabel } from '@/shared/utils/humanize';
 import { findResourceModule } from '@/features/resources/domain/resourceDefinitions';
+import { TutorialButton } from '@/features/onboarding/TutorialButton';
 import { getModuleVisualMeta } from '../moduleMeta';
 import styles from './ModuleResourcePickerPage.module.css';
 
@@ -53,6 +54,11 @@ export function ModuleResourcePickerPage() {
           <span>{meta.accent}</span>
           <h2>{humanizeTitleLabel(resourceModule.label, resourceModule.key)}</h2>
           <p>{meta.description}</p>
+          <TutorialButton
+            moduleKey={resourceModule.key}
+            className={styles.tutorialButton}
+            label="Ver tutorial paso a paso"
+          />
         </div>
       </div>
 
