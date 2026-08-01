@@ -98,14 +98,35 @@ function resolveRecordId(resource: CrudResourceDefinition, record: CrudRecord): 
   return null;
 }
 
+function findStatusKey(record: CrudRecord): string | null {
+  // "estado_registro" es la columna canónica de borrado lógico; si no está, se busca
+  // cualquier otra columna de estado o un flag de activo.
+  const preferred = ['estado_registro', 'estado'].find((key) => key in record);
+  if (preferred) return preferred;
+  return Object.keys(record).find((key) => {
+    const lower = key.toLowerCase();
+    return lower.includes('estado') || lower === 'es_activo' || lower === 'activo';
+  }) ?? null;
+}
+
 function canDisable(record: CrudRecord): boolean {
-  return Object.keys(record).some((key) => key.toLowerCase().includes('estado') || key.toLowerCase() === 'activo');
+  return findStatusKey(record) !== null;
 }
 
 function buildDisablePayload(record: CrudRecord): CrudRecord {
-  if ('activo' in record) return { activo: false };
-  const stateKey = Object.keys(record).find((key) => key.toLowerCase().includes('estado'));
-  return stateKey ? { [stateKey]: 'Inactivo' } : {};
+  const stateKey = findStatusKey(record);
+  if (!stateKey) return {};
+
+  const currentValue = record[stateKey];
+  const lower = stateKey.toLowerCase();
+  // Respeta el tipo real de la columna para no romper el UPDATE:
+  //  - columnas booleanas (p. ej. estado_registro/es_activo booleanos) → false
+  //  - flags de activo → false
+  //  - estados en texto → 'Inactivo'
+  if (typeof currentValue === 'boolean' || lower === 'es_activo' || lower === 'activo') {
+    return { [stateKey]: false };
+  }
+  return { [stateKey]: 'Inactivo' };
 }
 
 function mapFilterType(fieldType: string): ResourceTableFilter['type'] {

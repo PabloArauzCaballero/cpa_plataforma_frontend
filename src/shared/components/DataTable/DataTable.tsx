@@ -31,6 +31,7 @@ const INACTIVE_STATES = new Set(['inactivo', 'eliminado', 'anulado', 'baja', 'ca
 /** Un registro está "inhabilitado" (soft-delete) según su columna de estado o su flag activo. */
 function isInactiveRecord(record: TableRecord): boolean {
   const estado = record.estado_registro ?? record.estado;
+  if (estado === false) return true; // estado_registro booleano en algunas tablas
   if (typeof estado === 'string' && INACTIVE_STATES.has(estado.trim().toLowerCase())) return true;
   const activo = record.es_activo ?? record.activo;
   if (activo === false || String(activo).trim().toLowerCase() === 'false') return true;
@@ -49,6 +50,20 @@ function isActiveStatusValue(value: unknown): boolean {
   const text = String(value ?? '').trim().toLowerCase();
   if (INACTIVE_STATES.has(text)) return false;
   return text === 'activo' || text === 'true' || text === 'sí' || text === 'si' || text === 'vigente';
+}
+
+/**
+ * Etiqueta legible para el badge de estado. Un booleano de "activo" debe leerse como
+ * "Activo"/"Inactivo" (no "Sí"/"No"); los estados en texto se muestran tal cual.
+ */
+function renderStatusLabel(value: unknown): string {
+  if (value === true) return 'Activo';
+  if (value === false) return 'Inactivo';
+  const text = String(value ?? '').trim();
+  const lower = text.toLowerCase();
+  if (lower === 'true' || lower === 'sí' || lower === 'si') return 'Activo';
+  if (lower === 'false' || lower === 'no') return 'Inactivo';
+  return renderValue(value);
 }
 
 export function DataTable({
@@ -86,7 +101,7 @@ export function DataTable({
                         className={styles.statusBadge}
                         data-active={isActiveStatusValue(record[column])}
                       >
-                        {renderValue(record[column])}
+                        {renderStatusLabel(record[column])}
                       </span>
                     ) : (
                       renderValue(record[column])
