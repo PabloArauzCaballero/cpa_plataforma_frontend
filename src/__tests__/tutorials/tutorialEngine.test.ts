@@ -185,6 +185,57 @@ describe('TutorialEngine · cierre anticipado', () => {
     expect(harness.finished[0].reason).toBe('skipped');
   });
 
+  // La confirmación se pide con un modal de la plataforma, no con `window.confirm`:
+  // la respuesta llega por promesa y el cierre tiene que esperarla.
+  it('espera la respuesta cuando la confirmación es asíncrona', async () => {
+    let responder: ((confirmado: boolean) => void) | null = null;
+    const engine = createHarness();
+    const asyncEngine = new TutorialEngine({
+      renderer: { render: () => {}, refresh: () => {}, destroy: () => {} },
+      navigate: () => {},
+      getCurrentRoute: () => '/',
+      onFinish: (event) => engine.finished.push(event),
+      confirmExit: () => new Promise<boolean>((resolve) => { responder = resolve; }),
+    });
+
+    asyncEngine.start(threeStepTutorial());
+    await flush();
+
+    asyncEngine.close();
+    expect(engine.finished).toHaveLength(0);
+    expect(asyncEngine.isActive()).toBe(true);
+
+    // Un segundo cierre mientras el diálogo está abierto no apila confirmaciones.
+    const primerResponder = responder;
+    asyncEngine.close();
+    expect(responder).toBe(primerResponder);
+
+    responder!(true);
+    await flush();
+    expect(engine.finished[0]).toMatchObject({ reason: 'closed' });
+  });
+
+  it('mantiene el tutorial abierto si la confirmación asíncrona se rechaza', async () => {
+    let responder: ((confirmado: boolean) => void) | null = null;
+    const finished: TutorialFinishEvent[] = [];
+    const asyncEngine = new TutorialEngine({
+      renderer: { render: () => {}, refresh: () => {}, destroy: () => {} },
+      navigate: () => {},
+      getCurrentRoute: () => '/',
+      onFinish: (event) => finished.push(event),
+      confirmExit: () => new Promise<boolean>((resolve) => { responder = resolve; }),
+    });
+
+    asyncEngine.start(threeStepTutorial());
+    await flush();
+    asyncEngine.close();
+    responder!(false);
+    await flush();
+
+    expect(finished).toHaveLength(0);
+    expect(asyncEngine.isActive()).toBe(true);
+  });
+
   it('no pide confirmación en el último paso', async () => {
     const harness = createHarness();
     harness.engine.start(threeStepTutorial(), 2);

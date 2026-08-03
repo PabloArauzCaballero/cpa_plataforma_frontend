@@ -13,6 +13,12 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'default' | 'danger';
+  /**
+   * `top` dibuja el diálogo por encima del recorrido guiado, que se monta en un
+   * z-index altísimo. Sin esto, la confirmación de salir del tutorial quedaba
+   * tapada por el propio overlay del tutorial.
+   */
+  layer?: 'default' | 'top';
   isLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -27,6 +33,7 @@ export function ConfirmDialog({
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
   variant = 'default',
+  layer = 'default',
   isLoading = false,
   onConfirm,
   onCancel,
@@ -38,7 +45,7 @@ export function ConfirmDialog({
   // Mismo motivo que en Modal: montado en el body para que `position: fixed`
   // se resuelva contra la ventana y no contra un ancestro con transform.
   return createPortal(
-    <div className={styles.backdrop} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
+    <div className={styles.backdrop} data-layer={layer} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
       <div className={styles.dialog}>
         <header className={styles.header}>
           <span className={styles.icon} data-variant={variant} aria-hidden="true">

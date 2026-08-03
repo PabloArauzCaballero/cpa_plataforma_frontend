@@ -88,9 +88,18 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
   {
     key: "padre", module: "personas", moduleLabel: "Personas", label: "Padre",
     table: "persona.persona_padre", primaryKey: "id_padre",
-    endpoints: { list: "/api/personas/padre", detail: (id: string) => `/api/personas/padre/${id}`, create: "/api/personas/padre", update: (id: string) => `/api/personas/padre/${id}` },
+    // El padre nace junto con su persona base: sin ella el registro no tendría
+    // nombre ni contacto. Por eso el alta va al endpoint transaccional.
+    endpoints: { list: "/api/personas/padre", detail: (id: string) => `/api/personas/padre/${id}`, create: "/api/personas/padre/registrar", update: (id: string) => `/api/personas/padre/${id}` },
     permissions: "create=PERSONAS.PERSONA_PADRE.CREATE",
-    fields: [{ name: "es_embajador", label: "es_embajador", type: "checkbox" }],
+    fields: [
+      { name: "nombres", label: "Nombres", type: "text", required: true },
+      { name: "apellidos", label: "Apellidos", type: "text", required: true },
+      { name: "telefono", label: "Teléfono", type: "text", helpText: "Contacto principal para avisos del estudiante." },
+      { name: "email", label: "Correo electrónico", type: "email" },
+      { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
+      { name: "es_embajador", label: "Es embajador", type: "checkbox", helpText: "Marca si el padre refiere a otras familias al centro." },
+    ],
   },
   {
     key: "proveedor", module: "personas", moduleLabel: "Personas", label: "Proveedor",
@@ -148,6 +157,16 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
     endpoints: { list: "/api/servicios_educativos/asistencia-clase-curso", detail: (id: string) => `/api/servicios_educativos/asistencia-clase-curso/${id}`, create: "/api/servicios_educativos/asistencia-clase-curso", update: (id: string) => `/api/servicios_educativos/asistencia-clase-curso/${id}` },
     permissions: "create=SERVICIOS_EDUCATIVOS.ASISTENCIA_CLASE_CURSO.CREATE",
     fields: [{ name: "id_clase_curso", label: "id_clase_curso", type: "number", required: true }, { name: "id_estudiante", label: "id_estudiante", type: "number", required: true }, { name: "estado_asistencia", label: "estado_asistencia", type: "text", required: true }, { name: "hora_marcacion", label: "hora_marcacion", type: "datetime-local" }, { name: "observaciones", label: "observaciones", type: "textarea" }],
+  },
+  {
+    // Pantalla aparte de la de arriba: la de arriba corrige un registro suelto,
+    // esta marca a todo el curso de una vez. Comparten tabla y endpoints.
+    key: "asistencia-masiva", module: "servicios_educativos", moduleLabel: "Servicios educativos", label: "Asistencia Masiva",
+    table: "servicios_educativos.asistencia_clase_curso", primaryKey: "id_asistencia",
+    endpoints: { list: "/api/servicios_educativos/asistencia-clase-curso", detail: (id: string) => `/api/servicios_educativos/asistencia-clase-curso/${id}`, create: "/api/servicios_educativos/asistencia-clase-curso", update: (id: string) => `/api/servicios_educativos/asistencia-clase-curso/${id}` },
+    permissions: "create=SERVICIOS_EDUCATIVOS.ASISTENCIA_CLASE_CURSO.CREATE",
+    fields: [],
+    composite: 'asistencia-masiva',
   },
   {
     key: "clase-curso", module: "servicios_educativos", moduleLabel: "Servicios educativos", label: "Clase Curso",

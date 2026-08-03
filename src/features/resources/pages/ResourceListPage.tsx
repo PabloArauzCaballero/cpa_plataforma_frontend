@@ -11,6 +11,7 @@ import { ResourceForm } from '../components/ResourceForm';
 import { ResourceHeader } from '../components/ResourceHeader';
 import { TransactionForm } from '../components/TransactionForm';
 import { VentaClaseBatchPage } from './VentaClaseBatchPage';
+import { AsistenciaMasivaPage } from './AsistenciaMasivaPage';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { useResourceListViewModel } from '../hooks/useResourceListViewModel';
@@ -105,6 +106,10 @@ export function ResourceListPage() {
 function ResourceListContent({ resource }: { resource: CrudResourceDefinition }) {
   if (resource.composite === 'venta-clase-batch') {
     return <VentaClaseBatchPage />;
+  }
+
+  if (resource.composite === 'asistencia-masiva') {
+    return <AsistenciaMasivaPage />;
   }
 
   const viewModel = useResourceListViewModel(resource);
@@ -232,6 +237,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
       <Modal
         title={viewModel.disableResult?.title ?? ''}
         isOpen={Boolean(viewModel.disableResult)}
+        size="compact"
         onClose={viewModel.clearDisableResult}
       >
         {viewModel.disableResult ? (

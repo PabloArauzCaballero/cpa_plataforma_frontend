@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { FIRST_RUN_TUTORIAL_ID, createTutorialRegistry } from '../catalog';
 import type { TutorialDefinition } from '../domain/TutorialDefinition';
 import { createSessionViewer } from '../domain/tutorialAccess';
@@ -28,6 +29,13 @@ interface TutorialProviderProps {
   children: ReactNode;
   /** Desactiva el arranque automático del recorrido de bienvenida (usado en pruebas). */
   disableAutoStart?: boolean;
+}
+
+/** Confirmación de salida pendiente: qué preguntar y a quién contestarle. */
+interface ExitConfirmationRequest {
+  tutorialTitle: string;
+  stepNumber: number;
+  answer: (confirmed: boolean) => void;
 }
 
 /**
@@ -62,6 +70,28 @@ export function TutorialProvider({ children, disableAutoStart = false }: Tutoria
 
   const tutorials = useMemo(() => registry.listFor(viewer), [registry, viewer]);
 
+  // Salir de un tutorial a medias se pregunta con el diálogo de la plataforma, no
+  // con `window.confirm`: el nativo lo pinta el navegador, se ve ajeno al producto
+  // y muestra el dominio del sitio como si fuera una advertencia de seguridad.
+  // Como el motor es código plano sin React, la pregunta viaja por una promesa que
+  // se resuelve cuando la persona contesta.
+  const [exitRequest, setExitRequest] = useState<ExitConfirmationRequest | null>(null);
+
+  const requestExitConfirmation = useCallback(
+    (tutorial: TutorialDefinition, stepIndex: number) =>
+      new Promise<boolean>((resolve) => {
+        setExitRequest({ tutorialTitle: tutorial.title, stepNumber: stepIndex + 1, answer: resolve });
+      }),
+    [],
+  );
+
+  const answerExitRequest = useCallback((confirmed: boolean) => {
+    setExitRequest((current) => {
+      current?.answer(confirmed);
+      return null;
+    });
+  }, []);
+
   const engineRef = useRef<TutorialEngine | null>(null);
   if (!engineRef.current) {
     engineRef.current = new TutorialEngine({
@@ -72,11 +102,7 @@ export function TutorialProvider({ children, disableAutoStart = false }: Tutoria
       onStateChange: setEngineState,
       onStepChange: (event) => void progressService.markStep(event),
       onFinish: (event) => void progressService.markFinished(event),
-      confirmExit: (tutorial, stepIndex) =>
-        window.confirm(
-          `Vas a salir de "${tutorial.title}" en el paso ${stepIndex + 1}.\n\n` +
-            'Tu avance se guarda y podrás continuar desde el Centro de tutoriales. ¿Quieres salir?',
-        ),
+      confirmExit: requestExitConfirmation,
     });
   }
   const engine = engineRef.current;
@@ -249,5 +275,24 @@ export function TutorialProvider({ children, disableAutoStart = false }: Tutoria
     ],
   );
 
-  return <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>;
+  return (
+    <TutorialContext.Provider value={value}>
+      {children}
+      <ConfirmDialog
+        isOpen={exitRequest !== null}
+        title="Salir del tutorial"
+        message={
+          exitRequest
+            ? `Vas a salir de "${exitRequest.tutorialTitle}" en el paso ${exitRequest.stepNumber}.`
+            : ''
+        }
+        warning="Tu avance se guarda: puedes retomarlo donde lo dejaste desde el Centro de tutoriales."
+        confirmLabel="Sí, salir"
+        cancelLabel="Seguir en el tutorial"
+        layer="top"
+        onConfirm={() => answerExitRequest(true)}
+        onCancel={() => answerExitRequest(false)}
+      />
+    </TutorialContext.Provider>
+  );
 }
