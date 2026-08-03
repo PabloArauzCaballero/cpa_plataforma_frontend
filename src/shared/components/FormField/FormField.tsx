@@ -27,6 +27,20 @@ function normalizeOption(option: string | FormFieldOption): FormFieldOption {
   return typeof option === 'string' ? { value: option, label: option } : option;
 }
 
+/**
+ * Momento actual en el formato que espera el input, en hora local.
+ *
+ * `toISOString()` no sirve: devuelve UTC y en Bolivia dejaría la marcación cuatro
+ * horas adelantada. Se compone a partir de las partes locales de la fecha.
+ */
+function currentLocalValue(type: FieldType): string {
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, '0');
+  const time = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  if (type === 'time') return time;
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${time}`;
+}
+
 export function FormField({
   id,
   label,
@@ -103,16 +117,58 @@ export function FormField({
           rows={4}
         />
       ) : (
-        <input
+        <TextualInput
           id={id}
           type={type}
-          value={String(value ?? '')}
+          value={value}
           placeholder={placeholder}
           disabled={disabled}
-          onChange={(event) => onChange(type === 'number' ? (event.target.value === '' ? '' : Number(event.target.value)) : event.target.value)}
+          onChange={onChange}
         />
       )}
       {error ? <small className={styles.error}>{error}</small> : null}
     </label>
+  );
+}
+
+interface TextualInputProps {
+  id: string;
+  type: FieldType;
+  value: string | number | boolean;
+  placeholder?: string;
+  disabled: boolean;
+  onChange: (value: string | number | boolean) => void;
+}
+
+function TextualInput({ id, type, value, placeholder, disabled, onChange }: TextualInputProps) {
+  const input = (
+    <input
+      id={id}
+      type={type}
+      value={String(value ?? '')}
+      placeholder={placeholder}
+      disabled={disabled}
+      onChange={(event) => onChange(type === 'number' ? (event.target.value === '' ? '' : Number(event.target.value)) : event.target.value)}
+    />
+  );
+
+  // Marcar una hora casi siempre significa "ahora": el atajo ahorra teclear la
+  // fecha completa y evita equivocarse de día al registrar una asistencia.
+  const offersNow = type === 'datetime-local' || type === 'time';
+  if (!offersNow) return input;
+
+  return (
+    <div className={styles.timeRow}>
+      {input}
+      <button
+        type="button"
+        className={styles.nowButton}
+        disabled={disabled}
+        onClick={() => onChange(currentLocalValue(type))}
+        title="Poner la fecha y hora de este momento"
+      >
+        Ahora
+      </button>
+    </div>
   );
 }

@@ -29,6 +29,21 @@
   animation: modalIn 0.22s ease both;
 }
 
+/* Avisos y confirmaciones de resultado: el ancho de formulario deja la frase
+   estirada de lado a lado y el botón solo en medio de un vacío. */
+.modal[data-size='compact'] {
+  width: min(560px, calc(100vw - 2rem));
+  max-height: min(80vh, 640px);
+}
+
+.modal[data-size='compact'] .header {
+  padding: 1.15rem 1.4rem;
+}
+
+.modal[data-size='compact'] .header h2 {
+  font-size: 1.12rem;
+}
+
 .modal::-webkit-scrollbar {
   width: 10px;
 }

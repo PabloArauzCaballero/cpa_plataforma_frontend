@@ -84,6 +84,46 @@
   color: #b42318;
 }
 
+/* Campos de fecha-hora y hora: el atajo "Ahora" evita teclear dd/mm/aaaa --:--
+   para registrar algo que está pasando en este momento, que es el caso normal
+   al marcar asistencia o la llegada a una clase. */
+.timeRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.timeRow input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nowButton {
+  flex: 0 0 auto;
+  min-height: 3rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.nowButton:hover {
+  border-color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
+  color: var(--color-secondary-dark);
+}
+
+.nowButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .checkboxField[aria-disabled='true'] {
   opacity: 0.72;
 }

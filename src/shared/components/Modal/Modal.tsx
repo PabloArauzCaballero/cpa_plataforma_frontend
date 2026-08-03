@@ -9,10 +9,17 @@ interface ModalProps {
   title: string;
   isOpen: boolean;
   onClose: () => void;
+  /**
+   * `compact` para contenidos breves —un aviso, una confirmación de resultado—.
+   * El ancho por defecto (1180px) está pensado para formularios de varias
+   * columnas; con dos líneas de texto deja la frase estirada de lado a lado y el
+   * botón perdido en medio de un vacío.
+   */
+  size?: 'default' | 'compact';
   children: ReactNode;
 }
 
-export function Modal({ title, isOpen, onClose, children }: ModalProps) {
+export function Modal({ title, isOpen, onClose, size = 'default', children }: ModalProps) {
   useModalLayer(isOpen, onClose);
 
   if (!isOpen) return null;
@@ -31,7 +38,7 @@ export function Modal({ title, isOpen, onClose, children }: ModalProps) {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className={styles.modal} {...tutorialAnchor(TUTORIAL_ANCHORS.modal)}>
+      <div className={styles.modal} data-size={size} {...tutorialAnchor(TUTORIAL_ANCHORS.modal)}>
         <header className={styles.header}>
           <h2 id="modal-title">{title}</h2>
           <Button type="button" variant="ghost" onClick={onClose} {...tutorialAnchor(TUTORIAL_ANCHORS.modalClose)}>Cerrar</Button>

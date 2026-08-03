@@ -266,3 +266,20 @@
     background: rgba(255, 255, 255, 0.14);
   }
 }
+
+/* ------------------------------------------------ diálogos sobre el recorrido */
+
+/*
+ * driver.js apaga el puntero de toda la página mientras el recorrido está activo
+ * (`.driver-active * { pointer-events: none }`) y sólo lo devuelve a su propio
+ * globo y al elemento resaltado.
+ *
+ * La confirmación de "salir del tutorial" es un diálogo de la plataforma que
+ * nace justamente desde ahí: se dibujaba encima por z-index, pero los clics le
+ * pasaban de largo y aterrizaban en el overlay. Se le devuelve el puntero a
+ * cualquier capa marcada como superior.
+ */
+body.driver-active [data-layer='top'],
+body.driver-active [data-layer='top'] * {
+  pointer-events: auto;
+}

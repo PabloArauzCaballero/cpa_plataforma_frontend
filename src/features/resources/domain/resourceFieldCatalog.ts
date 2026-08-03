@@ -291,6 +291,8 @@ export const resourceFieldCatalog: Record<string, FieldCatalogPatch> = {
       "endpoint": "/api/servicios_educativos/clase-curso",
       "valueField": "id_clase_curso",
       "labelFields": [
+        "fecha",
+        "hora_inicio_real",
         "nombre",
         "codigo",
         "nombre_completo",

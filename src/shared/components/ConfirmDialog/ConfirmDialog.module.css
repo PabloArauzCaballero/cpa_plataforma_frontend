@@ -11,6 +11,13 @@
   backdrop-filter: blur(6px);
 }
 
+/* El recorrido guiado (driver.js) se monta en z-index 1000000000. Una
+   confirmación que nace desde el tutorial —salir a medias— tiene que quedar por
+   encima de su propio overlay o no se vería. */
+.backdrop[data-layer='top'] {
+  z-index: 1000000001;
+}
+
 .dialog {
   width: min(520px, calc(100vw - 2rem));
   overflow: hidden;

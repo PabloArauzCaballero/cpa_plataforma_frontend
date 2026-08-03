@@ -66,7 +66,7 @@ export interface CrudResourceDefinition {
   permissions: string;
   fields: ResourceFieldDefinition[];
   hideFromNavigation?: boolean;
-  composite?: 'transaction-with-account-movements' | 'venta-clase-batch';
+  composite?: 'transaction-with-account-movements' | 'venta-clase-batch' | 'asistencia-masiva';
 }
 
 export interface BatchValidationRow {

@@ -51,8 +51,14 @@ export interface TutorialEngineDeps {
   onStart?(event: { tutorialId: string; version: string; totalSteps: number }): void;
   onFinish?(event: TutorialFinishEvent): void;
   onStateChange?(state: TutorialEngineState): void;
-  /** Confirmación antes de abandonar un tutorial a medias. */
-  confirmExit?(tutorial: TutorialDefinition, stepIndex: number): boolean;
+  /**
+   * Confirmación antes de abandonar un tutorial a medias.
+   *
+   * Admite respuesta asíncrona porque la confirmación se pide con un modal de la
+   * plataforma, no con `window.confirm`: hay que esperar a que la persona
+   * conteste sin bloquear el hilo.
+   */
+  confirmExit?(tutorial: TutorialDefinition, stepIndex: number): boolean | Promise<boolean>;
   analytics?: TutorialAnalyticsAdapter;
   doc?: Document;
   win?: Window;
@@ -94,6 +100,8 @@ export class TutorialEngine {
   private runToken = 0;
   private abortController: AbortController | null = null;
   private keyListenerAttached = false;
+  /** Hay una confirmación de salida en pantalla esperando respuesta. */
+  private exitConfirmationPending = false;
   private readonly doc: Document;
   private readonly win: Window | undefined;
 
@@ -178,10 +186,33 @@ export class TutorialEngine {
   close(options: { confirm?: boolean } = {}): void {
     if (!this.tutorial) return;
     const isFinalStep = this.index >= this.steps.length - 1;
-    if (options.confirm !== false && !isFinalStep && this.deps.confirmExit) {
-      if (!this.deps.confirmExit(this.tutorial, this.index)) return;
+    if (options.confirm === false || isFinalStep || !this.deps.confirmExit) {
+      this.finish('closed');
+      return;
     }
-    this.finish('closed');
+
+    // Con la confirmación en pantalla, Escape y el aspa siguen llegando aquí.
+    // Sin este guardo se apilarían varios diálogos sobre el mismo cierre.
+    if (this.exitConfirmationPending) return;
+
+    const tutorial = this.tutorial;
+    const decision = this.deps.confirmExit(tutorial, this.index);
+
+    if (typeof decision === 'boolean') {
+      if (decision) this.finish('closed');
+      return;
+    }
+
+    this.exitConfirmationPending = true;
+    void decision
+      .then((confirmed) => {
+        // El tutorial pudo terminar o cambiar mientras el diálogo estaba abierto:
+        // sólo se cierra si sigue siendo el mismo que se preguntó.
+        if (confirmed && this.tutorial === tutorial) this.finish('closed');
+      })
+      .finally(() => {
+        this.exitConfirmationPending = false;
+      });
   }
 
   /** Abandona marcando el tutorial como omitido. */
