@@ -1,0 +1,19 @@
+node_modules
+dist
+.git
+.github
+.yarn/cache
+.yarn/install-state.gz
+tsconfig.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+.env
+.env.*
+!.env.example
+prompt
+coverage
+# docs/ NO se ignora: src/features/resources/domain/resourceFieldCatalog.ts
+# importa docs/validation/frontend-checks-catalog.json en tiempo de build.
+docs/**/*.md
+*.md

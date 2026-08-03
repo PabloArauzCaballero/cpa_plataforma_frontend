@@ -8,6 +8,60 @@ import { humanizeFieldLabel } from '@/shared/utils/humanize';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+const MAX_TABLE_COLUMNS = 14;
+
+/**
+ * Orden de lectura de la tabla: primero cómo se llama el registro, después su
+ * código y su estado, y al final los datos operativos.
+ *
+ * Los recursos hijos de persona (estudiante, tutor, usuario) llegan del sistema
+ * con las columnas de la persona base (`nombre_completo`, `nombres`, `apellidos`,
+ * `email`, `telefono`). Sin este orden quedaban fuera del recorte de columnas y
+ * la tabla mostraba sólo identificadores: filas imposibles de reconocer.
+ */
+const COLUMN_PRIORITY = [
+  'nombre_completo',
+  'nombres',
+  'apellidos',
+  'nombre',
+  'nombre_cuenta',
+  'razon_social',
+  'codigo_estudiante',
+  'codigo',
+  'sku',
+  'concepto',
+  'descripcion',
+  'email',
+  'telefono',
+  'estado_registro',
+  'estado',
+  'activo',
+  'fecha',
+];
+
+/**
+ * Columnas de auditoría y control: existen en casi todas las tablas y no ayudan
+ * a identificar el registro, así que van al final y sólo si sobra espacio.
+ */
+const LOW_PRIORITY_COLUMNS = new Set([
+  'fecha_registro',
+  'fecha_modificacion',
+  'version_registro',
+  'id_usuario',
+  'id_usuario_creador',
+  'id_usuario_modificacion',
+  'created_at',
+  'updated_at',
+  'deleted_at',
+]);
+
+function columnRank(column: string, primaryKey: string): number {
+  const priorityIndex = COLUMN_PRIORITY.indexOf(column);
+  if (priorityIndex !== -1) return priorityIndex;
+  if (column === primaryKey || column === 'id') return COLUMN_PRIORITY.length;
+  if (LOW_PRIORITY_COLUMNS.has(column)) return COLUMN_PRIORITY.length + 200;
+  return COLUMN_PRIORITY.length + 100;
+}
 
 
 
@@ -241,12 +295,30 @@ function isIdLikeField(name: string): boolean {
   return /^id_/i.test(name) || /^id[A-Z]/.test(name);
 }
 
+/**
+ * El estado del registro se guarda de dos formas según la tabla: texto
+ * ('Activo'/'Inactivo'/'Eliminado') o booleano. El filtro siempre ofrece las
+ * opciones en texto, así que sobre una tabla booleana —persona_estudiante, por
+ * ejemplo— comparar 'activo' contra `true` no casaba nunca y el filtro devolvía
+ * cero registros. Aquí se traduce el texto al booleano equivalente.
+ */
+function statusTextToBoolean(expected: string): boolean | null {
+  if (['activo', 'active', 'true', '1'].includes(expected)) return true;
+  if (['inactivo', 'eliminado', 'inactive', 'false', '0'].includes(expected)) return false;
+  return null;
+}
+
 function recordMatchesFilters(record: CrudRecord, filters: Record<string, string | number | boolean>): boolean {
   return Object.entries(filters).every(([key, expected]) => {
     if (expected === undefined || expected === null || String(expected).trim() === '') return true;
 
     const actual = record[key];
     if (actual === undefined || actual === null) return false;
+
+    if (typeof actual === 'boolean') {
+      const asBoolean = typeof expected === 'boolean' ? expected : statusTextToBoolean(normalizeForCompare(expected));
+      return asBoolean === null ? false : actual === asBoolean;
+    }
 
     if (typeof expected === 'boolean') return Boolean(actual) === expected || normalizeForCompare(actual) === normalizeForCompare(expected);
 
@@ -434,15 +506,12 @@ export function useResourceListViewModel(resource: CrudResourceDefinition) {
   const visibleRecords = useMemo(() => records, [records]);
 
   const columns = useMemo(() => {
-    const priority = [resource.primaryKey, 'id', 'codigo', 'nombre', 'nombre_cuenta', 'concepto', 'fecha', 'estado', 'estado_registro', 'activo'];
-    const keys = Array.from(new Set(records.slice(0, 8).flatMap((record) => Object.keys(record))));
+    const keys = Array.from(new Set(records.slice(0, 8).flatMap((record) => Object.keys(record))))
+      // Nunca se listan hashes ni tokens, igual que en los filtros.
+      .filter((key) => shouldShowFilter(key));
     return keys
-      .sort((a, b) => {
-        const ai = priority.indexOf(a);
-        const bi = priority.indexOf(b);
-        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-      })
-      .slice(0, 10);
+      .sort((a, b) => columnRank(a, resource.primaryKey) - columnRank(b, resource.primaryKey))
+      .slice(0, MAX_TABLE_COLUMNS);
   }, [records, resource.primaryKey]);
 
   const columnLabels = useMemo(() => {

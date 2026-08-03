@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Se resuelven en build. Cambiarlas exige reconstruir la imagen.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
+        VITE_CLOUDINARY_CLOUD_NAME: ${VITE_CLOUDINARY_CLOUD_NAME:-}
+        VITE_CLOUDINARY_UPLOAD_PRESET: ${VITE_CLOUDINARY_UPLOAD_PRESET:-}
+        VITE_CLOUDINARY_FOLDER: ${VITE_CLOUDINARY_FOLDER:-cpa/archivos}
+        VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER: ${VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER:-cpa/archivos}
+    image: cpa-plataforma-frontend:local
+    container_name: cpa-plataforma-frontend
+    ports:
+      # 5173 = puerto original de `yarn dev`. El CORS de la API solo acepta
+      # ese origen, por eso el contenedor debe publicarse en el mismo puerto.
+      - "${FRONTEND_PORT:-5173}:80"
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

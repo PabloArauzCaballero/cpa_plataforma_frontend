@@ -24,6 +24,14 @@ export interface ResourceFieldDefinition {
   label: string;
   type: FieldType;
   required?: boolean;
+  /**
+   * Campo que el sistema calcula y el usuario no captura (por ejemplo el código
+   * correlativo del estudiante). Se muestra para poder consultarlo, pero llega
+   * deshabilitado y nunca se envía en el payload: el valor lo pone el sistema.
+   */
+  readOnly?: boolean;
+  /** Texto dentro del campo vacío. Útil para explicar un valor autogenerado. */
+  placeholder?: string;
   options?: Array<string | SelectOption>;
   relation?: ResourceLookupRelation;
   selectSource?: 'enum' | 'catalog' | 'foreignKey';

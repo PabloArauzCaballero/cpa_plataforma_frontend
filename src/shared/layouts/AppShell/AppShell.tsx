@@ -3,22 +3,33 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
 import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
-import { TutorialButton } from '@/features/onboarding/TutorialButton';
-import { useFirstRunOnboarding } from '@/features/onboarding/useFirstRunOnboarding';
+import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
+import { TUTORIAL_CENTER_ROUTE } from '@/features/tutorials/domain/tutorialRoutes';
+import { TutorialLauncher } from '@/features/tutorials/react/TutorialLauncher';
+import { TutorialProvider } from '@/features/tutorials/react/TutorialProvider';
 import styles from './AppShell.module.css';
 
 interface AppShellProps {
   children?: ReactNode;
 }
 
+/**
+ * El proveedor de tutoriales envuelve todo el área autenticada: así cualquier pantalla
+ * puede lanzar su recorrido y el motor conserva su estado al navegar entre rutas.
+ */
 export function AppShell({ children }: AppShellProps) {
+  return (
+    <TutorialProvider>
+      <AppShellLayout>{children}</AppShellLayout>
+    </TutorialProvider>
+  );
+}
+
+function AppShellLayout({ children }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const email = getSessionDisplayName();
   const [navOpen, setNavOpen] = useState(false);
-
-  // Recorrido de bienvenida automático la primera vez que el usuario entra.
-  useFirstRunOnboarding(true);
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => {
@@ -49,15 +60,23 @@ export function AppShell({ children }: AppShellProps) {
         hidden={!navOpen}
         onClick={() => setNavOpen(false)}
       />
-      <aside id="app-sidebar" className={styles.sidebar} data-open={navOpen}>
+      <aside id="app-sidebar" className={styles.sidebar} data-open={navOpen} {...tutorialAnchor(TUTORIAL_ANCHORS.sidebar)}>
         <div className={styles.brand}>
           <span className={styles.brandTitle}>CPA Plataforma</span>
           <span>Centro de Preparación Académica</span>
         </div>
         <nav className={styles.nav} aria-label="Navegación principal">
-          <NavLink to="/" end className={styles.homeLink}>
+          <NavLink to="/" end className={styles.homeLink} {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarHome)}>
             <i className="fa-solid fa-house" aria-hidden="true" />
             <span>Inicio</span>
+          </NavLink>
+          <NavLink
+            to={TUTORIAL_CENTER_ROUTE}
+            className={styles.homeLink}
+            {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarTutorials)}
+          >
+            <i className="fa-solid fa-graduation-cap" aria-hidden="true" />
+            <span>Tutoriales</span>
           </NavLink>
           {resourceModules.map((module) => {
             const meta = getModuleVisualMeta(module.key);
@@ -67,7 +86,7 @@ export function AppShell({ children }: AppShellProps) {
             return (
               <details
                 key={module.key}
-                data-tour={module.key === 'personas' ? 'module-personas' : undefined}
+                {...tutorialAnchorFor(TUTORIAL_ANCHORS.sidebarModule, module.key)}
                 open={module.key === 'personas' || module.key === 'servicios_educativos'}
               >
                 <summary>
@@ -80,7 +99,12 @@ export function AppShell({ children }: AppShellProps) {
                   </span>
                 </summary>
                 <div className={styles.moduleLinks}>
-                  <NavLink to={`/modulos/${module.key}`} end className={styles.moduleBoardLink}>
+                  <NavLink
+                    to={`/modulos/${module.key}`}
+                    end
+                    className={styles.moduleBoardLink}
+                    {...tutorialAnchorFor(TUTORIAL_ANCHORS.sidebarModuleBoard, module.key)}
+                  >
                     <i className="fa-solid fa-table-cells-large" aria-hidden="true" />
                     Tablero del módulo
                   </NavLink>
@@ -117,6 +141,7 @@ export function AppShell({ children }: AppShellProps) {
               aria-expanded={navOpen}
               aria-controls="app-sidebar"
               onClick={() => setNavOpen((open) => !open)}
+              {...tutorialAnchor(TUTORIAL_ANCHORS.menuButton)}
             >
               <i className={navOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'} aria-hidden="true" />
             </button>
@@ -127,12 +152,12 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           </div>
           <div className={styles.userBox}>
-            <TutorialButton />
-            <NavLink to="/perfil">
+            <TutorialLauncher />
+            <NavLink to="/perfil" {...tutorialAnchor(TUTORIAL_ANCHORS.headerProfile)}>
               <i className="fa-solid fa-user-circle" aria-hidden="true" />
               {email}
             </NavLink>
-            <button onClick={logout}>
+            <button onClick={logout} {...tutorialAnchor(TUTORIAL_ANCHORS.headerLogout)}>
               <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
               Cerrar sesión
             </button>

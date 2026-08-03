@@ -16,6 +16,7 @@ import {
   type PersistentDraft,
   type DraftOperation,
 } from '../services/persistentDraftApi';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './ResourceForm.module.css';
 
 interface ResourceFormProps {
@@ -217,6 +218,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
 
   return (
     <form
+      {...tutorialAnchor(TUTORIAL_ANCHORS.resourceForm)}
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault();
@@ -264,6 +266,8 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
                 required={field.required}
                 options={viewModel.getFieldOptions(field)}
                 helpText={field.helpText}
+                placeholder={field.placeholder}
+                disabled={field.readOnly}
                 isLoadingOptions={viewModel.isLoadingFieldOptions(field)}
                 onChange={(value) => viewModel.setField(field.name, value)}
               />
@@ -305,7 +309,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
 
       <div className={styles.actions}>
         <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar'}</Button>
+        <Button type="submit" disabled={isSaving} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceFormSubmit)}>{isSaving ? 'Guardando...' : 'Guardar'}</Button>
       </div>
     </form>
   );

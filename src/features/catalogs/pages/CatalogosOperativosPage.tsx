@@ -16,6 +16,7 @@ import {
   type ProductoEducativoCatalogItem,
   type UnidadEducativaCatalogItem,
 } from '../services/catalogosOperativosApi';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './CatalogosOperativosPage.module.css';
 
 type TabKey = 'cuentas' | 'materias' | 'productos' | 'unidades' | 'flujo';
@@ -157,7 +158,7 @@ export function CatalogosOperativosPage() {
 
   return (
     <section className={styles.page}>
-      <div className={styles.hero}>
+      <div className={styles.hero} {...tutorialAnchor(TUTORIAL_ANCHORS.catalogsHero)}>
         <div>
           <span>Configuración previa · Venta clase</span>
           <h2>CATÁLOGOS Y CUENTAS OPERATIVAS</h2>

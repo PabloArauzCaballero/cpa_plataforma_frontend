@@ -1,0 +1,46 @@
+/*
+ * El lanzador hereda la forma de los botones del contenedor donde se inserte
+ * (encabezado, ficha de recurso, tablero). Aquí sólo se define lo propio:
+ * el ancho mínimo, el icono y la insignia de avance.
+ */
+.launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.launcher i {
+  color: var(--color-secondary);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.6rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  color: var(--color-secondary-dark);
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  /* En pantallas estrechas el encabezado prioriza perfil y cierre de sesión:
+     el lanzador se reduce al icono, conservando su etiqueta accesible. */
+  .launcher span:first-of-type {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

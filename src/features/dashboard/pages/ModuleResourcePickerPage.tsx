@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { PageState } from '@/shared/components/PageState';
 import { humanizeFieldLabel, humanizeTitleLabel } from '@/shared/utils/humanize';
 import { findResourceModule } from '@/features/resources/domain/resourceDefinitions';
-import { TutorialButton } from '@/features/onboarding/TutorialButton';
+import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
+import { TutorialLauncher } from '@/features/tutorials/react/TutorialLauncher';
 import { getModuleVisualMeta } from '../moduleMeta';
 import styles from './ModuleResourcePickerPage.module.css';
 
@@ -46,7 +47,7 @@ export function ModuleResourcePickerPage() {
 
   return (
     <section className={styles.page}>
-      <div className={styles.hero}>
+      <div className={styles.hero} {...tutorialAnchor(TUTORIAL_ANCHORS.moduleHero)}>
         <div className={styles.heroIcon}>
           <i className={meta.icon} aria-hidden="true" />
         </div>
@@ -54,10 +55,11 @@ export function ModuleResourcePickerPage() {
           <span>{meta.accent}</span>
           <h2>{humanizeTitleLabel(resourceModule.label, resourceModule.key)}</h2>
           <p>{meta.description}</p>
-          <TutorialButton
+          <TutorialLauncher
             moduleKey={resourceModule.key}
             className={styles.tutorialButton}
             label="Ver tutorial paso a paso"
+            anchor={TUTORIAL_ANCHORS.moduleTutorial}
           />
         </div>
       </div>
@@ -68,7 +70,7 @@ export function ModuleResourcePickerPage() {
           <h3>Elige la tabla que quieres consultar</h3>
           <p>No se abre ninguna tabla por defecto. Selecciona el registro operativo que necesitas trabajar.</p>
         </div>
-        <label className={styles.searchBox}>
+        <label className={styles.searchBox} {...tutorialAnchor(TUTORIAL_ANCHORS.moduleSearch)}>
           <span>Buscar tabla</span>
           <input
             type="search"
@@ -82,13 +84,13 @@ export function ModuleResourcePickerPage() {
       {filteredResources.length === 0 ? (
         <PageState title="Sin coincidencias" message="No hay tablas que coincidan con tu búsqueda dentro de este módulo." />
       ) : (
-        <div className={styles.grid}>
+        <div className={styles.grid} {...tutorialAnchor(TUTORIAL_ANCHORS.moduleGrid)}>
           {filteredResources.map((resource) => {
             const requiredFields = resource.fields.filter((field) => field.required).slice(0, 4);
             const sampleFields = (requiredFields.length > 0 ? requiredFields : resource.fields.slice(0, 4)).map((field) => humanizeFieldLabel(field.label, field.name));
 
             return (
-              <article className={styles.card} key={resource.key}>
+              <article className={styles.card} key={resource.key} {...tutorialAnchorFor(TUTORIAL_ANCHORS.moduleResourceCard, resource.key)}>
                 <div className={styles.cardHeader}>
                   <div>
                     <span>{resource.table}</span>
@@ -107,12 +109,12 @@ export function ModuleResourcePickerPage() {
                 </div>
 
                 <div className={styles.cardActions}>
-                  <Link to={`/modulos/${resourceModule.key}/${resource.key}`} className={styles.primaryAction}>
+                  <Link to={`/modulos/${resourceModule.key}/${resource.key}`} className={styles.primaryAction} {...tutorialAnchorFor(TUTORIAL_ANCHORS.moduleResourceOpen, resource.key)}>
                     {resource.composite === 'venta-clase-batch' ? 'Abrir formulario' : 'Abrir tabla'}
                     <i className="fa-solid fa-arrow-right" aria-hidden="true" />
                   </Link>
                   {resource.composite === 'venta-clase-batch' ? null : (
-                    <Link to={`/batch/${resourceModule.key}/${resource.key}`} className={styles.secondaryAction}>
+                    <Link to={`/batch/${resourceModule.key}/${resource.key}`} className={styles.secondaryAction} {...tutorialAnchorFor(TUTORIAL_ANCHORS.moduleResourceImport, resource.key)}>
                       Importar
                     </Link>
                   )}

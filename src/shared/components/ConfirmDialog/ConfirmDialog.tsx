@@ -1,5 +1,7 @@
+import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { useModalLayer } from '@/shared/components/Modal/useModalLayer';
 import styles from './ConfirmDialog.module.css';
 
 interface ConfirmDialogProps {
@@ -29,9 +31,13 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useModalLayer(isOpen, isLoading ? undefined : onCancel);
+
   if (!isOpen) return null;
 
-  return (
+  // Mismo motivo que en Modal: montado en el body para que `position: fixed`
+  // se resuelva contra la ventana y no contra un ancestro con transform.
+  return createPortal(
     <div className={styles.backdrop} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
       <div className={styles.dialog}>
         <header className={styles.header}>
@@ -58,6 +64,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

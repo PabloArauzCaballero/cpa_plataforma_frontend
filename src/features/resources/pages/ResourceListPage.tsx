@@ -16,6 +16,7 @@ import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { useResourceListViewModel } from '../hooks/useResourceListViewModel';
 import { humanizeFieldLabel, humanizeTitleLabel } from '@/shared/utils/humanize';
 import { userHasAnyPermission } from '@/shared/auth/session';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './ResourceListPage.module.css';
 
 function readHourValue(record: CrudRecord): string {
@@ -174,7 +175,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
             onDisable={canDelete ? (record: TableRecord) => setRecordPendingDisable(record as CrudRecord) : undefined}
             getRowHourTone={showHourColors ? getHourTone : undefined}
           />
-          <div className={styles.pagination}>
+          <div className={styles.pagination} {...tutorialAnchor(TUTORIAL_ANCHORS.resourcePagination)}>
             <div>
               Página <strong>{viewModel.page}</strong> de <strong>{viewModel.totalPages}</strong> · {viewModel.totalRecords} registros
             </div>

@@ -1,5 +1,6 @@
 import type { ResourceTableFilter } from '@/features/resources/domain/CrudResource';
 import { Button } from '@/shared/components/Button';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './SearchFilterBar.module.css';
 
 interface SearchFilterBarProps {
@@ -82,18 +83,18 @@ export function SearchFilterBar({
       <div className={styles.topRow}>
         <label className={styles.searchBox}>
           <span>Buscar</span>
-          <input value={search} placeholder="Buscar por cualquier campo" onChange={(event) => onSearchChange(event.target.value)} />
+          <input {...tutorialAnchor(TUTORIAL_ANCHORS.resourceSearch)} value={search} placeholder="Buscar por cualquier campo" onChange={(event) => onSearchChange(event.target.value)} />
           {isSearchPending ? <small>La búsqueda se aplicará automáticamente.</small> : null}
         </label>
         <div className={styles.actions}>
-          <Button type="button" variant="secondary" onClick={onReload}>Actualizar</Button>
-          <Button type="button" variant="secondary" onClick={onClearFilters}>Limpiar filtros</Button>
-          {canExport && onExportOpen ? <Button type="button" variant="secondary" onClick={onExportOpen}>Exportar</Button> : null}
-          {canCreate && onCreate ? <Button type="button" onClick={onCreate}>Crear registro</Button> : null}
+          <Button type="button" variant="secondary" onClick={onReload} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceReload)}>Actualizar</Button>
+          <Button type="button" variant="secondary" onClick={onClearFilters} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceClearFilters)}>Limpiar filtros</Button>
+          {canExport && onExportOpen ? <Button type="button" variant="secondary" onClick={onExportOpen} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceExport)}>Exportar</Button> : null}
+          {canCreate && onCreate ? <Button type="button" onClick={onCreate} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceCreate)}>Crear registro</Button> : null}
         </div>
       </div>
 
-      <details className={styles.filtersPanel} open>
+      <details className={styles.filtersPanel} open {...tutorialAnchor(TUTORIAL_ANCHORS.resourceFilters)}>
         <summary>Filtros de consulta</summary>
         <div className={styles.filtersGrid}>
           {filterFields.map((filter) => (

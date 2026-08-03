@@ -108,6 +108,9 @@ function buildCleanPayload(resource: CrudResourceDefinition, payload: CrudRecord
   const normalizedPayload = normalizeResourceSpecificPayload(resource, payload);
 
   return resource.fields.reduce<CrudRecord>((clean, field) => {
+    // Un campo de solo lectura lo calcula el sistema; enviarlo sería pedirle que
+    // acepte un valor que el usuario nunca escribió.
+    if (field.readOnly) return clean;
     const sourcePayload = normalizedPayload;
     const normalized = normalizeFieldValue(field, sourcePayload[field.name]);
     if (normalized === undefined || normalized === null) return clean;

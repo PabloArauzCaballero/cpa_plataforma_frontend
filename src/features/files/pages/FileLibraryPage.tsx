@@ -24,6 +24,7 @@ import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { uploadSingleFile } from '@/shared/services/cloudinaryUpload';
 import type { ServerFileRecord } from '../domain/ServerFile';
 import { listServerFiles, registerServerFile, registerTransactionFile } from '../services/fileServerApi';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './FileLibraryPage.module.css';
 
 const DEFAULT_LIMIT = 24;
@@ -365,7 +366,7 @@ export function FileLibraryPage() {
 
   return (
     <div className={styles.page}>
-      <section className={styles.hero}>
+      <section className={styles.hero} {...tutorialAnchor(TUTORIAL_ANCHORS.filesHero)}>
         <div>
           <span>Contabilidad · archivos</span>
           <h2>Biblioteca de archivos</h2>

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { PageState } from '@/shared/components/PageState';
 import { useUserProfileViewModel } from '../hooks/useUserProfileViewModel';
 import type { UserProfile } from '../domain/UserProfile';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './UserProfilePage.module.css';
 
 function getInitials(profile: UserProfile): string {
@@ -46,14 +47,14 @@ export function UserProfilePage() {
 
   return (
     <main className={styles.profilePage}>
-      <section className={styles.pageHeader}>
+      <section className={styles.pageHeader} {...tutorialAnchor(TUTORIAL_ANCHORS.profileHeader)}>
         <div>
           <h1>PERFIL DE USUARIO</h1>
           <p>Información de tu cuenta, roles y permisos activos dentro del sistema CPA.</p>
         </div>
 
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnPrimary}`} type="button" onClick={reload}>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} type="button" onClick={reload} {...tutorialAnchor(TUTORIAL_ANCHORS.profileRefresh)}>
             <i className="fa-solid fa-rotate" aria-hidden="true" />
             Actualizar datos
           </button>
@@ -61,7 +62,7 @@ export function UserProfilePage() {
       </section>
 
       <section className={styles.profileGrid}>
-        <aside className={`${styles.card} ${styles.profileSummary}`}>
+        <aside className={`${styles.card} ${styles.profileSummary}`} {...tutorialAnchor(TUTORIAL_ANCHORS.profileSummary)}>
           <div className={styles.profileCover} />
 
           <div className={styles.avatarWrap}>
@@ -136,7 +137,7 @@ export function UserProfilePage() {
             )}
           </section>
 
-          <section className={styles.card}>
+          <section className={styles.card} {...tutorialAnchor(TUTORIAL_ANCHORS.profilePermissions)}>
             <div className={styles.cardHeader}>
               <div>
                 <h2>Permisos</h2>

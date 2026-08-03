@@ -1,4 +1,5 @@
 import styles from './DataTable.module.css';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -77,7 +78,7 @@ export function DataTable({
   getRowHourTone,
 }: DataTableProps) {
   return (
-    <div className={styles.tableWrap}>
+    <div className={styles.tableWrap} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceTable)}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -112,7 +113,7 @@ export function DataTable({
                 <td>
                   <div className={styles.actions}>
                     {onEdit ? (
-                      <button type="button" onClick={() => onEdit(record)} aria-label="Editar registro">
+                      <button type="button" onClick={() => onEdit(record)} aria-label="Editar registro" {...tutorialAnchor(TUTORIAL_ANCHORS.resourceRowEdit)}>
                         <FontAwesomeIcon icon={faPen} />
                       </button>
                     ) : null}

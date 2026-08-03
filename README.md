@@ -25,6 +25,40 @@ cp .env.example .env
 yarn dev
 ```
 
+## Docker
+
+Imagen multi-stage: build con Node 24 + Yarn Classic, runtime con Nginx sirviendo `dist/`.
+
+```bash
+docker compose up -d --build
+# http://localhost:5173
+docker compose logs -f frontend
+docker compose down
+```
+
+Se publica en `5173`, el mismo puerto de `yarn dev`, porque el CORS de la API solo
+acepta ese origen. Servir el contenedor en otro puerto rompe el login salvo que se
+agregue el nuevo origen a la whitelist del backend. Como el puerto está ocupado por
+`yarn dev`, hay que apagar el dev server antes de levantar el contenedor.
+
+Variables:
+
+| Variable | Default | Nota |
+| --- | --- | --- |
+| `FRONTEND_PORT` | `5173` | Puerto publicado en el host. Debe coincidir con el CORS de la API. |
+| `VITE_API_BASE_URL` | `http://localhost:3000` | Se resuelve en build; cambiarla exige `--build`. |
+| `VITE_CLOUDINARY_*` | ver `.env.example` | Igual, se resuelven en build. |
+
+Las variables `VITE_*` se compilan dentro del bundle, no se leen en runtime. Para apuntar a otra API:
+
+```bash
+VITE_API_BASE_URL=https://api.midominio.com docker compose up -d --build
+```
+
+Si la API corre en el host, `http://localhost:3000` funciona porque la petición la hace el navegador, no el contenedor. Si la API corriera en otro contenedor, usar el nombre del servicio o `host.docker.internal` (ya declarado en `extra_hosts`).
+
+Nginx resuelve las rutas de `react-router` con fallback a `index.html`, cachea `/assets/*` con hash por un año y deja `index.html` sin caché.
+
 ## Calidad
 
 ```bash
@@ -42,6 +76,26 @@ VITE_API_BASE_URL=http://localhost:3000
 
 El sistema documenta rutas con prefijo `/api`, por lo que la URL base no debe repetir `/api`.
 
+### Desarrollo vs. producción
+
+Hay dos archivos y Vite elige según el modo:
+
+| Archivo | Lo usa | Apunta a |
+| --- | --- | --- |
+| `.env` | `yarn dev` y `yarn test` | `http://localhost:3000` (la API en tu máquina) |
+| `.env.production` | `yarn build` | la API publicada en Render |
+
+`.env.production` pisa a `.env` durante el build, así que no hay que editar nada
+para pasar de local a publicado. Las variables `VITE_*` se resuelven en tiempo de
+compilación: **cambiar la URL exige `yarn build` y publicar el `dist/` nuevo**.
+
+`dist/` está versionado porque Cloudflare sirve ese contenido tal cual. Si se
+edita `src/` sin reconstruir, lo publicado se queda con el código anterior.
+
+En Docker mandan los `build args` del `docker-compose.yml` (variables de entorno
+reales, que tienen prioridad sobre cualquier `.env*`), por eso el contenedor local
+sigue apuntando a `http://localhost:3000`.
+
 ## Credenciales demo documentadas
 
 El archivo `docs/endpoints/endpoints.md` documenta estas credenciales de seed:
@@ -54,7 +108,6 @@ PabloAdmin2026!
 ## Nota técnica
 
 El `prompt/index.md` original estaba orientado a sistema. En esta entrega se corrigió para frontend y se aplicó `prompt/programacionFrontend.md` como prompt específico del proyecto.
-
 
 ## Corrección aplicada al batch
 
