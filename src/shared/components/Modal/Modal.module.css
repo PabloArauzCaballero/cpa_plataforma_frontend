@@ -2,11 +2,17 @@
   position: fixed;
   inset: 0;
   display: grid;
-  place-items: center;
+  /* `safe` evita el recorte clásico del centrado en grid: cuando el contenido no
+     cabe, se alinea al inicio en vez de desbordar hacia arriba sin scroll. */
+  place-items: safe center;
   padding: clamp(1rem, 2vw, 2rem);
   background: color-mix(in srgb, var(--color-primary-dark) 78%, transparent);
   z-index: 50;
   animation: fadeIn 0.18s ease both;
+  /* Si el contenido excede la altura disponible, el backdrop hace de scroller;
+     el modal nunca queda con su cabecera fuera de la pantalla. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal {
@@ -14,6 +20,7 @@
   max-height: min(92vh, 930px);
   overflow: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
   background: var(--color-white);
   color: var(--color-primary);
   border-radius: calc(var(--radius-lg) + 4px);

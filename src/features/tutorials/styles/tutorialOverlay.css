@@ -1,0 +1,268 @@
+/*
+ * Tema del recorrido guiado.
+ *
+ * Reutiliza las variables de `theme.css` para que el globo del tutorial se lea como
+ * parte de la plataforma y no como un widget de terceros.
+ */
+
+.driver-popover.cpa-tutorial-popover {
+  --cpa-tutorial-surface: var(--color-white, #ffffff);
+  --cpa-tutorial-ink: #0f2440;
+  --cpa-tutorial-ink-soft: #4a5a72;
+
+  box-sizing: border-box;
+  width: min(24rem, calc(100vw - 2rem));
+  max-width: min(24rem, calc(100vw - 2rem));
+  padding: 0.95rem 1.05rem 1rem;
+  border-radius: var(--radius-lg, 18px);
+  background: var(--cpa-tutorial-surface);
+  color: var(--cpa-tutorial-ink);
+  box-shadow: var(--shadow-strong, 0 20px 48px rgba(0, 37, 95, 0.2));
+  font-family: var(--font-family-base, Inter, system-ui, sans-serif);
+}
+
+.driver-popover.cpa-tutorial-popover:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--shadow-strong, 0 20px 48px rgba(0, 37, 95, 0.2)),
+    var(--ring-focus, 0 0 0 3px rgba(32, 160, 197, 0.32));
+}
+
+.cpa-tutorial-popover .driver-popover-arrow {
+  border-color: var(--cpa-tutorial-surface);
+}
+
+/* ---------------------------------------------------------------- encabezado */
+
+.cpa-tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: 0.55rem;
+}
+
+.cpa-tutorial-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-secondary-dark, #1a7ba6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cpa-tutorial-close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--cpa-tutorial-ink-soft);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition-base, 160ms ease), color var(--transition-base, 160ms ease);
+}
+
+.cpa-tutorial-close:hover {
+  background: rgba(1, 43, 101, 0.08);
+  color: var(--cpa-tutorial-ink);
+}
+
+/* ------------------------------------------------------------------ progreso */
+
+.cpa-tutorial-progress {
+  height: 4px;
+  margin-bottom: 0.85rem;
+  border-radius: 999px;
+  background: rgba(1, 43, 101, 0.12);
+  overflow: hidden;
+}
+
+.cpa-tutorial-progress-bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-secondary, #20a0c5), var(--color-primary-soft, #0e3e74));
+  transition: width var(--transition-base, 160ms ease);
+}
+
+/* ------------------------------------------------------------------- textos */
+
+.cpa-tutorial-popover .driver-popover-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--cpa-tutorial-ink);
+}
+
+.cpa-tutorial-popover .driver-popover-description {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--cpa-tutorial-ink-soft);
+}
+
+.cpa-tutorial-hint {
+  margin: 0.7rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-sm, 8px);
+  border-left: 3px solid var(--color-secondary, #20a0c5);
+  background: rgba(32, 160, 197, 0.1);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #16405f;
+}
+
+.cpa-tutorial-hint[data-tone='error'] {
+  border-left-color: #b4551f;
+  background: rgba(180, 85, 31, 0.1);
+  color: #7c3a11;
+}
+
+/* --------------------------------------------------------------- pie y botones */
+
+.cpa-tutorial-popover .driver-popover-footer.cpa-tutorial-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  flex-wrap: wrap;
+  margin-top: 0.95rem;
+}
+
+.cpa-tutorial-counter {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--cpa-tutorial-ink-soft);
+}
+
+.cpa-tutorial-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cpa-tutorial-btn {
+  all: unset;
+  box-sizing: border-box;
+  padding: 0.42rem 0.8rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background var(--transition-base, 160ms ease),
+    color var(--transition-base, 160ms ease),
+    transform 120ms ease;
+}
+
+.cpa-tutorial-btn:focus-visible {
+  box-shadow: var(--ring-focus, 0 0 0 3px rgba(32, 160, 197, 0.32));
+}
+
+.cpa-tutorial-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.cpa-tutorial-btn--primary {
+  background: var(--color-button-primary, #20a0c5);
+  color: var(--color-white, #ffffff);
+}
+
+.cpa-tutorial-btn--primary:hover:not(:disabled) {
+  background: var(--color-button-primary-hover, #1a7ba6);
+}
+
+.cpa-tutorial-btn--secondary {
+  border: 1px solid rgba(1, 43, 101, 0.22);
+  background: transparent;
+  color: var(--color-primary, #012b65);
+}
+
+.cpa-tutorial-btn--secondary:hover:not(:disabled) {
+  background: rgba(1, 43, 101, 0.07);
+}
+
+.cpa-tutorial-btn--ghost {
+  background: transparent;
+  color: var(--cpa-tutorial-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cpa-tutorial-btn--ghost:hover {
+  color: var(--cpa-tutorial-ink);
+}
+
+.cpa-tutorial-btn:disabled,
+.cpa-tutorial-btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------- responsive / a11y */
+
+@media (max-width: 640px) {
+  .driver-popover.cpa-tutorial-popover {
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+    padding: 0.85rem 0.9rem 0.9rem;
+  }
+
+  .cpa-tutorial-popover .driver-popover-footer.cpa-tutorial-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cpa-tutorial-actions {
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpa-tutorial-progress-bar,
+  .cpa-tutorial-btn,
+  .cpa-tutorial-close {
+    transition: none;
+  }
+
+  .driver-fade .driver-overlay,
+  .driver-fade .driver-popover {
+    animation: none;
+  }
+}
+
+/* Modo oscuro del sistema: el globo mantiene el contraste sin depender del color solo. */
+@media (prefers-color-scheme: dark) {
+  .driver-popover.cpa-tutorial-popover {
+    --cpa-tutorial-surface: #0e3e74;
+    --cpa-tutorial-ink: #ffffff;
+    --cpa-tutorial-ink-soft: #dedfe1;
+  }
+
+  .cpa-tutorial-hint {
+    background: rgba(32, 160, 197, 0.18);
+    color: #eaf6fb;
+  }
+
+  .cpa-tutorial-hint[data-tone='error'] {
+    background: rgba(255, 176, 120, 0.16);
+    color: #ffd9bd;
+  }
+
+  .cpa-tutorial-btn--secondary {
+    border-color: rgba(255, 255, 255, 0.32);
+    color: var(--color-white, #ffffff);
+  }
+
+  .cpa-tutorial-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+}

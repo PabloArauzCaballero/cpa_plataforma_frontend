@@ -27,7 +27,8 @@ function readFirstString(...values: unknown[]): string | undefined {
   return undefined;
 }
 
-function normalizeToken(value: string): string {
+/** Normaliza roles y permisos a un token comparable (`Super Admin` → `SUPER_ADMIN`). */
+export function normalizeToken(value: string): string {
   return value.trim().toUpperCase().replace(/[\s-]+/g, '_');
 }
 

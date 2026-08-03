@@ -302,13 +302,21 @@
    would pop in with no transition. */
 .routeTransition,
 .routeTransition > * {
-  animation: routeFadeIn 260ms ease both;
+  animation: routeFadeIn 260ms ease backwards;
 }
 
 /* Staggered entrance: each top-level section of the page rises into place in
-   sequence, giving navigation a clear, premium transition. */
+   sequence, giving navigation a clear, premium transition.
+
+   fill-mode is `backwards`, NOT `both`: with `both` the last keyframe
+   (`transform: translateY(0) scale(1)`) stays applied forever, and an element
+   with any transform — even the identity one — becomes the containing block of
+   its `position: fixed` descendants. That is what pushed every modal and
+   confirm dialog off-centre and stopped their backdrops from covering the
+   viewport. `backwards` only pre-applies the first keyframe, so once the
+   entrance finishes the element carries no transform at all. */
 .routeTransition > * > * {
-  animation: routeContentIn 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: routeContentIn 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .routeTransition > * > *:nth-child(1) { animation-delay: 40ms; }

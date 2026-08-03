@@ -12,6 +12,7 @@ const ResourceBatchPage = lazy(() => import('@/features/resources/pages/Resource
 const UserProfilePage = lazy(() => import('@/features/profile/pages/UserProfilePage').then((module) => ({ default: module.UserProfilePage })));
 const CatalogosOperativosPage = lazy(() => import('@/features/catalogs/pages/CatalogosOperativosPage').then((module) => ({ default: module.CatalogosOperativosPage })));
 const FileLibraryPage = lazy(() => import('@/features/files/pages/FileLibraryPage').then((module) => ({ default: module.FileLibraryPage })));
+const TutorialCenterPage = lazy(() => import('@/features/tutorials/pages/TutorialCenterPage').then((module) => ({ default: module.TutorialCenterPage })));
 
 function withSuspense(element: ReactElement) {
   return (
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
       { path: 'batch/:module/:resource', element: withSuspense(<ResourceBatchPage />) },
       { path: 'contabilidad/catalogos-cuentas-operativas', element: withSuspense(<CatalogosOperativosPage />) },
       { path: 'contabilidad/archivos', element: withSuspense(<FileLibraryPage />) },
+      { path: 'tutoriales', element: withSuspense(<TutorialCenterPage />) },
       { path: 'perfil', element: withSuspense(<UserProfilePage />) },
       { path: '*', element: <PageState title="Pantalla no encontrada" message="La opción solicitada no existe o fue movida." /> },
     ],

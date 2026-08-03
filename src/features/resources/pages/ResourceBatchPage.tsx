@@ -7,6 +7,7 @@ import type { BatchProcessResult, BatchValidationResult, CrudResourceDefinition 
 import { findResourceDefinition } from '../domain/resourceDefinitions';
 import { processBatchResource, validateBatchResource } from '../services/resourceApi';
 import { humanizeTitleLabel } from '@/shared/utils/humanize';
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import styles from './ResourceBatchPage.module.css';
 
 const acceptedFileTypes = '.xlsx,.xls,.csv';
@@ -107,7 +108,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
 
   return (
     <section className={styles.page}>
-      <div className={styles.header}>
+      <div className={styles.header} {...tutorialAnchor(TUTORIAL_ANCHORS.batchHeader)}>
         <div>
           <span>{resource.moduleLabel}</span>
           <h2>Importar Excel · {humanizeTitleLabel(resource.label, resource.key)}</h2>

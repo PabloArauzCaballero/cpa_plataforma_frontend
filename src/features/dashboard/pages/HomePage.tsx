@@ -1,10 +1,11 @@
+import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import { ModuleSummary } from '../components/ModuleSummary';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
   return (
     <section className={styles.page}>
-      <div className={styles.hero}>
+      <div className={styles.hero} {...tutorialAnchor(TUTORIAL_ANCHORS.homeHero)}>
         <div className={styles.heroCopy}>
           <span>Panel principal</span>
           <h2>Centro de clases personalizadas CPA</h2>

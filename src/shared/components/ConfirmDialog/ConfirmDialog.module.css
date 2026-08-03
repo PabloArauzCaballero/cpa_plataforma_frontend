@@ -3,8 +3,10 @@
   inset: 0;
   z-index: 70;
   display: grid;
-  place-items: center;
+  place-items: safe center;
   padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(0, 37, 95, 0.64);
   backdrop-filter: blur(6px);
 }
