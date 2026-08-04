@@ -161,7 +161,11 @@ export function validateResourcePayload(
       continue;
     }
 
-    if (field.checks?.includes('email') && !validateEmail(value)) {
+    // `type: 'email'` alcanza para exigir el formato: antes solo se revisaba con
+    // `checks`, asi que el unico control era el nativo del navegador, que corta
+    // el submit sin pintar nada dentro del modal. Validado aca, el usuario ve el
+    // mensaje junto al campo.
+    if ((field.type === 'email' || field.checks?.includes('email')) && !validateEmail(value)) {
       errors[field.name] = 'Ingrese un correo válido.';
       continue;
     }

@@ -95,12 +95,20 @@
 @media (max-width: 780px) {
   .backdrop {
     padding: var(--space-3);
+    /* En moviles la barra de direcciones se retrae al hacer scroll: `100vh` mide
+       la ventana SIN esa barra, asi que es mas alta que lo que se ve de verdad.
+       Con `dvh` el alto sigue a la ventana real y el pie del modal —donde esta
+       "Guardar"— deja de quedar tapado por el navegador. `vh` queda de respaldo
+       para los que no soportan `dvh`. */
+    height: 100vh;
+    height: 100dvh;
     place-items: start center;
   }
 
   .modal {
     width: 100%;
     max-height: calc(100vh - 1.5rem);
+    max-height: calc(100dvh - 1.5rem);
   }
 
   .header {
