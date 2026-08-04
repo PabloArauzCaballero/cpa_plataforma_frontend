@@ -220,6 +220,11 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     <form
       {...tutorialAnchor(TUTORIAL_ANCHORS.resourceForm)}
       className={styles.form}
+      // La validación nativa del navegador cortaba el envío sin avisar: en un
+      // `type="email"` a medio escribir el globo de error queda fuera del modal
+      // con scroll, y en móvil directamente no se ve. Con `noValidate` manda
+      // `validateResourcePayload`, que sí pinta el error debajo del campo.
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         const payload = viewModel.getPayload();

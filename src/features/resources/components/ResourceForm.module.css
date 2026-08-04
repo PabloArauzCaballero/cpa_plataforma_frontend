@@ -69,8 +69,21 @@
     grid-template-columns: 1fr;
   }
 
+  /* En una columna el formulario se alarga mucho y "Guardar" queda al final de
+     todo, despues de la barra de borradores. Anclado al pie del modal siempre
+     esta a mano, sin tener que recorrer el formulario entero para enviar.
+     El padding con `safe-area-inset-bottom` lo levanta del indicador de inicio
+     del iPhone, que si no se come el boton. */
   .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
     flex-direction: column;
+    margin: 0 calc(-1 * clamp(1.35rem, 2.6vw, 2rem)) calc(-1 * clamp(1.35rem, 2.6vw, 2rem));
+    padding: var(--space-4) clamp(1.35rem, 2.6vw, 2rem);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+    background: var(--color-white);
+    border-top: 1px solid var(--color-neutral-light);
   }
 }
 

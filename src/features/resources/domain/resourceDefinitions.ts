@@ -62,13 +62,9 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
       { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
       { name: "telefono", label: "Teléfono", type: "text" },
       { name: "email", label: "Correo electrónico", type: "email" },
-      { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular un registro ya existente." },
-      {
-        name: "codigo_estudiante", label: "Código estudiante", type: "text",
-        readOnly: true,
-        placeholder: "Se genera solo al guardar (EST-AAAA-NNNNN)",
-        helpText: "Lo asigna el sistema con formato EST-AAAA-NNNNN, por ejemplo EST-2026-00007. No se escribe a mano y no cambia al editar.",
-      },
+      // id_persona y codigo_estudiante no van en el formulario: el primero es la
+      // clave primaria y viaja en la URL al editar; el segundo lo genera la base
+      // con formato EST-AAAA-NNNNN. La tabla los sigue mostrando desde la API.
       { name: "id_unidad_educativa", label: "Unidad educativa", type: "number" },
       { name: "tipo", label: "Tipo estudiante", type: "select", required: true, options: ["UNIVERSITARIO", "COLEGIAL"] },
       { name: "nivel_actual", label: "Nivel actual", type: "text", requiredWhen: { tipo: "COLEGIAL" }, visibleWhen: { tipo: "COLEGIAL" } },
