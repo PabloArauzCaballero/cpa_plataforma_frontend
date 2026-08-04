@@ -1,5 +1,9 @@
 import { InfoHint } from '../Tooltip';
+import { SearchableSelect } from './SearchableSelect';
 import styles from './FormField.module.css';
+
+/** Desde cuántas opciones conviene buscar por texto en vez de desplegar la lista. */
+const SEARCHABLE_OPTION_THRESHOLD = 12;
 
 export type FieldType = 'text' | 'email' | 'password' | 'number' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'checkbox' | 'select' | 'url' | 'tel';
 
@@ -76,6 +80,32 @@ export function FormField({
 
   if (type === 'select') {
     const normalizedOptions = options.map(normalizeOption);
+
+    // A partir de cierta cantidad el <select> nativo deja de ser usable: hay que
+    // recorrer la lista entera a mano, y en móvil es una rueda interminable. El
+    // caso real son las unidades educativas, que son cientos. Por debajo del
+    // umbral (tipo de estudiante, turno, nivel...) el nativo es mejor: se abre
+    // de una y no hace falta teclear nada.
+    if (normalizedOptions.length > SEARCHABLE_OPTION_THRESHOLD) {
+      return (
+        <label className={styles.field} htmlFor={id}>
+          <span>
+            {label}
+            {required ? <strong> *</strong> : null}
+            {helpText ? <InfoHint text={helpText} label={`Ayuda: ${label}`} /> : null}
+          </span>
+          <SearchableSelect
+            id={id}
+            options={normalizedOptions}
+            value={value}
+            disabled={disabled}
+            isLoadingOptions={isLoadingOptions}
+            onChange={onChange}
+          />
+          {error ? <small className={styles.error}>{error}</small> : null}
+        </label>
+      );
+    }
 
     return (
       <label className={styles.field} htmlFor={id}>

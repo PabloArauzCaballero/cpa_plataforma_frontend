@@ -127,3 +127,95 @@
 .checkboxField[aria-disabled='true'] {
   opacity: 0.72;
 }
+
+/* ---------------------------------------------------------------------------
+   Selector con búsqueda (SearchableSelect)
+   Se usa en las listas largas —unidades educativas, sobre todo—, donde el
+   <select> nativo obliga a recorrer cientos de opciones a mano.
+   --------------------------------------------------------------------------- */
+
+.searchable {
+  position: relative;
+}
+
+/* El input hereda el aspecto de .field input, así que no se redefine el borde:
+   sólo se reserva sitio a la derecha para el botón de limpiar. */
+.searchable input {
+  padding-right: 2.4rem;
+}
+
+/* Sin selección el placeholder es una instrucción ("Escribe para buscar"); con
+   selección muestra la opción elegida y debe leerse como un valor, no como un
+   texto de ayuda en gris. */
+.searchable input[data-selected]::placeholder {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+.searchableClear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  width: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.searchableClear:hover {
+  color: var(--color-primary);
+}
+
+.searchableList {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  /* Tope de altura para que la lista no empuje el formulario ni se salga del
+     modal: a partir de ahí hace su propio scroll. */
+  max-height: 15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  box-shadow: 0 14px 32px rgba(0, 37, 95, 0.16);
+}
+
+.searchableList button {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.65rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.searchableList button[data-highlighted],
+.searchableList button:hover {
+  background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
+}
+
+.searchableList button[aria-selected='true'] {
+  font-weight: 800;
+}
+
+.searchableEmpty {
+  padding: 0.6rem 0.65rem;
+  color: var(--color-accent);
+  font-size: 0.92rem;
+}

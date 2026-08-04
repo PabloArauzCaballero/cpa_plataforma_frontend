@@ -115,7 +115,8 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
       { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
       { name: "telefono", label: "Teléfono", type: "text" },
       { name: "email", label: "Correo electrónico", type: "email" },
-      { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular a una persona ya registrada." },
+      // id_persona fuera del alta: es la clave primaria, la base la genera sola y
+      // al editar viaja en la URL. Pedirla confundía a quien registra.
       { name: "pago_por_hora", label: "Pago por hora (BOB)", type: "number", required: true, helpText: "Tarifa que se paga al tutor por hora de clase. Debe ser mayor o igual a 0." },
       { name: "nivel_experiencia", label: "Nivel de experiencia", type: "select", required: true, options: ["RECLUTA", "EXPERIMENTADO", "SENIOR"], helpText: "RECLUTA: recién incorporado. EXPERIMENTADO: con trayectoria. SENIOR: referente del área." },
       { name: "tipo_estudiante_especialidad", label: "Especialidad (tipo)", type: "select", required: true, options: ["UNIVERSITARIO", "COLEGIAL"], helpText: "A qué tipo de estudiantes enseña. Si es COLEGIAL, debes indicar el nivel." },
@@ -140,7 +141,7 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
       { name: "fecha_nacimiento", label: "Fecha nacimiento", type: "date" },
       { name: "telefono", label: "Teléfono", type: "text" },
       { name: "email", label: "Correo electrónico", type: "email" },
-      { name: "id_persona", label: "ID persona existente", type: "number", helpText: "Opcional. Solo úsalo al editar o vincular a una persona ya registrada." },
+      // id_persona fuera del alta: ver la nota en el recurso "tutor".
       { name: "nombre_usuario", label: "Nombre de usuario", type: "text", required: true, helpText: "Identificador único para iniciar sesión (por ejemplo, nombre.apellido)." },
       { name: "password", label: "Contraseña", type: "password", required: true, helpText: "Se envía en texto plano por HTTPS y el servidor la almacena cifrada (hash). Usa una contraseña robusta." },
       { name: "tipo_usuario", label: "Tipo de usuario", type: "text", helpText: "Rol funcional del usuario (por ejemplo, USUARIO_INTERNO, OPERADOR, ADMIN). Por defecto: USUARIO_INTERNO." },
