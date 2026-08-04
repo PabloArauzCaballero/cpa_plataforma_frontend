@@ -1,212 +1,398 @@
 .page {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
-.panel {
+/* ----------------------------------------------------------------- cabecera */
+
+.hero {
   display: grid;
-  gap: var(--space-4);
-  padding: clamp(1.15rem, 2.4vw, 1.75rem);
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+  gap: var(--space-5);
+  align-items: end;
+  padding: clamp(1.25rem, 2.6vw, 1.9rem);
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-lg);
   background: var(--color-white);
   box-shadow: var(--shadow-sm);
 }
 
-.panelTitle {
-  display: grid;
-  gap: 0.3rem;
+.eyebrow {
+  margin: 0;
+  color: var(--color-secondary-dark);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
-.panelTitle strong {
+.hero h1 {
+  margin: 0.2rem 0 0.4rem;
   color: var(--color-primary);
-  font-size: 1.05rem;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  letter-spacing: -0.025em;
 }
 
-.panelTitle span {
+.lead {
+  margin: 0;
+  max-width: 46rem;
   color: var(--color-accent);
   font-weight: 650;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-.claseRow {
+.claseField {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: var(--space-4);
-  align-items: end;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-2);
   color: var(--color-primary);
   font-weight: 800;
   min-width: 0;
 }
 
-.field span {
-  font-size: 0.88rem;
+.claseField > span {
+  font-size: 0.84rem;
 }
 
-.field select,
-.field input,
-.field textarea {
+.claseField select {
   width: 100%;
   min-height: 3rem;
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   background: var(--color-white);
   color: var(--color-primary);
-  padding: 0.72rem 0.85rem;
-  outline: none;
+  padding: 0.7rem 0.85rem;
   font: inherit;
-  font-weight: 700;
+  font-weight: 800;
+  outline: none;
 }
 
-.field select:focus,
-.field input:focus,
-.field textarea:focus {
+.claseField select:focus {
   border-color: var(--color-secondary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 18%, transparent);
 }
 
-.toolbar {
+.hint {
+  color: var(--color-accent);
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+/* -------------------------------------------------------------------- panel */
+
+.panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: clamp(1.1rem, 2.2vw, 1.6rem);
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Cifras de cabecera: cuántos hay, cuántos faltan. Es lo primero que se mira
+   al abrir la planilla y lo último antes de guardar. */
+.resumen {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  align-items: center;
 }
 
-.toolbar button {
-  min-height: 2.85rem;
-  padding: 0 1rem;
+.stat {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 6.5rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-light) 18%, var(--color-white));
+}
+
+.stat strong {
+  color: var(--color-primary);
+  font-size: 1.45rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.stat span {
+  color: var(--color-accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stat[data-tone='pendiente'] {
+  border-color: color-mix(in srgb, var(--color-secondary) 40%, var(--color-neutral-light));
+  background: color-mix(in srgb, var(--color-secondary) 9%, var(--color-white));
+}
+
+.stat[data-tone='aviso'] {
+  border-color: color-mix(in srgb, #b42318 32%, var(--color-neutral-light));
+  background: color-mix(in srgb, #b42318 7%, var(--color-white));
+}
+
+.stat[data-tone='aviso'] strong {
+  color: #8a1f11;
+}
+
+/* ------------------------------------------------------------------ acciones */
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-neutral-light);
+}
+
+.grupoAcciones {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.grupoTitulo {
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  min-height: 2.35rem;
+  padding: 0 0.8rem;
   border: 1px solid var(--color-neutral-light);
   border-radius: 999px;
   background: var(--color-white);
   color: var(--color-primary);
   font: inherit;
+  font-size: 0.86rem;
   font-weight: 800;
   cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
 }
 
-.toolbar button:hover:not(:disabled) {
+.chip:hover:not(:disabled) {
   border-color: var(--color-secondary);
-  background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
+  background: color-mix(in srgb, var(--color-secondary) 9%, var(--color-white));
+  color: var(--color-secondary-dark);
 }
 
-.toolbar button:disabled {
+.chip:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.5;
 }
+
+/* -------------------------------------------------------------------- tabla */
 
 .tableWrap {
   overflow-x: auto;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-md);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 60rem;
+  min-width: 52rem;
 }
 
 .table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   text-align: left;
-  padding: 0.7rem 0.6rem;
-  color: var(--color-primary);
-  font-size: 0.76rem;
+  padding: 0.6rem 0.7rem;
+  background: color-mix(in srgb, var(--color-neutral-light) 26%, var(--color-white));
+  color: var(--color-accent);
+  font-size: 0.71rem;
   font-weight: 900;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--color-neutral-light);
   white-space: nowrap;
 }
 
 .table td {
-  padding: 0.55rem 0.6rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-neutral-light) 55%, transparent);
+  padding: 0.4rem 0.7rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-neutral-light) 60%, transparent);
   vertical-align: middle;
 }
 
-.table tr[data-existing='true'] td:first-child {
-  border-left: 3px solid var(--color-secondary);
+.table tbody tr:hover td {
+  background: color-mix(in srgb, var(--color-secondary) 4%, transparent);
 }
+
+/* Una franja al costado distingue de un vistazo lo ya guardado de lo pendiente,
+   sin repetir una etiqueta en cada fila. */
+.table tbody tr td:first-child {
+  border-left: 3px solid transparent;
+}
+
+.table tbody tr[data-guardado='true'] td:first-child {
+  border-left-color: color-mix(in srgb, #16a34a 65%, transparent);
+}
+
+.table tbody tr[data-sin-matricula='true'] td:first-child {
+  border-left-color: #b42318;
+}
+
+.estudianteCell {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 14rem;
+}
+
+.estudianteCell strong {
+  color: var(--color-primary);
+  font-size: 0.93rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.marcaGuardado,
+.marcaAviso {
+  font-size: 0.71rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.marcaGuardado {
+  color: #166534;
+}
+
+.marcaAviso {
+  color: #8a1f11;
+}
+
+/* ------------------------------------------------------------- controles fila */
 
 .rowControl {
   width: 100%;
-  min-height: 2.7rem;
-  border: 1px solid var(--color-neutral-light);
+  min-height: 2.4rem;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: color-mix(in srgb, var(--color-neutral-light) 20%, var(--color-white));
   color: var(--color-primary);
-  padding: 0.5rem 0.65rem;
+  padding: 0.4rem 0.6rem;
   font: inherit;
+  font-size: 0.9rem;
   font-weight: 700;
   outline: none;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.rowControl:hover {
+  background: color-mix(in srgb, var(--color-neutral-light) 34%, var(--color-white));
 }
 
 .rowControl:focus {
   border-color: var(--color-secondary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 16%, transparent);
+}
+
+/* El estado se lee por color antes que por texto: en una planilla de treinta
+   filas, buscar las faltas leyendo palabra por palabra es lento. */
+.estadoControl {
+  min-height: 2.4rem;
+  min-width: 8.5rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  outline: none;
+  cursor: pointer;
+}
+
+.estadoControl:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 20%, transparent);
+}
+
+.estadoControl[data-estado='Asistió'] {
+  background: color-mix(in srgb, #16a34a 13%, var(--color-white));
+  color: #166534;
+}
+
+.estadoControl[data-estado='Tardanza'] {
+  background: color-mix(in srgb, #d97706 15%, var(--color-white));
+  color: #92400e;
+}
+
+.estadoControl[data-estado='Falta'] {
+  background: color-mix(in srgb, #b42318 12%, var(--color-white));
+  color: #8a1f11;
+}
+
+.estadoControl[data-estado='Justificado'] {
+  background: color-mix(in srgb, var(--color-secondary) 14%, var(--color-white));
+  color: var(--color-secondary-dark);
+}
+
+.estadoControl[data-estado='En línea'] {
+  background: color-mix(in srgb, #7c3aed 12%, var(--color-white));
+  color: #5b21b6;
 }
 
 .horaCell {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.35rem;
   align-items: center;
+  min-width: 15rem;
 }
 
-.horaCell button,
-.removeButton {
+.horaAhora {
   flex: 0 0 auto;
-  min-height: 2.7rem;
-  padding: 0 0.75rem;
+  min-height: 2.4rem;
+  padding: 0 0.65rem;
   border: 1px solid var(--color-neutral-light);
   border-radius: var(--radius-md);
   background: var(--color-white);
-  color: var(--color-primary);
+  color: var(--color-secondary-dark);
   font: inherit;
+  font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.horaCell button:hover {
+.horaAhora:hover {
   border-color: var(--color-secondary);
-  color: var(--color-secondary-dark);
+  background: color-mix(in srgb, var(--color-secondary) 9%, var(--color-white));
 }
 
-.removeButton:hover {
-  border-color: #b42318;
+.quitar {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.quitar:hover {
+  background: color-mix(in srgb, #b42318 10%, var(--color-white));
   color: #b42318;
 }
 
-.estudianteCell {
-  display: grid;
-  gap: 0.3rem;
-  justify-items: start;
-}
-
-.estudianteCell strong {
-  color: var(--color-primary);
-  font-weight: 800;
-  line-height: 1.35;
-}
-
-.marca {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-secondary) 14%, var(--color-white));
-  color: var(--color-secondary-dark);
-  font-size: 0.72rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
+/* ------------------------------------------------------------------- estados */
 
 .actions {
   display: flex;
@@ -218,7 +404,7 @@
 .message,
 .error {
   margin: 0;
-  padding: 0.9rem 1.1rem;
+  padding: 0.85rem 1.05rem;
   border-radius: var(--radius-md);
   font-weight: 700;
   line-height: 1.5;
@@ -237,14 +423,36 @@
 }
 
 .empty {
-  padding: var(--space-5);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: clamp(1.5rem, 4vw, 3rem);
   text-align: center;
   color: var(--color-accent);
-  font-weight: 700;
+  font-weight: 650;
+  line-height: 1.6;
 }
 
-@media (max-width: 900px) {
-  .claseRow {
+.empty strong {
+  color: var(--color-primary);
+  font-size: 1.05rem;
+}
+
+.empty p {
+  margin: 0;
+  max-width: 34rem;
+}
+
+.empty a,
+.hint a {
+  color: var(--color-secondary-dark);
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+  .hero {
     grid-template-columns: 1fr;
+    align-items: start;
   }
 }

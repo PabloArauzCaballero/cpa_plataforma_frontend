@@ -159,6 +159,23 @@ const baseResourceDefinitions: CrudResourceDefinition[] = [
     fields: [{ name: "id_clase_curso", label: "id_clase_curso", type: "number", required: true }, { name: "id_estudiante", label: "id_estudiante", type: "number", required: true }, { name: "estado_asistencia", label: "estado_asistencia", type: "text", required: true }, { name: "hora_marcacion", label: "hora_marcacion", type: "datetime-local" }, { name: "observaciones", label: "observaciones", type: "textarea" }],
   },
   {
+    // Matrícula: de aquí sale la lista de la planilla de asistencia. Sin ella,
+    // la planilla no tiene forma de saber quién cursa qué.
+    key: "inscripcion-curso", module: "servicios_educativos", moduleLabel: "Servicios educativos", label: "Inscripción a Curso",
+    table: "servicios_educativos.inscripcion_curso", primaryKey: "id_inscripcion",
+    endpoints: { list: "/api/servicios_educativos/inscripcion-curso", detail: (id: string) => `/api/servicios_educativos/inscripcion-curso/${id}`, create: "/api/servicios_educativos/inscripcion-curso", update: (id: string) => `/api/servicios_educativos/inscripcion-curso/${id}` },
+    permissions: "create=SERVICIOS_EDUCATIVOS.INSCRIPCION_CURSO.CREATE",
+    fields: [
+      { name: "id_curso_version", label: "Curso", type: "number", required: true, helpText: "Versión del curso en la que se matricula al estudiante." },
+      { name: "id_estudiante", label: "Estudiante", type: "number", required: true },
+      { name: "fecha_inscripcion", label: "Fecha de inscripción", type: "date" },
+      { name: "estado", label: "Estado", type: "select", required: true, options: ["ACTIVA", "RETIRADA", "FINALIZADA"], helpText: "Sólo las matrículas ACTIVA aparecen en la planilla de asistencia." },
+      { name: "fecha_baja", label: "Fecha de baja", type: "date", requiredWhen: { estado: "RETIRADA" }, visibleWhen: { estado: "RETIRADA" } },
+      { name: "motivo_baja", label: "Motivo de baja", type: "text", visibleWhen: { estado: "RETIRADA" } },
+      { name: "observaciones", label: "Observaciones", type: "textarea" },
+    ],
+  },
+  {
     // Pantalla aparte de la de arriba: la de arriba corrige un registro suelto,
     // esta marca a todo el curso de una vez. Comparten tabla y endpoints.
     key: "asistencia-masiva", module: "servicios_educativos", moduleLabel: "Servicios educativos", label: "Asistencia Masiva",

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
 import { PageState } from '@/shared/components/PageState';
 import { userHasAnyPermission } from '@/shared/auth/session';
@@ -9,8 +10,10 @@ import {
   explicarErrorAsistencia,
   listarAsistenciaDeClase,
   listarClasesDeCurso,
+  listarInscritosDeCurso,
   registrarAsistenciaMasiva,
   type AsistenciaFilaPayload,
+  type ClaseDelCurso,
 } from '../services/asistenciaMasivaApi';
 import styles from './AsistenciaMasivaPage.module.css';
 
@@ -29,6 +32,8 @@ interface FilaAsistencia {
   observaciones: string;
   /** Id de la asistencia ya guardada, si la fila venía de la base. */
   idAsistencia: number | string | null;
+  /** Está matriculado en el curso de esta clase. */
+  inscrito: boolean;
 }
 
 function ahoraLocal(): string {
@@ -43,8 +48,7 @@ function ahoraLocal(): string {
  * `hora_marcacion` es `timestamp without time zone`: guarda una hora de reloj,
  * no un instante en la línea del tiempo. El sistema la serializa con sufijo `Z`,
  * así que pasarla por `new Date(...)` y leerla en hora local la corría cuatro
- * horas en Bolivia: se guardaba 08:05 y al volver a abrir la planilla decía
- * 04:05. Se toman los dígitos tal cual vienen.
+ * horas en Bolivia. Se toman los dígitos tal cual vienen.
  */
 function aValorDeInput(valor: string | null): string {
   if (!valor) return '';
@@ -55,38 +59,41 @@ function aValorDeInput(valor: string | null): string {
 }
 
 let contadorFilas = 0;
-function nuevaFila(idEstudiante = ''): FilaAsistencia {
+function nuevaFila(idEstudiante = '', inscrito = false): FilaAsistencia {
   contadorFilas += 1;
   return {
     clave: `fila-${contadorFilas}`,
     idEstudiante,
     estado: 'Asistió',
-    hora: ahoraLocal(),
+    hora: '',
     observaciones: '',
     idAsistencia: null,
+    inscrito,
   };
 }
 
 /**
- * Planilla de asistencia: una clase, todos sus estudiantes y sus horas en una
- * sola pantalla.
+ * Planilla de asistencia: una clase, los estudiantes matriculados en su curso y
+ * sus horas en una sola pantalla.
  *
  * Convive con el alta de a uno, que se sigue usando para corregir un registro
  * suelto. Esta pantalla existe porque marcar un curso completo de a uno obliga a
  * repetir clase, estado y hora por cada estudiante.
  *
- * La tabla tiene llave única por (clase, estudiante): al elegir la clase se
- * cargan las marcas existentes, que se actualizan en vez de duplicarse.
+ * La lista sale de las matrículas del curso, no del padrón completo del centro.
+ * Quien tiene asistencia registrada pero ya no está matriculado sigue apareciendo,
+ * marcado como tal, para poder corregirlo en vez de perderlo de vista.
  */
 export function AsistenciaMasivaPage() {
   const puedeRegistrar = userHasAnyPermission('create=SERVICIOS_EDUCATIVOS.ASISTENCIA_CLASE_CURSO.CREATE');
 
-  const [clases, setClases] = useState<SelectOption[]>([]);
+  const [clases, setClases] = useState<ClaseDelCurso[]>([]);
   const [estudiantes, setEstudiantes] = useState<SelectOption[]>([]);
   const [cargandoCatalogos, setCargandoCatalogos] = useState(true);
 
   const [idClase, setIdClase] = useState('');
   const [filas, setFilas] = useState<FilaAsistencia[]>([]);
+  const [totalInscritos, setTotalInscritos] = useState(0);
   const [cargandoClase, setCargandoClase] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -95,7 +102,7 @@ export function AsistenciaMasivaPage() {
   useEffect(() => {
     let montado = true;
     Promise.all([
-      listarClasesDeCurso().catch(() => [] as SelectOption[]),
+      listarClasesDeCurso().catch(() => [] as ClaseDelCurso[]),
       listAllLookupOptions(ESTUDIANTE_RELATION, 300, 20000).catch(() => [] as SelectOption[]),
     ]).then(([opcionesClase, opcionesEstudiante]) => {
       if (!montado) return;
@@ -112,31 +119,59 @@ export function AsistenciaMasivaPage() {
     return new Map(estudiantes.map((opcion) => [String(opcion.value), opcion.label]));
   }, [estudiantes]);
 
-  const cargarClase = useCallback(async (valorClase: string) => {
-    setIdClase(valorClase);
-    setMensaje(null);
-    setError(null);
-    setFilas([]);
-    if (!valorClase) return;
+  const claseElegida = useMemo(() => clases.find((clase) => clase.value === idClase) ?? null, [clases, idClase]);
 
-    setCargandoClase(true);
-    try {
-      const registradas = await listarAsistenciaDeClase(valorClase);
-      setFilas(
-        registradas.map((registro) => ({
-          ...nuevaFila(String(registro.id_estudiante)),
+  const cargarClase = useCallback(
+    async (valorClase: string) => {
+      setIdClase(valorClase);
+      setMensaje(null);
+      setError(null);
+      setFilas([]);
+      setTotalInscritos(0);
+      if (!valorClase) return;
+
+      const clase = clases.find((candidata) => candidata.value === valorClase) ?? null;
+      setCargandoClase(true);
+      try {
+        const [registradas, inscritos] = await Promise.all([
+          listarAsistenciaDeClase(valorClase),
+          clase?.idCursoVersion ? listarInscritosDeCurso(clase.idCursoVersion) : Promise.resolve<string[]>([]),
+        ]);
+
+        const porEstudiante = new Map(registradas.map((registro) => [String(registro.id_estudiante), registro]));
+        setTotalInscritos(inscritos.length);
+
+        // Primero los matriculados, en el orden en que están inscritos.
+        const filasInscritos = inscritos.map((idEstudiante) => {
+          const registro = porEstudiante.get(idEstudiante);
+          porEstudiante.delete(idEstudiante);
+          return {
+            ...nuevaFila(idEstudiante, true),
+            estado: registro?.estado_asistencia || 'Asistió',
+            hora: aValorDeInput(registro?.hora_marcacion ?? null),
+            observaciones: registro?.observaciones ?? '',
+            idAsistencia: registro?.id_asistencia ?? null,
+          };
+        });
+
+        // Y después lo que quedó: asistencias de quien ya no figura matriculado.
+        const filasSinMatricula = Array.from(porEstudiante.values()).map((registro) => ({
+          ...nuevaFila(String(registro.id_estudiante), false),
           estado: registro.estado_asistencia || 'Asistió',
           hora: aValorDeInput(registro.hora_marcacion),
           observaciones: registro.observaciones ?? '',
           idAsistencia: registro.id_asistencia,
-        })),
-      );
-    } catch (fallo) {
-      setError(explicarErrorAsistencia(fallo));
-    } finally {
-      setCargandoClase(false);
-    }
-  }, []);
+        }));
+
+        setFilas([...filasInscritos, ...filasSinMatricula]);
+      } catch (fallo) {
+        setError(explicarErrorAsistencia(fallo));
+      } finally {
+        setCargandoClase(false);
+      }
+    },
+    [clases],
+  );
 
   function actualizarFila(clave: string, cambios: Partial<FilaAsistencia>) {
     setFilas((actuales) => actuales.map((fila) => (fila.clave === clave ? { ...fila, ...cambios } : fila)));
@@ -147,9 +182,14 @@ export function AsistenciaMasivaPage() {
     return estudiantes.filter((opcion) => !yaEnPlanilla.has(String(opcion.value)));
   }, [estudiantes, filas]);
 
-  function agregarTodos() {
-    setFilas((actuales) => [...actuales, ...estudiantesDisponibles.map((opcion) => nuevaFila(String(opcion.value)))]);
-  }
+  const resumen = useMemo(() => {
+    const conEstudiante = filas.filter((fila) => fila.idEstudiante.trim() !== '');
+    return {
+      enPlanilla: conEstudiante.length,
+      guardados: conEstudiante.filter((fila) => fila.idAsistencia !== null).length,
+      sinMatricula: conEstudiante.filter((fila) => !fila.inscrito).length,
+    };
+  }, [filas]);
 
   async function guardar() {
     setError(null);
@@ -161,7 +201,7 @@ export function AsistenciaMasivaPage() {
       return;
     }
     if (conEstudiante.length === 0) {
-      setError('Agrega al menos un estudiante a la planilla.');
+      setError('No hay estudiantes en la planilla.');
       return;
     }
 
@@ -208,163 +248,220 @@ export function AsistenciaMasivaPage() {
 
   return (
     <section className={styles.page}>
-      <div className={styles.panel}>
-        <div className={styles.panelTitle}>
-          <strong>Planilla de asistencia</strong>
-          <span>
-            Marca a todos los estudiantes de una clase en una sola pantalla. Si un estudiante ya tenía asistencia en
-            esta clase, aparece cargado y se actualiza en vez de duplicarse.
-          </span>
+      <header className={styles.hero}>
+        <div>
+          <p className={styles.eyebrow}>Servicios educativos</p>
+          <h1>Planilla de asistencia</h1>
+          <p className={styles.lead}>
+            Elige una clase y marca de una vez a los estudiantes matriculados en su curso. Lo que ya estaba registrado
+            se carga y se actualiza, no se duplica.
+          </p>
         </div>
 
-        <div className={styles.claseRow}>
-          <label className={styles.field}>
-            <span>Clase del curso *</span>
-            <select value={idClase} onChange={(event) => void cargarClase(event.target.value)} disabled={guardando}>
-              <option value="">Seleccionar clase</option>
-              {clases.map((opcion) => (
-                <option key={String(opcion.value)} value={String(opcion.value)}>{opcion.label}</option>
-              ))}
-            </select>
-          </label>
-
-          <div className={styles.toolbar}>
-            <button type="button" onClick={() => setFilas((actuales) => [...actuales, nuevaFila()])} disabled={!idClase || guardando}>
-              Agregar estudiante
-            </button>
-            <button type="button" onClick={agregarTodos} disabled={!idClase || guardando || estudiantesDisponibles.length === 0}>
-              Agregar todos ({estudiantesDisponibles.length})
-            </button>
-          </div>
-        </div>
-      </div>
+        <label className={styles.claseField}>
+          <span>Clase del curso</span>
+          <select value={idClase} onChange={(event) => void cargarClase(event.target.value)} disabled={guardando}>
+            <option value="">Seleccionar clase</option>
+            {clases.map((opcion) => (
+              <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
+            ))}
+          </select>
+          {clases.length === 0 ? (
+            <small className={styles.hint}>
+              No hay clases registradas todavía. Créalas en <Link to="/modulos/servicios_educativos/clase-curso">Clase Curso</Link>.
+            </small>
+          ) : null}
+        </label>
+      </header>
 
       {mensaje ? <p className={styles.message}>{mensaje}</p> : null}
       {error ? <p className={styles.error}>{error}</p> : null}
 
-      {idClase ? (
+      {!idClase ? null : cargandoClase ? (
         <div className={styles.panel}>
-          <div className={styles.toolbar}>
-            {ESTADOS_ASISTENCIA.map((estado) => (
-              <button
-                key={estado}
-                type="button"
-                disabled={filas.length === 0 || guardando}
-                onClick={() => setFilas((actuales) => actuales.map((fila) => ({ ...fila, estado })))}
-              >
-                Marcar todos: {estado}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={filas.length === 0 || guardando}
-              onClick={() => setFilas((actuales) => actuales.map((fila) => ({ ...fila, hora: ahoraLocal() })))}
-            >
-              Hora de ahora a todos
-            </button>
+          <p className={styles.empty}>Cargando matrícula y asistencia de esta clase...</p>
+        </div>
+      ) : (
+        <div className={styles.panel}>
+          <div className={styles.resumen}>
+            <div className={styles.stat}>
+              <strong>{totalInscritos}</strong>
+              <span>matriculados</span>
+            </div>
+            <div className={styles.stat}>
+              <strong>{resumen.guardados}</strong>
+              <span>ya registrados</span>
+            </div>
+            <div className={styles.stat} data-tone={resumen.enPlanilla - resumen.guardados > 0 ? 'pendiente' : 'ok'}>
+              <strong>{resumen.enPlanilla - resumen.guardados}</strong>
+              <span>por guardar</span>
+            </div>
+            {resumen.sinMatricula > 0 ? (
+              <div className={styles.stat} data-tone="aviso">
+                <strong>{resumen.sinMatricula}</strong>
+                <span>sin matrícula</span>
+              </div>
+            ) : null}
           </div>
 
-          {cargandoClase ? (
-            <p className={styles.empty}>Cargando la asistencia ya registrada de esta clase...</p>
-          ) : filas.length === 0 ? (
-            <p className={styles.empty}>
-              Todavía no hay estudiantes en la planilla. Usa &quot;Agregar estudiante&quot; o &quot;Agregar todos&quot;.
-            </p>
+          {filas.length === 0 ? (
+            <div className={styles.empty}>
+              <strong>Este curso no tiene estudiantes matriculados.</strong>
+              <p>
+                La planilla se arma con las matrículas del curso. Inscribe estudiantes en{' '}
+                <Link to="/modulos/servicios_educativos/inscripcion-curso">Inscripción a curso</Link> y vuelve aquí, o
+                agrega a alguien puntualmente con el botón de abajo.
+              </p>
+              <Button type="button" variant="ghost" onClick={() => setFilas([nuevaFila()])}>
+                Agregar un estudiante igualmente
+              </Button>
+            </div>
           ) : (
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Estudiante</th>
-                    <th>Estado</th>
-                    <th>Hora de marcación</th>
-                    <th>Observaciones</th>
-                    <th>Quitar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filas.map((fila) => (
-                    <tr key={fila.clave} data-existing={fila.idAsistencia !== null}>
-                      <td>
-                        {fila.idAsistencia !== null ? (
-                          <div className={styles.estudianteCell}>
-                            <span className={styles.marca}>Ya registrado</span>
-                            <strong>{etiquetaEstudiante.get(fila.idEstudiante) ?? `Estudiante ${fila.idEstudiante}`}</strong>
-                          </div>
-                        ) : (
+            <>
+              <div className={styles.acciones}>
+                <div className={styles.grupoAcciones}>
+                  <span className={styles.grupoTitulo}>Marcar a todos</span>
+                  <div className={styles.chips}>
+                    {ESTADOS_ASISTENCIA.map((estado) => (
+                      <button
+                        key={estado}
+                        type="button"
+                        className={styles.chip}
+                        data-estado={estado}
+                        disabled={guardando}
+                        onClick={() => setFilas((actuales) => actuales.map((fila) => ({ ...fila, estado })))}
+                      >
+                        {estado}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className={styles.chip}
+                      disabled={guardando}
+                      onClick={() => setFilas((actuales) => actuales.map((fila) => ({ ...fila, hora: ahoraLocal() })))}
+                    >
+                      Hora de ahora
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.chip}
+                  disabled={guardando || estudiantesDisponibles.length === 0}
+                  onClick={() => setFilas((actuales) => [...actuales, nuevaFila()])}
+                >
+                  Agregar estudiante fuera de matrícula
+                </button>
+              </div>
+
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Estudiante</th>
+                      <th>Estado</th>
+                      <th>Hora de marcación</th>
+                      <th>Observaciones</th>
+                      <th aria-label="Quitar de la planilla" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filas.map((fila) => (
+                      <tr key={fila.clave} data-guardado={fila.idAsistencia !== null} data-sin-matricula={!fila.inscrito}>
+                        <td>
+                          {fila.idEstudiante && fila.inscrito ? (
+                            <div className={styles.estudianteCell}>
+                              <strong>{etiquetaEstudiante.get(fila.idEstudiante) ?? `Estudiante ${fila.idEstudiante}`}</strong>
+                              {fila.idAsistencia !== null ? <span className={styles.marcaGuardado}>Ya registrado</span> : null}
+                            </div>
+                          ) : fila.idEstudiante ? (
+                            <div className={styles.estudianteCell}>
+                              <strong>{etiquetaEstudiante.get(fila.idEstudiante) ?? `Estudiante ${fila.idEstudiante}`}</strong>
+                              <span className={styles.marcaAviso}>Sin matrícula en este curso</span>
+                            </div>
+                          ) : (
+                            <select
+                              className={styles.rowControl}
+                              value={fila.idEstudiante}
+                              onChange={(event) => actualizarFila(fila.clave, { idEstudiante: event.target.value })}
+                            >
+                              <option value="">Seleccionar estudiante</option>
+                              {estudiantesDisponibles.map((opcion) => (
+                                <option key={String(opcion.value)} value={String(opcion.value)}>{opcion.label}</option>
+                              ))}
+                            </select>
+                          )}
+                        </td>
+                        <td>
                           <select
-                            className={styles.rowControl}
-                            value={fila.idEstudiante}
-                            onChange={(event) => actualizarFila(fila.clave, { idEstudiante: event.target.value })}
+                            className={styles.estadoControl}
+                            data-estado={fila.estado}
+                            value={fila.estado}
+                            onChange={(event) => actualizarFila(fila.clave, { estado: event.target.value })}
                           >
-                            <option value="">Seleccionar estudiante</option>
-                            {estudiantes.map((opcion) => (
-                              <option key={String(opcion.value)} value={String(opcion.value)}>{opcion.label}</option>
+                            {ESTADOS_ASISTENCIA.map((estado) => (
+                              <option key={estado} value={estado}>{estado}</option>
                             ))}
                           </select>
-                        )}
-                      </td>
-                      <td>
-                        <select
-                          className={styles.rowControl}
-                          value={fila.estado}
-                          onChange={(event) => actualizarFila(fila.clave, { estado: event.target.value })}
-                        >
-                          {ESTADOS_ASISTENCIA.map((estado) => (
-                            <option key={estado} value={estado}>{estado}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td>
-                        <div className={styles.horaCell}>
+                        </td>
+                        <td>
+                          <div className={styles.horaCell}>
+                            <input
+                              className={styles.rowControl}
+                              type="datetime-local"
+                              value={fila.hora}
+                              onChange={(event) => actualizarFila(fila.clave, { hora: event.target.value })}
+                            />
+                            <button
+                              type="button"
+                              className={styles.horaAhora}
+                              title="Poner la hora de este momento"
+                              onClick={() => actualizarFila(fila.clave, { hora: ahoraLocal() })}
+                            >
+                              Ahora
+                            </button>
+                          </div>
+                        </td>
+                        <td>
                           <input
                             className={styles.rowControl}
-                            type="datetime-local"
-                            value={fila.hora}
-                            onChange={(event) => actualizarFila(fila.clave, { hora: event.target.value })}
+                            type="text"
+                            value={fila.observaciones}
+                            maxLength={240}
+                            placeholder="Opcional"
+                            onChange={(event) => actualizarFila(fila.clave, { observaciones: event.target.value })}
                           />
-                          <button type="button" onClick={() => actualizarFila(fila.clave, { hora: ahoraLocal() })}>
-                            Ahora
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className={styles.quitar}
+                            aria-label="Quitar de la planilla"
+                            title="Quitar de la planilla"
+                            onClick={() => setFilas((actuales) => actuales.filter((otra) => otra.clave !== fila.clave))}
+                          >
+                            ×
                           </button>
-                        </div>
-                      </td>
-                      <td>
-                        <input
-                          className={styles.rowControl}
-                          type="text"
-                          value={fila.observaciones}
-                          maxLength={240}
-                          placeholder="Opcional"
-                          onChange={(event) => actualizarFila(fila.clave, { observaciones: event.target.value })}
-                        />
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className={styles.removeButton}
-                          aria-label="Quitar de la planilla"
-                          onClick={() => setFilas((actuales) => actuales.filter((otra) => otra.clave !== fila.clave))}
-                        >
-                          Quitar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-          <div className={styles.actions}>
-            <Button type="button" variant="ghost" onClick={() => void cargarClase(idClase)} disabled={guardando}>
-              Recargar clase
-            </Button>
-            <Button type="button" onClick={() => void guardar()} disabled={guardando || filas.length === 0}>
-              {guardando ? 'Guardando...' : `Guardar asistencia (${filas.length})`}
-            </Button>
-          </div>
+              <div className={styles.actions}>
+                <Button type="button" variant="ghost" onClick={() => void cargarClase(idClase)} disabled={guardando}>
+                  Recargar clase
+                </Button>
+                <Button type="button" onClick={() => void guardar()} disabled={guardando || resumen.enPlanilla === 0}>
+                  {guardando ? 'Guardando...' : `Guardar asistencia (${resumen.enPlanilla})`}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
-      ) : null}
+      )}
     </section>
   );
 }

@@ -37,7 +37,14 @@ function texto(valor: unknown): string | null {
  * "2026-08-03T00:00:00.000Z · 08:00:00 · Programada" en el selector. Quien pasa
  * asistencia elige por día y hora, así que se arma aquí con ese formato.
  */
-export async function listarClasesDeCurso(): Promise<Array<{ value: string; label: string }>> {
+export interface ClaseDelCurso {
+  value: string;
+  label: string;
+  /** Versión de curso a la que pertenece: de ahí sale la lista de inscritos. */
+  idCursoVersion: string | null;
+}
+
+export async function listarClasesDeCurso(): Promise<ClaseDelCurso[]> {
   const response = await httpClient.get<unknown>(
     '/api/servicios_educativos/clase-curso?limit=100&orderBy=fecha&orderDir=DESC',
   );
@@ -52,9 +59,37 @@ export async function listarClasesDeCurso(): Promise<Array<{ value: string; labe
         texto(clase.estado),
         texto(clase.modalidad),
       ].filter((parte): parte is string => Boolean(parte));
-      return { value: String(id), label: partes.length ? partes.join(' · ') : `Clase ${String(id)}` };
+      return {
+        value: String(id),
+        label: partes.length ? partes.join(' · ') : `Clase ${String(id)}`,
+        idCursoVersion: texto(clase.id_curso_version),
+      };
     })
-    .filter((opcion): opcion is { value: string; label: string } => opcion !== null);
+    .filter((opcion): opcion is ClaseDelCurso => opcion !== null);
+}
+
+/**
+ * Estudiantes matriculados y vigentes en una versión de curso.
+ *
+ * Es la lista que debe proponer la planilla. Antes se ofrecían todos los
+ * estudiantes del centro, porque hasta la migración 022 el esquema no tenía cómo
+ * decir quién cursa qué: pasar asistencia obligaba a buscar a mano entre cientos
+ * de nombres y no había nada que impidiera marcar a alguien de otro curso.
+ */
+export async function listarInscritosDeCurso(idCursoVersion: string): Promise<string[]> {
+  const query = new URLSearchParams({
+    id_curso_version: idCursoVersion,
+    estado: 'ACTIVA',
+    limit: '100',
+    orderDir: 'ASC',
+  });
+  const response = await httpClient.get<unknown>(`/api/servicios_educativos/inscripcion-curso?${query.toString()}`);
+
+  return normalizeListResponse(response)
+    .filter((fila) => String(fila.id_curso_version ?? '') === String(idCursoVersion))
+    .filter((fila) => String(fila.estado ?? '').toUpperCase() === 'ACTIVA')
+    .map((fila) => texto(fila.id_estudiante))
+    .filter((id): id is string => id !== null);
 }
 
 function formatearFecha(valor: unknown): string | null {
