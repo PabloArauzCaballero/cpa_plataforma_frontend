@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+.yarn/cache/
+.yarn/install-state.gz
+
+# Artefactos de build locales
+# OJO: dist/ NO se ignora a proposito. Cloudflare sirve el contenido
+# versionado de dist/ tal cual, asi que el build publicado va al repo.
+tsconfig.tsbuildinfo
+coverage/
+
+# Entorno
+# .env.example y .env.production si se versionan: el primero documenta las
+# variables, el segundo es el que usa `yarn build` para el bundle publicado.
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# Sistema
+.DS_Store
+
+# graphify
+graphify-out/
