@@ -1,0 +1,22 @@
+// Configuración del Worker que sirve el frontend en Cloudflare.
+//
+// El deploy del panel ejecuta `npx wrangler versions upload`. Sin este archivo
+// wrangler no sabe qué subir y aborta con:
+//   Missing entry-point to Worker script or to assets directory
+// El build (`tsc -b && vite build`) termina bien; lo que fallaba era el paso
+// posterior de publicación.
+//
+// Aquí no hay Worker con código: este sitio es estático, así que se declara
+// `assets.directory` en vez de `main`. Es el mismo `dist/` que se versiona en el
+// repo —ver README— y que Cloudflare sirve tal cual.
+//
+// `name` debe coincidir exactamente con el Worker que ya existe; si no, el
+// deploy publicaría en uno distinto. Sale del dominio que el backend acepta en
+// CORS_ORIGINS: https://cpaplataformafrontend.a2020115468.workers.dev
+{
+  "name": "cpaplataformafrontend",
+  "compatibility_date": "2026-08-04",
+  "assets": {
+    "directory": "./dist"
+  }
+}
