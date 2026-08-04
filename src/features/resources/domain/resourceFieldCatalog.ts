@@ -285,6 +285,42 @@ export const resourceFieldCatalog: Record<string, FieldCatalogPatch> = {
       "positiveInteger"
     ]
   },
+  "inscripcion-curso.id_curso_version": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/servicios_educativos/curso-version",
+      "valueField": "id_curso_version",
+      "labelFields": [
+        "nombre_version",
+        "fecha_inicio",
+        "fecha_fin"
+      ],
+      "resourceKey": "curso-version"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": [
+      "positiveInteger"
+    ]
+  },
+  "inscripcion-curso.id_estudiante": {
+    "type": "select",
+    "relation": {
+      "endpoint": "/api/personas/estudiante",
+      "valueField": "id_persona",
+      "labelFields": [
+        "codigo_estudiante",
+        "nombre_completo",
+        "tipo"
+      ],
+      "resourceKey": "estudiante"
+    },
+    "selectSource": "foreignKey",
+    "valueKind": "number",
+    "checks": [
+      "positiveInteger"
+    ]
+  },
   "asistencia-clase-curso.id_clase_curso": {
     "type": "select",
     "relation": {
