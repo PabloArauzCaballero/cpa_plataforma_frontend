@@ -1,0 +1,89 @@
+.cue {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  /* Por encima del pie, para no taparlo al llegar abajo. */
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-glass-strong);
+  color: var(--text-on-light);
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  transition:
+    opacity var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out),
+    background var(--motion-micro) var(--ease-in-out);
+}
+
+/* Oculto: además de invisible queda fuera del alcance del puntero, para que no
+   intercepte clics sobre el contenido que hay debajo. */
+.cue[data-visible='false'] {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.cue[data-visible='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cue:hover {
+  background: var(--surface-1);
+  border-color: var(--color-secondary);
+}
+
+.cue i {
+  color: var(--color-secondary);
+  animation: cueBob 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes cueBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+/* En móvil el texto ocuparía un tercio del ancho y compite con las acciones
+   de la pantalla; queda sólo la flecha, con su etiqueta accesible intacta. */
+@media (max-width: 560px) {
+  .cue {
+    padding: 0.7rem;
+    min-width: 2.75rem;
+    justify-content: center;
+  }
+
+  .cue span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue {
+    transition: opacity var(--motion-base) linear;
+  }
+
+  .cue[data-visible='false'] {
+    transform: none;
+  }
+
+  .cue i {
+    animation: none;
+  }
+}

@@ -166,10 +166,11 @@
 }
 
 .tableWrap {
+  composes: scrollShadow scrollShadowX from global;
   overflow-x: auto;
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--surface-1);
+  background-color: var(--surface-1);
   box-shadow: 0 8px 22px rgba(0, 37, 95, 0.05);
 }
 

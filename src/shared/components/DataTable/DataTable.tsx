@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { useScrollAffordance } from '@/shared/hooks/useScrollAffordance';
 import styles from './DataTable.module.css';
 import { TUTORIAL_ANCHORS, tutorialAnchor } from '@/features/tutorials/domain/tutorialAnchors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -77,9 +79,17 @@ export function DataTable({
   canDisable,
   getRowHourTone,
 }: DataTableProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const affordance = useScrollAffordance(scrollRef);
+
   return (
-    <div className={styles.tableWrap} {...tutorialAnchor(TUTORIAL_ANCHORS.resourceTable)}>
-      <table className={styles.table}>
+    <div className={styles.tableWrapper}>
+      <div
+        ref={scrollRef}
+        className={styles.tableWrap}
+        {...tutorialAnchor(TUTORIAL_ANCHORS.resourceTable)}
+      >
+        <table className={styles.table}>
         <thead>
           <tr>
             {columns.map((column) => (
@@ -132,7 +142,24 @@ export function DataTable({
             );
           })}
         </tbody>
-      </table>
+        </table>
+      </div>
+
+      {/* Las sombras van ENCIMA del contenido, no detrás: las celdas tienen
+          fondo propio y opaco, así que un degradado pintado en el fondo del
+          contenedor quedaría tapado por las filas y no se vería. */}
+      <span className={styles.edge} data-side="left" data-on={affordance.moreLeft} aria-hidden="true" />
+      <span className={styles.edge} data-side="right" data-on={affordance.moreRight} aria-hidden="true" />
+
+      {/* La sombra del borde ya dice "hay más"; esto dice qué hacer. Muchas
+          personas no intentan desplazar una tabla en horizontal si nadie se lo
+          sugiere. Desaparece al llegar al final. */}
+      {affordance.overflowsX ? (
+        <p className={`${styles.hint} scrollHint`} data-visible={affordance.moreRight} aria-hidden="true">
+          Desliza para ver más columnas
+          <i className="fa-solid fa-arrow-right-long" />
+        </p>
+      ) : null}
     </div>
   );
 }

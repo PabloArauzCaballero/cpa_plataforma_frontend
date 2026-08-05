@@ -1,8 +1,22 @@
+/* Envoltorio que NO se desplaza: sostiene el aviso para que no viaje con el
+   contenido al deslizar la tabla.
+
+   `min-width: 0` es imprescindible. Un hijo de grid o flex arranca con
+   `min-width: auto`, que le deja crecer hasta caber su contenido; sin esto el
+   envoltorio se estira a lo ancho de la tabla y quien se desplaza es la PÁGINA
+   entera, no la tabla. */
+.tableWrapper {
+  position: relative;
+  min-width: 0;
+}
+
 .tableWrap {
   overflow-x: auto;
   border-radius: calc(var(--radius-lg) + 2px);
   border: 1px solid var(--border-hairline);
-  background: var(--surface-1);
+  /* `background-color`, no `background`: la utilidad `scrollShadow` ocupa las
+     capas de `background-image` para dibujar las sombras de borde. */
+  background-color: var(--surface-1);
   box-shadow: var(--shadow-soft), inset 0 1px 0 var(--surface-sheen);
   -webkit-overflow-scrolling: touch;
 }
@@ -163,3 +177,42 @@
 .table tbody tr[data-hour-tone='5'] td { background: rgba(154, 169, 187, 0.16) !important; }
 .table tbody tr[data-hour-tone='6'] td { background: rgba(32, 160, 197, 0.18) !important; }
 .table tbody tr[data-hour-tone='7'] td { background: rgba(1, 43, 101, 0.13) !important; }
+
+/* ── Sombras de borde por encima del contenido ─────────────────────────────
+   Se apoyan en `.tableWrapper`, que no se desplaza, así que quedan fijas
+   mientras la tabla corre por debajo. Aparecen sólo del lado donde queda
+   contenido por ver. */
+.edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+
+.edge[data-on='true'] {
+  opacity: 1;
+}
+
+.edge[data-side='left'] {
+  left: 0;
+  border-radius: calc(var(--radius-lg) + 2px) 0 0 calc(var(--radius-lg) + 2px);
+  background: linear-gradient(to right, var(--scroll-edge), transparent);
+}
+
+.edge[data-side='right'] {
+  right: 0;
+  border-radius: 0 calc(var(--radius-lg) + 2px) calc(var(--radius-lg) + 2px) 0;
+  background: linear-gradient(to left, var(--scroll-edge), transparent);
+}
+
+.tableWrapper {
+  --scroll-edge: rgba(1, 43, 101, 0.18);
+}
+
+/* Sobre fondo oscuro una sombra azulada no se percibe: hace falta negro. */
+:global(:root[data-theme='dark']) .tableWrapper {
+  --scroll-edge: rgba(0, 0, 0, 0.55);
+}

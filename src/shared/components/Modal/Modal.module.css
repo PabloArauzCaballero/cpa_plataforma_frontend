@@ -21,12 +21,13 @@
 }
 
 .modal {
+  composes: scrollShadow scrollShadowY from global;
   width: min(1180px, calc(100vw - 2rem));
   max-height: min(92vh, 930px);
   overflow: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  background: var(--surface-1);
+  background-color: var(--surface-1);
   color: var(--text-on-light);
   border-radius: calc(var(--radius-lg) + 6px);
   border: 1px solid rgba(255, 255, 255, 0.6);

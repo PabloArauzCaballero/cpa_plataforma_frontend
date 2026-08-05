@@ -1,0 +1,156 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   SEÑALES DE DESPLAZAMIENTO
+
+   Problema: un contenedor con `overflow: auto` corta el contenido sin avisar.
+   Una tabla ancha se ve truncada a la derecha y una lista larga parece
+   terminar donde termina la caja. Sin una señal, se lee como un fallo de la
+   aplicación —"está cortado", "está roto"— y no como algo que se desplaza.
+
+   Solución: una sombra en el borde que SOLO aparece cuando hay contenido
+   escondido en esa dirección, y desaparece sola al llegar al final.
+
+   Cómo funciona, sin una línea de JavaScript:
+
+     - Las capas `local` (las "tapas") se desplazan CON el contenido. En
+       reposo cubren la sombra del borde donde ya no hay nada más.
+     - Las capas `scroll` (las sombras) quedan fijas al contenedor.
+
+   Al desplazarse, la tapa se va con el contenido y deja ver la sombra. Es
+   decir: la sombra aparece y desaparece sola, sin escuchar eventos de
+   scroll ni recalcular nada en cada frame.
+
+   Uso desde JSX:      <div class="scrollShadow scrollShadowX">
+   Uso desde un módulo CSS (no hace falta tocar el JSX):
+
+     .miTabla { composes: scrollShadow scrollShadowX from global; }
+
+   El color de la tapa debe coincidir con el fondo real del contenedor. Si
+   no es `--surface-1`, se ajusta con `--scroll-cover` en ese contenedor.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.scrollShadow {
+  --scroll-cover: var(--surface-1);
+  --scroll-shade: rgba(1, 43, 101, 0.16);
+  --scroll-cover-size: 2.5rem;
+  --scroll-shade-size: 0.95rem;
+
+  background-repeat: no-repeat;
+  /* Las tapas van declaradas ANTES: se pintan encima de las sombras. */
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* ── Horizontal: tablas anchas ─────────────────────────────────────────── */
+.scrollShadowX {
+  background-image:
+    linear-gradient(to right, var(--scroll-cover), transparent),
+    linear-gradient(to left, var(--scroll-cover), transparent),
+    linear-gradient(to right, var(--scroll-shade), transparent),
+    linear-gradient(to left, var(--scroll-shade), transparent);
+  background-position: left center, right center, left center, right center;
+  background-size:
+    var(--scroll-cover-size) 100%,
+    var(--scroll-cover-size) 100%,
+    var(--scroll-shade-size) 100%,
+    var(--scroll-shade-size) 100%;
+}
+
+/* ── Vertical: modales, menú lateral, paneles largos ───────────────────── */
+.scrollShadowY {
+  background-image:
+    linear-gradient(to bottom, var(--scroll-cover), transparent),
+    linear-gradient(to top, var(--scroll-cover), transparent),
+    linear-gradient(to bottom, var(--scroll-shade), transparent),
+    linear-gradient(to top, var(--scroll-shade), transparent);
+  background-position: center top, center bottom, center top, center bottom;
+  background-size:
+    100% var(--scroll-cover-size),
+    100% var(--scroll-cover-size),
+    100% var(--scroll-shade-size),
+    100% var(--scroll-shade-size);
+}
+
+/* ── Ambos ejes ───────────────────────────────────────────────────────── */
+.scrollShadowXY {
+  background-image:
+    linear-gradient(to right, var(--scroll-cover), transparent),
+    linear-gradient(to left, var(--scroll-cover), transparent),
+    linear-gradient(to bottom, var(--scroll-cover), transparent),
+    linear-gradient(to top, var(--scroll-cover), transparent),
+    linear-gradient(to right, var(--scroll-shade), transparent),
+    linear-gradient(to left, var(--scroll-shade), transparent),
+    linear-gradient(to bottom, var(--scroll-shade), transparent),
+    linear-gradient(to top, var(--scroll-shade), transparent);
+  background-position:
+    left center, right center, center top, center bottom,
+    left center, right center, center top, center bottom;
+  background-size:
+    var(--scroll-cover-size) 100%, var(--scroll-cover-size) 100%,
+    100% var(--scroll-cover-size), 100% var(--scroll-cover-size),
+    var(--scroll-shade-size) 100%, var(--scroll-shade-size) 100%,
+    100% var(--scroll-shade-size), 100% var(--scroll-shade-size);
+  background-attachment: local, local, local, local, scroll, scroll, scroll, scroll;
+}
+
+/* En oscuro la sombra tiene que ser más negra y más marcada: una sombra azul
+   translúcida sobre un fondo ya oscuro no se percibe. */
+:root[data-theme='dark'] .scrollShadow {
+  --scroll-shade: rgba(0, 0, 0, 0.5);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   AVISO EXPLÍCITO
+
+   La sombra comunica "hay más", pero no dice qué hacer. En una tabla ancha
+   —donde además mucha gente no intenta desplazar en horizontal— conviene
+   decirlo con palabras. Se muestra sólo mientras la tabla desborda y aún no
+   se ha llegado al final; lo controla `useScrollAffordance`.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Se posiciona contra el contenedor, NO contra el elemento que se desplaza:
+   si viviera dentro del scroller se iría con el contenido al deslizar. Quien
+   lo use debe envolverlo en un elemento `position: relative` que no scrollee. */
+.scrollHint {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-glass-strong);
+  color: var(--text-on-light-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+
+.scrollHint[data-visible='false'] {
+  opacity: 0;
+}
+
+.scrollHint i {
+  color: var(--color-secondary);
+  animation: scrollHintNudge 1.6s var(--ease-in-out) infinite;
+}
+
+/* Un empujoncito de tres píxeles: sugiere la dirección del gesto sin
+   convertirse en un elemento que se mueve todo el rato en el rabillo del ojo. */
+@keyframes scrollHintNudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollHint i {
+    animation: none;
+  }
+}

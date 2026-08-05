@@ -431,6 +431,7 @@
 }
 
 .permissionTableWrapper {
+  composes: scrollShadow scrollShadowXY from global;
   overflow-x: auto;
   overflow-y: auto;
   max-height: 30rem;
