@@ -11,12 +11,30 @@
     <link rel="apple-touch-icon" href="/logo.png" />
     <meta name="theme-color" content="#00255f" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <script type="module" crossorigin src="/assets/index-yI70d6Bc.js"></script>
+    <script type="module" crossorigin src="/assets/index-CHGrVha6.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/jsx-runtime-bzQ4Vb5N.js">
     <link rel="modulepreload" crossorigin href="/assets/resourceDefinitions-Bd6doClK.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-DUNyvY_C.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CdCPFIlJ.css">
   </head>
   <body>
+    <!-- Tema aplicado antes de que React monte nada. Si esto viviera en el
+         bundle, la página se pintaría primero en claro y saltaría a oscuro al
+         hidratar: un destello blanco en cada carga. Mantener en sintonía con
+         src/shared/theme/theme.ts (misma clave y mismo atributo). -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('cpa.theme.v1');
+          var theme = stored === 'light' || stored === 'dark'
+            ? stored
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
     <div id="root"></div>
   </body>
 </html>
