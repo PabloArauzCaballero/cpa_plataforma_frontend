@@ -1,11 +1,34 @@
 .button {
+  position: relative;
+  overflow: hidden;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  padding: 0.78rem 1rem;
+  padding: 0.78rem 1.05rem;
   cursor: pointer;
   font-weight: 700;
   letter-spacing: 0.01em;
-  transition: transform 160ms ease, background 160ms ease, border 160ms ease, opacity 160ms ease;
+  transition:
+    transform var(--motion-micro) var(--ease-out),
+    background var(--motion-micro) var(--ease-in-out),
+    border-color var(--motion-micro) var(--ease-in-out),
+    box-shadow var(--motion-micro) var(--ease-out),
+    opacity var(--motion-micro) var(--ease-in-out);
+}
+
+/* Barrido de luz al pasar el cursor: un pseudo-elemento que se desplaza con
+   `transform`, sin repintar el botón ni provocar reflow. */
+.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22), transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 620ms var(--ease-out);
+}
+
+.button:hover:not(:disabled)::after {
+  transform: translateX(120%);
 }
 
 .button:hover:not(:disabled) {
@@ -22,36 +45,72 @@
   opacity: 0.62;
 }
 
+/* Sin cursor el barrido no llega a dispararse nunca y sólo añade una capa
+   más que componer en cada scroll. */
+@media (pointer: coarse) {
+  .button::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button::after {
+    display: none;
+  }
+}
+
 .primary {
-  background: var(--color-button-primary);
+  /* Degradado leve en vez de color plano: da volumen a la acción principal
+     sin subir la saturación de la marca. */
+  background: linear-gradient(180deg, #29AFD4 0%, var(--color-button-primary) 100%);
   color: var(--color-white);
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    0 8px 20px color-mix(in srgb, var(--color-secondary) 32%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--color-button-primary-hover);
+  background: linear-gradient(180deg, var(--color-button-primary) 0%, var(--color-button-primary-hover) 100%);
+  box-shadow:
+    0 12px 26px color-mix(in srgb, var(--color-secondary) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .secondary {
-  background: var(--color-surface);
+  background: linear-gradient(180deg, var(--color-primary-soft) 0%, var(--color-primary) 100%);
   color: var(--color-text-primary);
-  border-color: var(--color-border);
+  border-color: var(--border-on-dark);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.secondary:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
 .ghost {
-  background: var(--color-white);
-  color: var(--color-primary);
-  border-color: var(--color-border);
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
 
+/* Antes era azul marino, visualmente idéntico a una acción normal. Ahora usa
+   el color semántico de peligro, que es lo que la variante promete. */
 .danger {
-  background: var(--color-primary-dark);
-  color: var(--color-text-primary);
-  border-color: var(--color-border);
+  background: linear-gradient(180deg, #C7362B 0%, var(--state-danger-fg) 100%);
+  color: var(--color-white);
+  box-shadow:
+    0 8px 20px color-mix(in srgb, var(--state-danger-fg) 30%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.danger:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--state-danger-fg) 0%, #8C1D15 100%);
 }
 
 .fullWidth {

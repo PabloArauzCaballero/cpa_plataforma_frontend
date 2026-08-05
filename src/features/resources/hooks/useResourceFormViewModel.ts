@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceFieldDefinition, SelectOption } from '../domain/CrudResource';
-import { listLookupOptions } from '../services/lookupApi';
+import { createLookupOption, listLookupOptions } from '../services/lookupApi';
 import { validateResourcePayload } from '@/shared/validation/formValidation';
 
 function stringifyInitialValue(value: unknown): string | number | boolean {
@@ -204,6 +204,34 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     return Boolean(loadingRelationFields[field.name]);
   }
 
+  /**
+   * Da de alta una opción del catálogo sin salir del formulario y la deja
+   * seleccionada.
+   *
+   * La opción nueva se inserta en la lista que ya está en memoria en vez de
+   * recargar la relación entera: recargar significa otra vuelta a la red y, con
+   * cientos de unidades educativas, un parpadeo del campo justo después de
+   * elegir. El id que se guarda es el que devolvió el servidor.
+   */
+  async function createFieldOption(
+    field: ResourceFieldDefinition,
+    values: Record<string, unknown>,
+  ): Promise<SelectOption> {
+    if (!field.relation) throw new Error('El campo no apunta a ningún catálogo.');
+
+    const option = await createLookupOption(field.relation, values);
+    setRelationOptions((current) => {
+      const existing = current[field.name] ?? [];
+      const withoutDuplicate = existing.filter((item) => String(item.value) !== String(option.value));
+      return {
+        ...current,
+        [field.name]: [...withoutDuplicate, option].sort((a, b) => String(a.label).localeCompare(String(b.label), 'es')),
+      };
+    });
+    setField(field.name, option.value);
+    return option;
+  }
+
   function isFieldVisible(field: ResourceFieldDefinition): boolean {
     if (!field.visibleWhen) return true;
     return conditionMatches(payload, field.visibleWhen);
@@ -238,5 +266,6 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     getFieldOptions,
     isLoadingFieldOptions,
     isFieldVisible,
+    createFieldOption,
   };
 }

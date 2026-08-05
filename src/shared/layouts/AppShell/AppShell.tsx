@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
+import { AmbientBackground } from '@/shared/components/Background';
 import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
 import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
@@ -131,7 +132,8 @@ function AppShellLayout({ children }: AppShellProps) {
           })}
         </nav>
       </aside>
-      <div className={styles.mainArea}>
+      <div className={`${styles.mainArea} bgSurface`} data-bg="app">
+        <AmbientBackground variant="app" />
         <header className={styles.header}>
           <div className={styles.headerBrand}>
             <button

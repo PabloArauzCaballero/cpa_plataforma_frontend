@@ -7,9 +7,10 @@
   margin: 0;
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  color: var(--color-primary);
-  background: var(--color-white);
-  border: 1px solid var(--color-neutral-light);
+  color: var(--text-on-light);
+  background: var(--surface-1);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-xs);
   font-weight: 700;
 }
 
@@ -20,10 +21,11 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid var(--color-neutral-light);
-  border-radius: var(--radius-lg);
-  background: var(--color-white);
-  color: var(--color-primary);
+  border: 1px solid var(--border-hairline);
+  border-radius: calc(var(--radius-lg) + 2px);
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   font-weight: 700;
 }
 
@@ -34,11 +36,11 @@
 }
 
 .pagination select {
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 0.55rem 0.75rem;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font-weight: 700;
 }
 
@@ -48,13 +50,22 @@
 }
 
 .paginationActions button {
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   padding: 0.65rem 0.9rem;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: background var(--motion-micro) var(--ease-in-out),
+    border-color var(--motion-micro) var(--ease-in-out);
+}
+
+.paginationActions button:not(:disabled):hover {
+  background: var(--surface-2);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-dark);
 }
 
 .paginationActions button:disabled {
@@ -68,10 +79,10 @@
   flex-wrap: wrap;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--color-secondary) 56%, transparent);
+  border: 1px solid var(--state-info-border);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-secondary) 10%, var(--color-white));
-  color: var(--color-primary);
+  background: var(--state-info-bg);
+  color: var(--state-info-fg);
 }
 
 .feedback {
@@ -92,19 +103,21 @@
 }
 
 .feedback[data-status='success'] .feedbackIcon {
-  color: #166534;
-  background: color-mix(in srgb, #16a34a 14%, var(--color-white));
+  color: var(--state-success-fg);
+  background: var(--state-success-bg);
+  box-shadow: 0 0 0 1px var(--state-success-border);
 }
 
 .feedback[data-status='error'] .feedbackIcon {
-  color: #b42318;
-  background: color-mix(in srgb, #b42318 12%, var(--color-white));
+  color: var(--state-danger-fg);
+  background: var(--state-danger-bg);
+  box-shadow: 0 0 0 1px var(--state-danger-border);
 }
 
 .feedback p {
   margin: 0;
   max-width: 34rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 650;
   line-height: 1.6;
 }

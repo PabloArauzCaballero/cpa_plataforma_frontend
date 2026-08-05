@@ -23,13 +23,13 @@
 }
 
 .sectionHeader h3 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: clamp(1.45rem, 3vw, 2rem);
   letter-spacing: -0.025em;
 }
 
 .sectionHeader p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.6;
 }
 
@@ -39,6 +39,14 @@
   gap: clamp(1rem, 1.7vw, 1.35rem);
 }
 
+/* Los módulos son nueve. En cuatro columnas la última fila queda con una
+   sola tarjeta huérfana; en tres cuadra en un 3×3 exacto. */
+@media (min-width: 1180px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .card {
   position: relative;
   display: grid;
@@ -46,28 +54,60 @@
   gap: var(--space-5);
   min-height: 17rem;
   padding: clamp(1.2rem, 2vw, 1.5rem);
-  background: var(--color-white);
-  color: var(--color-primary);
-  border: 1px solid color-mix(in srgb, var(--color-neutral-light) 86%, var(--color-secondary));
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  border: 1px solid var(--border-hairline);
   border-radius: calc(var(--radius-lg) + 2px);
   box-shadow: 0 10px 28px rgba(0, 37, 95, 0.08);
   overflow: hidden;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: transform var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out),
+    border-color var(--motion-base) var(--ease-out);
 }
 
 .card::before {
   content: '';
   position: absolute;
   inset: 0 0 auto;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, var(--color-secondary), rgba(32, 160, 197, 0.12));
   opacity: 0.82;
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+
+/* Luz de marca que sólo aparece al apuntar la tarjeta: refuerza cuál está
+   activa sin añadir un borde de color permanente a las nueve. */
+.card::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -30% -30% auto auto;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, rgba(32, 160, 197, 0.16), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-out);
+  pointer-events: none;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--color-secondary) 38%, var(--color-neutral-light));
-  box-shadow: 0 18px 40px rgba(0, 37, 95, 0.14);
+  border-color: var(--border-brand);
+  box-shadow: 0 20px 44px rgba(0, 37, 95, 0.15);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover::after {
+  opacity: 1;
 }
 
 .cardTop {
@@ -89,18 +129,21 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-secondary) 18%, transparent);
 }
 
+/* La etiqueta de área es contexto, no titular: antes iba en mayúsculas y
+   negrita máxima, partía en dos líneas y competía con el nombre del módulo.
+   Ahora es una nota discreta de una sola línea. */
 .tag {
   max-width: 11rem;
-  padding: 0.42rem 0.65rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
-  background: var(--color-surface-soft);
-  color: var(--color-accent);
-  font-size: 0.72rem;
-  font-weight: 900;
-  line-height: 1.2;
+  background: var(--surface-3);
+  color: var(--text-on-light-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
   text-align: right;
   text-transform: uppercase;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.03em;
 }
 
 .cardBody {
@@ -120,7 +163,7 @@
 }
 
 .card p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.62;
   font-size: 0.95rem;
 }
@@ -136,7 +179,8 @@
   background: var(--color-primary);
   color: var(--color-white);
   font-weight: 900;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background var(--motion-micro) var(--ease-in-out),
+    transform var(--motion-micro) var(--ease-out);
 }
 
 .cardLink:hover {
@@ -144,7 +188,7 @@
 }
 
 .cardLink i {
-  transition: transform 0.2s ease;
+  transition: transform var(--motion-micro) var(--ease-out);
 }
 
 .cardLink:hover i {

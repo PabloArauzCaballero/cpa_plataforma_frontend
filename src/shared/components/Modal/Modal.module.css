@@ -6,9 +6,14 @@
      cabe, se alinea al inicio en vez de desbordar hacia arriba sin scroll. */
   place-items: safe center;
   padding: clamp(1rem, 2vw, 2rem);
-  background: color-mix(in srgb, var(--color-primary-dark) 78%, transparent);
+  /* Fondo del velo: azul de marca muy oscuro + desenfoque. La pantalla de
+     detrás sigue reconocible, así que el modal se lee como una capa encima y
+     no como un cambio de página. */
+  background: color-mix(in srgb, #00142F 72%, transparent);
+  backdrop-filter: blur(5px) saturate(115%);
+  -webkit-backdrop-filter: blur(5px) saturate(115%);
   z-index: 50;
-  animation: fadeIn 0.18s ease both;
+  animation: fadeIn var(--motion-micro) var(--ease-out) both;
   /* Si el contenido excede la altura disponible, el backdrop hace de scroller;
      el modal nunca queda con su cabecera fuera de la pantalla. */
   overflow-y: auto;
@@ -21,12 +26,14 @@
   overflow: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  background: var(--color-white);
-  color: var(--color-primary);
-  border-radius: calc(var(--radius-lg) + 4px);
-  border: 1px solid color-mix(in srgb, var(--color-secondary) 22%, var(--color-border));
-  box-shadow: 0 28px 80px rgba(0, 37, 95, 0.32);
-  animation: modalIn 0.22s ease both;
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  border-radius: calc(var(--radius-lg) + 6px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 40px 90px rgba(0, 20, 47, 0.42),
+    0 0 0 1px rgba(1, 43, 101, 0.06);
+  animation: modalIn var(--motion-base) var(--ease-out) both;
 }
 
 /* Avisos y confirmaciones de resultado: el ancho de formulario deja la frase
@@ -49,9 +56,9 @@
 }
 
 .modal::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--color-primary) 32%, transparent);
+  background: var(--border-strong);
   border-radius: 999px;
-  border: 3px solid var(--color-white);
+  border: 3px solid var(--surface-1);
 }
 
 .header {
@@ -63,15 +70,16 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: clamp(1.25rem, 2.2vw, 1.85rem) clamp(1.5rem, 3vw, 2.25rem);
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid var(--color-neutral-light);
-  backdrop-filter: blur(10px);
+  background: var(--surface-glass-strong);
+  border-bottom: 1px solid var(--border-hairline);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
 
 .header h2 {
   margin: 0;
   font-size: clamp(1.25rem, 2vw, 1.55rem);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   letter-spacing: -0.025em;
 }
 

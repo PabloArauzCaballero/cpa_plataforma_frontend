@@ -60,4 +60,121 @@
   --ring-focus: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 32%, transparent);
   --transition-base: 160ms cubic-bezier(0.4, 0, 0.2, 1);
   --sidebar-width: 18.5rem;
+
+  /* ══════════════════════════════════════════════════════════════════════
+     SUPERFICIES
+
+     Antes sólo existían `--color-white` y `--color-surface-soft`, así que
+     todo terminaba siendo una caja blanca sobre un fondo casi blanco y la
+     interfaz se leía plana. Esta escala da tres niveles de elevación
+     percibida sobre el lienzo, más un tono translúcido para los paneles
+     que se apoyan sobre el fondo ambiental sin taparlo.
+     ══════════════════════════════════════════════════════════════════════ */
+  --surface-canvas: #EEF3F8;
+  --surface-1: #FFFFFF;
+  --surface-2: #F7FAFC;
+  --surface-3: #EDF2F7;
+  --surface-sunken: #E7EDF4;
+  --surface-glass: rgba(255, 255, 255, 0.78);
+  --surface-glass-strong: rgba(255, 255, 255, 0.92);
+
+  /* Bordes sobre superficie clara. `--color-border` (#195687) es azul
+     oscuro: sirve sobre fondos oscuros, pero como contorno de una tarjeta
+     blanca se ve como un borde de depuración. Estos son sus reemplazos. */
+  --border-hairline: rgba(1, 43, 101, 0.09);
+  --border-subtle: rgba(1, 43, 101, 0.14);
+  --border-strong: rgba(1, 43, 101, 0.22);
+  --border-brand: color-mix(in srgb, var(--color-secondary) 34%, transparent);
+  /* Bordes sobre superficie oscura (sidebar, héroes, modo oscuro). */
+  --border-on-dark: rgba(255, 255, 255, 0.14);
+  --border-on-dark-strong: rgba(255, 255, 255, 0.24);
+
+  /* Texto sobre superficie clara: la jerarquía antes se apoyaba en
+     `--color-accent`, que es un azul de marca, no un gris de texto. */
+  --text-on-light: #0B2545;
+  --text-on-light-secondary: #3D5A80;
+  --text-on-light-muted: #6B7F99;
+
+  /* ══════════════════════════════════════════════════════════════════════
+     MOTION
+
+     Escala única para toda la app. Antes había 0.18s, 0.2s, 0.22s, 160ms,
+     240ms y 260ms repartidos por doce archivos sin criterio compartido.
+     ══════════════════════════════════════════════════════════════════════ */
+  --motion-micro: 140ms;   /* hover, press, cambios de color */
+  --motion-base: 220ms;    /* despliegues, entradas de componente */
+  --motion-view: 380ms;    /* transición de vista/ruta */
+  --motion-ambient: 24s;   /* movimiento de fondo, lento y continuo */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     ESTADOS SEMÁNTICOS
+
+     Cada estado es una tripleta fondo/borde/texto pensada para cumplir
+     contraste AA sobre superficie clara. El color nunca es el único
+     portador del significado: los componentes acompañan con icono y texto.
+     ══════════════════════════════════════════════════════════════════════ */
+  --state-success-fg: #14663D;
+  --state-success-bg: #E6F6EE;
+  --state-success-border: rgba(20, 102, 61, 0.28);
+
+  --state-warning-fg: #8A5300;
+  --state-warning-bg: #FFF4E0;
+  --state-warning-border: rgba(138, 83, 0, 0.26);
+
+  --state-danger-fg: #A4231A;
+  --state-danger-bg: #FDECEA;
+  --state-danger-border: rgba(164, 35, 26, 0.26);
+
+  --state-info-fg: #1A5F8A;
+  --state-info-bg: #E6F3F9;
+  --state-info-border: rgba(26, 95, 138, 0.26);
+
+  --state-neutral-fg: #4A5B70;
+  --state-neutral-bg: #EEF1F5;
+  --state-neutral-border: rgba(74, 91, 112, 0.22);
+
+  --state-progress-fg: #4A3A9E;
+  --state-progress-bg: #EFEBFB;
+  --state-progress-border: rgba(74, 58, 158, 0.24);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     FONDOS (ver backgrounds.css para las capas que los consumen)
+     ══════════════════════════════════════════════════════════════════════ */
+  --bg-base: var(--surface-canvas);
+  --bg-mesh-a: rgba(32, 160, 197, 0.16);
+  --bg-mesh-b: rgba(1, 43, 101, 0.10);
+  --bg-mesh-c: rgba(25, 86, 135, 0.08);
+  --bg-grid-line: rgba(1, 43, 101, 0.05);
+  --bg-grid-size: 30px;
+  --bg-noise-opacity: 0.028;
+  --bg-glow-strength: 0.5;
+
+  /* Opacidad global de la capa decorativa. Cualquier contexto puede bajarla
+     (tablas, formularios) sin reescribir las capas. */
+  --bg-decor-opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MODO OSCURO — capa de fondo y tokens de superficie
+
+   Alcance deliberado: se adaptan el sistema de fondos, las superficies,
+   los bordes y los estados. NO es una inversión automática de toda la
+   aplicación: las pantallas de módulos todavía fijan colores claros en sus
+   propios módulos CSS y convertirlas requiere tocar archivos que ahora
+   mismo están siendo editados por otros agentes. Ver el informe final.
+   ════════════════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #07142B;
+    --bg-mesh-a: rgba(32, 160, 197, 0.20);
+    --bg-mesh-b: rgba(14, 62, 116, 0.34);
+    --bg-mesh-c: rgba(1, 43, 101, 0.30);
+    --bg-grid-line: rgba(255, 255, 255, 0.045);
+    --bg-noise-opacity: 0.035;
+    --bg-glow-strength: 0.72;
+  }
 }

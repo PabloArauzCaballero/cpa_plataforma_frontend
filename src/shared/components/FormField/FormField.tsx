@@ -1,5 +1,5 @@
 import { InfoHint } from '../Tooltip';
-import { SearchableSelect } from './SearchableSelect';
+import { SearchableSelect, type QuickCreateConfig } from './SearchableSelect';
 import styles from './FormField.module.css';
 
 /** Desde cuántas opciones conviene buscar por texto en vez de desplegar la lista. */
@@ -24,6 +24,8 @@ interface FormFieldProps {
   helpText?: string;
   disabled?: boolean;
   isLoadingOptions?: boolean;
+  quickCreate?: QuickCreateConfig;
+  onCreateOption?: (values: Record<string, unknown>) => Promise<unknown>;
   onChange: (value: string | number | boolean) => void;
 }
 
@@ -57,6 +59,8 @@ export function FormField({
   helpText,
   disabled = false,
   isLoadingOptions = false,
+  quickCreate,
+  onCreateOption,
   onChange,
 }: FormFieldProps) {
   if (type === 'checkbox') {
@@ -100,6 +104,8 @@ export function FormField({
             value={value}
             disabled={disabled}
             isLoadingOptions={isLoadingOptions}
+            quickCreate={quickCreate}
+            onCreateOption={onCreateOption}
             onChange={onChange}
           />
           {error ? <small className={styles.error}>{error}</small> : null}

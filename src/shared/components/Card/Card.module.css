@@ -1,15 +1,27 @@
 .card {
-  border-radius: var(--radius-lg);
-  border: 1px solid color-mix(in srgb, var(--color-neutral-light) 84%, var(--color-secondary));
+  position: relative;
+  border-radius: calc(var(--radius-lg) + 2px);
+  border: 1px solid var(--border-hairline);
   box-shadow: var(--shadow-soft);
+  transition: box-shadow var(--motion-base) var(--ease-out),
+    border-color var(--motion-base) var(--ease-out);
 }
 
 .light {
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  /* Luz interior en el canto superior: el realce de material que separa la
+     tarjeta del lienzo sin tener que subir la opacidad de la sombra. */
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .dark {
-  background: var(--gradient-card-dark);
+  /* La tarjeta oscura recibe su propia luz de marca en la esquina, para que
+     un bloque grande no se lea como un rectángulo azul liso. */
+  background:
+    radial-gradient(circle at 88% -10%, rgba(32, 160, 197, 0.2), transparent 55%),
+    var(--gradient-card-dark);
   color: var(--color-text-primary);
+  border-color: var(--border-on-dark);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }

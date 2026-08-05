@@ -219,3 +219,71 @@
   color: var(--color-accent);
   font-size: 0.92rem;
 }
+
+/* Alta de una opción sin salir del formulario, cuando la búsqueda no encuentra
+   nada. El caso real es el colegio que todavía no está en el catálogo. */
+.searchableCreate {
+  border-top: 1px solid var(--color-neutral-light);
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+}
+
+.searchableCreate > button {
+  color: var(--color-secondary);
+  font-weight: 800;
+}
+
+.searchableCreateForm {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0.5rem 0.65rem;
+}
+
+.searchableCreateForm strong {
+  color: var(--color-primary);
+}
+
+.searchableCreateForm label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+/* El select vive dentro de la lista desplegable, fuera del alcance de las
+   reglas de .field, así que necesita su propio aspecto. */
+.searchableCreateForm select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.searchableCreateActions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.searchableCreateActions button {
+  width: auto;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  font-weight: 700;
+}
+
+.searchableCreateActions button:last-child {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.searchableCreateError {
+  color: #a01717;
+  font-weight: 700;
+}

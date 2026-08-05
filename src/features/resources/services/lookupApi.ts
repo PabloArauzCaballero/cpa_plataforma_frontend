@@ -105,3 +105,36 @@ export async function listAllLookupOptions(relation: ResourceLookupRelation, pag
 
   return recordsToOptions(collected.slice(0, maxRecords), relation);
 }
+
+/**
+ * Da de alta un registro del catálogo al que apunta la relación y devuelve la
+ * opción ya lista para seleccionar.
+ *
+ * Existe para el caso de las unidades educativas: el catálogo nunca va a estar
+ * completo —hay cientos de colegios y el listado oficial cambia—, así que quien
+ * registra a un estudiante necesita poder añadir el suyo sin abandonar el
+ * formulario ni perder lo que llevaba escrito.
+ *
+ * La respuesta del POST se reutiliza para construir la opción en vez de volver
+ * a pedir la lista entera: así el id que queda seleccionado es exactamente el
+ * que creó el servidor, y no uno deducido por nombre que podría chocar con un
+ * homónimo ya existente.
+ */
+export async function createLookupOption(
+  relation: ResourceLookupRelation,
+  payload: Record<string, unknown>,
+): Promise<SelectOption> {
+  const response = await httpClient.post<unknown, Record<string, unknown>>(relation.endpoint, payload);
+  const [created] = normalizeListResponse(response);
+
+  const record = created ?? payload;
+  const value = record[relation.valueField];
+  if (value === undefined || value === null || String(value).trim() === '') {
+    throw new Error('El servidor no devolvió el identificador del registro creado.');
+  }
+
+  return {
+    value: typeof value === 'number' ? value : String(value),
+    label: toLabel(record, relation),
+  };
+}
