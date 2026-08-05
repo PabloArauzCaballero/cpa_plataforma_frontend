@@ -476,6 +476,16 @@
     gap: var(--space-2);
   }
 
+  /* 44×44 es el mínimo recomendado para acertar con el dedo. En móvil estos
+     controles medían 36–38 px de alto y eran los más fáciles de fallar de
+     toda la cabecera. */
+  .userBox a,
+  .userBox button {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    justify-content: center;
+  }
+
   .userBox a {
     font-size: 0;
     gap: 0;
