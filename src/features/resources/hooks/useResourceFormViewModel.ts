@@ -194,6 +194,16 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     };
   }, [resource]);
 
+  /**
+   * Devuelve el formulario a su punto de partida: vacío en un alta, y con los
+   * valores originales del registro en una edición. También borra los errores
+   * de validación, que si no quedarían señalando campos ya limpios.
+   */
+  function resetFields() {
+    setPayload(buildInitialPayload(resource, record));
+    setErrors({});
+  }
+
   function setField(name: string, value: unknown) {
     setPayload((current) => (resource.key === 'estudiante' ? resetStudentDependentFields(name, value, current) : { ...current, [name]: value }));
   }
@@ -276,5 +286,6 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     isLoadingFieldOptions,
     isFieldVisible,
     createFieldOption,
+    resetFields,
   };
 }

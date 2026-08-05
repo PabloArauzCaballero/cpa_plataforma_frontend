@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faDatabase, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faDatabase, faEraser, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/shared/components/Button';
 import styles from '../TransactionForm.module.css';
 
@@ -16,6 +16,8 @@ interface TransactionDraftActionsProps {
   onSaveDraft: () => void;
   onLoadDraft: () => void;
   onDiscardDraft: () => void;
+  /** Vacía el formulario en pantalla; no toca los borradores guardados. */
+  onClearFields: () => void;
   onPreviousDraft: () => void;
   onNextDraft: () => void;
 }
@@ -33,6 +35,7 @@ export function TransactionDraftActions({
   onSaveDraft,
   onLoadDraft,
   onDiscardDraft,
+  onClearFields,
   onPreviousDraft,
   onNextDraft,
 }: TransactionDraftActionsProps) {
@@ -67,6 +70,9 @@ export function TransactionDraftActions({
         </Button>
         <Button type="button" variant="ghost" onClick={onDiscardDraft} disabled={isDraftBusy || !hasDraft}>
           <FontAwesomeIcon icon={faTrash} /> Eliminar seleccionado
+        </Button>
+        <Button type="button" variant="ghost" onClick={onClearFields} disabled={isDraftBusy}>
+          <FontAwesomeIcon icon={faEraser} /> Limpiar campos
         </Button>
       </div>
     </div>

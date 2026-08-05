@@ -4,11 +4,25 @@ import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { useModalLayer } from '@/shared/components/Modal/useModalLayer';
 import styles from './ConfirmDialog.module.css';
 
+export interface ConfirmDetail {
+  label: string;
+  value: string;
+  /** Valor anterior. Si viene, se muestra tachado antes del nuevo. */
+  previous?: string;
+}
+
 interface ConfirmDialogProps {
   isOpen: boolean;
   title: string;
   message: string;
   targetLabel?: string;
+  /**
+   * Resumen de lo que se va a guardar. Convierte un "¿estás seguro?" —que se
+   * acepta sin leer— en una revisión real de lo que está a punto de pasar.
+   */
+  details?: ConfirmDetail[];
+  /** Cuántos detalles se listan antes de resumir el resto. */
+  maxDetails?: number;
   warning?: string;
   confirmLabel?: string;
   cancelLabel?: string;
@@ -29,6 +43,8 @@ export function ConfirmDialog({
   title,
   message,
   targetLabel,
+  details,
+  maxDetails = 8,
   warning,
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
@@ -57,9 +73,36 @@ export function ConfirmDialog({
           </div>
         </header>
 
-        {(targetLabel || warning) ? (
+        {(targetLabel || warning || details?.length) ? (
           <div className={styles.body}>
             {targetLabel ? <div className={styles.target}>{targetLabel}</div> : null}
+
+            {details?.length ? (
+              <>
+                <dl className={styles.details}>
+                  {details.slice(0, maxDetails).map((detail) => (
+                    <div key={detail.label} className={styles.detailRow}>
+                      <dt>{detail.label}</dt>
+                      <dd>
+                        {detail.previous !== undefined ? (
+                          <>
+                            <s className={styles.previous}>{detail.previous}</s>
+                            <i className="fa-solid fa-arrow-right-long" aria-label="cambia a" />
+                          </>
+                        ) : null}
+                        <strong>{detail.value}</strong>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                {details.length > maxDetails ? (
+                  <p className={styles.moreDetails}>
+                    y {details.length - maxDetails} campo{details.length - maxDetails === 1 ? '' : 's'} más.
+                  </p>
+                ) : null}
+              </>
+            ) : null}
+
             {warning ? <p className={styles.warning}>{warning}</p> : null}
           </div>
         ) : null}

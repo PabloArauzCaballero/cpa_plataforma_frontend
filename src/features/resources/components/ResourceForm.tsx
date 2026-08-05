@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faDatabase, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faDatabase, faEraser, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/shared/components/Button';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
+import type { ResolvedOptions } from '../domain/changeSummary';
 import { FormField } from '@/shared/components/FormField';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
@@ -23,7 +25,12 @@ interface ResourceFormProps {
   resource: CrudResourceDefinition;
   record: CrudRecord | null;
   isSaving: boolean;
-  onSubmit: (payload: CrudRecord) => void | Promise<void>;
+  /**
+   * `resolvedOptions` acompaña al payload porque las listas que apuntan a un
+   * catálogo cargan sus opciones aquí dentro: sin ellas, quien muestre el
+   * resumen de confirmación sólo puede enseñar el id en crudo.
+   */
+  onSubmit: (payload: CrudRecord, resolvedOptions?: ResolvedOptions) => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -66,6 +73,7 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
   const draftKey = buildResourceDraftKey(resource.key, recordId);
   const [localDraftExists, setLocalDraftExists] = useState(() => hasLocalDraft(draftKey));
   const [persistentDrafts, setPersistentDrafts] = useState<Array<PersistentDraft<CrudRecord>>>([]);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [selectedDraftIndex, setSelectedDraftIndex] = useState(0);
   const [isDraftBusy, setIsDraftBusy] = useState(false);
   const [draftMessage, setDraftMessage] = useState<string | null>(null);
@@ -228,7 +236,12 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
       onSubmit={(event) => {
         event.preventDefault();
         const payload = viewModel.getPayload();
-        if (payload) void onSubmit(payload);
+        if (!payload) return;
+        const resolvedOptions = resource.fields.reduce<ResolvedOptions>((acc, field) => {
+          acc[field.name] = viewModel.getFieldOptions(field);
+          return acc;
+        }, {});
+        void onSubmit(payload, resolvedOptions);
       }}
     >
       {isJsonMode ? (
@@ -315,8 +328,27 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
           <Button type="button" variant="ghost" onClick={discardDraft} disabled={isDraftBusy || !hasDraft}>
             <FontAwesomeIcon icon={faTrash} /> Eliminar seleccionado
           </Button>
+          {/* Vaciar el formulario no toca los borradores guardados: sólo
+              descarta lo que hay escrito en pantalla ahora mismo. */}
+          <Button type="button" variant="ghost" onClick={() => setConfirmClear(true)} disabled={isDraftBusy}>
+            <FontAwesomeIcon icon={faEraser} /> Limpiar campos
+          </Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmClear}
+        title="Limpiar campos"
+        message={record
+          ? 'Los campos volverán a los valores que tiene guardados el registro. No se modifica nada en la base de datos.'
+          : 'Se vaciará todo lo que has escrito en el formulario.'}
+        warning="Los borradores guardados no se tocan."
+        confirmLabel="Sí, limpiar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onCancel={() => setConfirmClear(false)}
+        onConfirm={() => { setConfirmClear(false); viewModel.resetFields(); }}
+      />
 
       <div className={styles.actions}>
         <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>

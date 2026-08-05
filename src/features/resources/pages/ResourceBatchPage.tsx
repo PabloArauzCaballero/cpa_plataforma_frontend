@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
 import { Card } from '@/shared/components/Card';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { PageState } from '@/shared/components/PageState';
 import type { BatchProcessResult, BatchValidationResult, CrudResourceDefinition } from '../domain/CrudResource';
 import { findResourceDefinition } from '../domain/resourceDefinitions';
@@ -65,6 +66,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
   const [mode, setMode] = useState('create');
   const [validation, setValidation] = useState<BatchValidationResult | null>(null);
   const [processResult, setProcessResult] = useState<BatchProcessResult | null>(null);
+  const [confirmProcess, setConfirmProcess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -108,6 +110,33 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
 
   return (
     <section className={styles.page}>
+      {/* Una importación escribe muchas filas de una vez y no hay forma de
+          deshacerla: conviene enseñar el recuento antes de lanzarla. */}
+      <ConfirmDialog
+        isOpen={confirmProcess}
+        title="Confirmar importación"
+        message={`Se procesará el archivo sobre ${resource.label}. Esta operación escribe todos los registros válidos y no se puede deshacer.`}
+        targetLabel={file?.name}
+        details={[
+          { label: 'Filas totales', value: String(validation?.totalRows ?? 0) },
+          { label: 'Válidas', value: String(validation?.validRows ?? 0) },
+          { label: 'Con observaciones', value: String(validation?.warningRows ?? 0) },
+          { label: 'Con error (se omiten)', value: String(validation?.errorRows ?? 0) },
+          { label: 'Modo', value: mode },
+        ]}
+        warning={validation && validation.errorRows > 0
+          ? 'Las filas con error no se importarán. Corrige el archivo si necesitas incluirlas.'
+          : undefined}
+        confirmLabel="Sí, procesar importación"
+        cancelLabel="Cancelar"
+        variant={validation && validation.errorRows > 0 ? 'danger' : 'default'}
+        isLoading={isProcessing}
+        onCancel={() => setConfirmProcess(false)}
+        onConfirm={() => {
+          setConfirmProcess(false);
+          void processFile();
+        }}
+      />
       <div className={styles.header} {...tutorialAnchor(TUTORIAL_ANCHORS.batchHeader)}>
         <div>
           <span>{resource.moduleLabel}</span>
@@ -182,7 +211,7 @@ function ResourceBatchContent({ resource }: { resource: CrudResourceDefinition }
           <Button type="button" onClick={() => void validateFile()} disabled={isValidating || !file}>
             {isValidating ? 'Validando...' : 'Validar archivo'}
           </Button>
-          <Button type="button" onClick={() => void processFile()} disabled={isProcessing || !canProcess}>
+          <Button type="button" onClick={() => setConfirmProcess(true)} disabled={isProcessing || !canProcess}>
             {isProcessing ? 'Procesando...' : 'Procesar importación'}
           </Button>
         </div>
