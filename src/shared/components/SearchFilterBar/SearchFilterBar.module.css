@@ -1,11 +1,12 @@
 .bar {
   display: grid;
   gap: var(--space-4);
-  background: var(--color-white);
-  color: var(--color-primary);
-  border: 1px solid var(--color-neutral-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  border: 1px solid var(--border-hairline);
+  border-radius: calc(var(--radius-lg) + 2px);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .topRow {
@@ -26,8 +27,8 @@
 .bar span,
 .searchBox small,
 .filtersPanel summary {
-  font-size: 0.85rem;
-  color: var(--color-accent);
+  font-size: 0.83rem;
+  color: var(--text-on-light-secondary);
 }
 
 .searchBox small {
@@ -35,15 +36,30 @@
   color: var(--color-secondary);
 }
 
+/* El panel de filtros se apoya sobre una superficie hundida: separa el muro
+   de campos del resto de la barra sin necesidad de otra caja con borde. */
 .filtersPanel {
-  border-top: 1px solid var(--color-neutral-light);
-  padding-top: var(--space-3);
+  margin: 0 calc(var(--space-5) * -1) calc(var(--space-5) * -1);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--border-hairline);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--surface-2);
 }
 
 .filtersPanel summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   cursor: pointer;
   font-weight: 800;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  transition: background var(--motion-micro) var(--ease-in-out);
+}
+
+.filtersPanel summary:hover {
+  background: var(--surface-3);
 }
 
 .filtersGrid {
@@ -54,18 +70,37 @@
 
 .bar input,
 .bar select {
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 0.78rem 0.9rem;
-  color: var(--color-primary);
-  background: var(--color-white);
+  padding: 0.7rem 0.85rem;
+  color: var(--text-on-light);
+  background: var(--surface-1);
   outline: none;
-  min-height: 2.85rem;
+  /* 2.75rem ≈ 44px: el mínimo recomendado para una zona táctil cómoda. */
+  min-height: 2.75rem;
+  transition: border-color var(--motion-micro) var(--ease-in-out),
+    box-shadow var(--motion-micro) var(--ease-in-out);
+}
+
+.bar input::placeholder {
+  color: var(--text-on-light-muted);
 }
 
 .bar input:focus,
 .bar select:focus {
   border-color: var(--color-secondary);
+  box-shadow: var(--ring-focus);
+}
+
+/* Un filtro con texto se marca: en una rejilla de veinte campos idénticos es
+   lo único que permite ver de un vistazo qué está acotando la consulta.
+
+   Sólo aplica a `input`. En un `select` no hay forma fiable de distinguir en
+   CSS "Todos" de una opción elegida —`:valid` es cierto para cualquier select
+   no obligatorio—, y marcarlos todos sería peor que no marcar ninguno. */
+.bar input:not(:placeholder-shown) {
+  border-color: var(--border-brand);
+  background: color-mix(in srgb, var(--color-secondary) 5%, var(--surface-1));
 }
 
 .actions {

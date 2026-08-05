@@ -10,7 +10,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
 }
 
 .header h2,
@@ -19,7 +19,7 @@
 }
 
 .header h2 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: var(--font-display);
   line-height: 1.05;
   text-transform: uppercase;
@@ -27,8 +27,9 @@
 }
 
 .header p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   margin-top: var(--space-2);
+  font-size: 0.92rem;
 }
 
 .header a {
@@ -54,24 +55,34 @@
   justify-content: flex-end;
 }
 
+/* Jerarquía: estas son acciones de apoyo (tutorial, ayuda, importación).
+   La acción principal de la pantalla —"Crear registro"— vive en la barra de
+   búsqueda. Antes "Importar Excel" iba en azul sólido y era el botón más
+   llamativo de la página, por delante de la acción real. Ahora las tres
+   comparten un mismo peso secundario. */
 .actions button,
 .actions a {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  border: 1px solid var(--color-primary);
-  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  padding: 0.65rem 0.95rem;
   border-radius: var(--radius-md);
-  font-weight: 800;
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: background var(--motion-micro) var(--ease-in-out),
+    border-color var(--motion-micro) var(--ease-in-out),
+    transform var(--motion-micro) var(--ease-out);
 }
 
-.actions button {
-  background: var(--color-white);
-  color: var(--color-primary);
-}
-
-.actions a {
-  background: var(--color-primary);
-  color: var(--color-white);
+.actions button:hover,
+.actions a:hover {
+  background: var(--surface-2);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-dark);
+  transform: translateY(-1px);
 }

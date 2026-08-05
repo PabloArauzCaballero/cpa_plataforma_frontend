@@ -1,30 +1,175 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PANTALLA DE ESTADO
+
+   Cinco tonos sobre una misma estructura. El color se declara una vez por
+   tono en `[data-tone]` y de ahí lo heredan la ilustración, el halo y el
+   borde: añadir un estado nuevo es añadir un bloque de tres variables.
+   ══════════════════════════════════════════════════════════════════════════ */
+
 .state {
+  --tone-fg: var(--state-info-fg);
+  --tone-bg: var(--state-info-bg);
+  --tone-border: var(--state-info-border);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
-  place-items: center;
-  gap: var(--space-3);
-  min-height: 18rem;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-4);
+  min-height: 20rem;
+  padding: clamp(2rem, 5vw, 3.25rem) var(--space-6);
   text-align: center;
-  background: var(--color-white);
-  color: var(--color-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  padding: var(--space-8);
+  border-radius: calc(var(--radius-lg) + 4px);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   box-shadow: var(--shadow-soft);
+  animation: stateIn var(--motion-base) var(--ease-out) both;
 }
 
-.state h2,
-.state p {
+/* Halo del tono detrás de la ilustración: da profundidad y tiñe el bloque sin
+   colorear el fondo entero, que restaría contraste al texto. */
+.state::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -8rem;
+  left: 50%;
+  width: 28rem;
+  height: 28rem;
+  margin-left: -14rem;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, var(--tone-bg), transparent 70%);
+  opacity: 0.9;
+}
+
+.state[data-tone='loading'] {
+  --tone-fg: var(--state-info-fg);
+  --tone-bg: var(--state-info-bg);
+  --tone-border: var(--state-info-border);
+}
+
+.state[data-tone='empty'],
+.state[data-tone='info'] {
+  --tone-fg: var(--state-neutral-fg);
+  --tone-bg: var(--state-neutral-bg);
+  --tone-border: var(--state-neutral-border);
+}
+
+.state[data-tone='error'] {
+  --tone-fg: var(--state-danger-fg);
+  --tone-bg: var(--state-danger-bg);
+  --tone-border: var(--state-danger-border);
+}
+
+.state[data-tone='notFound'] {
+  --tone-fg: var(--state-warning-fg);
+  --tone-bg: var(--state-warning-bg);
+  --tone-border: var(--state-warning-border);
+}
+
+.state[data-tone='blocked'] {
+  --tone-fg: var(--state-progress-fg);
+  --tone-bg: var(--state-progress-bg);
+  --tone-border: var(--state-progress-border);
+}
+
+/* ── Ilustración ─────────────────────────────────────────────────────── */
+
+.art {
+  width: 7.5rem;
+  height: 7.5rem;
+  /* `currentColor` dentro del SVG resuelve contra este color, así que basta
+     con teñir el contenedor para teñir la ilustración entera. */
+  color: var(--tone-fg);
+  --state-art-bg: var(--surface-1);
+}
+
+.art svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Texto ───────────────────────────────────────────────────────────── */
+
+.copy {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 36rem;
+}
+
+.copy h2,
+.copy p {
   margin: 0;
 }
 
-.state p {
-  color: var(--color-accent);
-  max-width: 32rem;
+.copy h2 {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  letter-spacing: -0.02em;
+  color: var(--text-on-light);
 }
 
-.marker {
-  width: 3rem;
-  height: 0.45rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-secondary);
+.copy p {
+  color: var(--text-on-light-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.action {
+  margin-top: var(--space-1);
+  min-width: 12rem;
+}
+
+@keyframes stateIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 560px) {
+  .state {
+    min-height: 16rem;
+  }
+
+  .art {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+
+  .action {
+    width: 100%;
+  }
+}
+
+/* Latido de las líneas de la ilustración de carga. Sólo anima `opacity`,
+   así que el compositor lo resuelve sin repintar el SVG. */
+.pulse {
+  opacity: 0.3;
+  animation: artPulse 1.4s var(--ease-in-out) infinite;
+}
+
+@keyframes artPulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state {
+    animation: none;
+  }
+
+  /* La ilustración se congela en su estado legible en vez de quedarse en el
+     fotograma casi transparente del inicio. */
+  .pulse {
+    animation: none;
+    opacity: 0.6;
+  }
 }

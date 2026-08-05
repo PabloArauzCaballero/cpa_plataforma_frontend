@@ -1,12 +1,25 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   TARJETA DE ACCESO
+
+   Superficie clara flotando sobre el fondo oscuro por capas. El borde ya no
+   usa `--color-border` (#195687, azul oscuro): sobre blanco se leía como un
+   contorno de depuración.
+   ══════════════════════════════════════════════════════════════════════════ */
+
 .form {
   display: grid;
-  gap: var(--space-4);
-  padding: var(--space-8);
-  background: var(--color-white);
-  color: var(--color-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-strong);
+  gap: var(--space-5);
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  background: var(--surface-1);
+  color: var(--text-on-light);
+  border-radius: calc(var(--radius-lg) + 6px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  /* Sombra ambiental amplia + halo de marca: la tarjeta se despega del fondo
+     sin necesidad de un borde marcado. */
+  box-shadow:
+    0 32px 80px rgba(0, 15, 40, 0.42),
+    0 0 0 1px rgba(1, 43, 101, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 .heading {
@@ -14,12 +27,19 @@
   gap: var(--space-2);
 }
 
-.heading span {
-  color: var(--color-secondary-dark);
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--state-info-bg);
+  color: var(--state-info-fg);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
 }
 
 .heading h1,
@@ -28,20 +48,196 @@
 }
 
 .heading h1 {
-  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  font-size: clamp(1.65rem, 3.2vw, 2.15rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .heading p {
-  color: var(--color-accent);
-  line-height: 1.5;
+  color: var(--text-on-light-secondary);
+  font-size: 0.94rem;
+  line-height: 1.55;
 }
 
-.error {
-  margin: 0;
-  padding: var(--space-3);
+/* ── Campos ──────────────────────────────────────────────────────────── */
+
+.fields {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--text-on-light);
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: -0.005em;
+}
+
+/* El control es la caja visible; el `input` interior es transparente. Así el
+   icono, el campo y el botón de revelar comparten un mismo borde y un mismo
+   estado de foco en vez de dibujar tres rectángulos. */
+.control {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: center;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-soft);
-  color: var(--color-primary-dark);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  transition:
+    border-color var(--motion-micro) var(--ease-in-out),
+    background var(--motion-micro) var(--ease-in-out),
+    box-shadow var(--motion-micro) var(--ease-in-out);
+}
+
+.control > i {
+  justify-self: center;
+  color: var(--text-on-light-muted);
+  font-size: 0.95rem;
+  transition: color var(--motion-micro) var(--ease-in-out);
+}
+
+.control input {
+  min-width: 0;
+  padding: 0.9rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-on-light);
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.control input::placeholder {
+  color: var(--text-on-light-muted);
+  font-weight: 500;
+}
+
+/* `:focus-within` en el contenedor: el anillo rodea el control completo,
+   incluidos icono y botón, en vez de sólo el `input`. */
+.control:focus-within {
+  border-color: var(--color-secondary);
+  background: var(--surface-1);
+  box-shadow: var(--ring-focus);
+}
+
+.control:focus-within > i {
+  color: var(--color-secondary-dark);
+}
+
+.control:has(input:disabled) {
+  opacity: 0.6;
+}
+
+/* El anillo se pinta en el contenedor, así que el input no debe repetirlo. */
+.control input:focus-visible {
+  box-shadow: none;
+}
+
+.reveal {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  margin-right: 0.2rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-on-light-muted);
+  cursor: pointer;
+  transition: color var(--motion-micro) var(--ease-in-out),
+    background var(--motion-micro) var(--ease-in-out);
+}
+
+.reveal:hover {
+  background: var(--surface-3);
+  color: var(--text-on-light);
+}
+
+/* ── Error ───────────────────────────────────────────────────────────── */
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--state-danger-border);
+  background: var(--state-danger-bg);
+  color: var(--state-danger-fg);
+  font-size: 0.9rem;
   font-weight: 700;
+  line-height: 1.45;
+  animation: errorIn var(--motion-base) var(--ease-out) both;
+}
+
+.error i {
+  margin-top: 0.1rem;
+  flex: 0 0 auto;
+}
+
+@keyframes errorIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Acción principal ────────────────────────────────────────────────── */
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-block: 0.95rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.spinner {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--color-white);
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.footnote {
+  margin: 0;
+  text-align: center;
+  color: var(--text-on-light-muted);
+  font-size: 0.82rem;
+}
+
+/* Con movimiento reducido el spinner no puede desaparecer —es el único
+   indicador de que algo está pasando—, así que se sustituye por un pulso
+   de opacidad, que no produce sensación de giro. */
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    animation: none;
+  }
+
+  .spinner {
+    animation: spinnerPulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes spinnerPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
 }

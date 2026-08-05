@@ -2,6 +2,11 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { FormFieldOption } from './FormField';
 import styles from './FormField.module.css';
 
+export interface QuickCreateConfig {
+  labelField: string;
+  extraFields?: Array<{ name: string; label: string; options: string[] }>;
+}
+
 interface SearchableSelectProps {
   id: string;
   options: FormFieldOption[];
@@ -9,6 +14,8 @@ interface SearchableSelectProps {
   disabled: boolean;
   isLoadingOptions: boolean;
   onChange: (value: string | number | boolean) => void;
+  quickCreate?: QuickCreateConfig;
+  onCreateOption?: (values: Record<string, unknown>) => Promise<unknown>;
 }
 
 /**
@@ -48,12 +55,25 @@ export function matches(label: string, query: string): boolean {
  * etiqueta seleccionada para no dejar en pantalla una búsqueda a medias que
  * parezca un valor.
  */
-export function SearchableSelect({ id, options, value, disabled, isLoadingOptions, onChange }: SearchableSelectProps) {
+export function SearchableSelect({
+  id,
+  options,
+  value,
+  disabled,
+  isLoadingOptions,
+  onChange,
+  quickCreate,
+  onCreateOption,
+}: SearchableSelectProps) {
   const listId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [highlighted, setHighlighted] = useState(0);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createExtras, setCreateExtras] = useState<Record<string, string>>({});
+  const [isSavingNew, setIsSavingNew] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const selectedOption = options.find((option) => String(option.value) === String(value ?? '')) ?? null;
   const visibleOptions = useMemo(
@@ -61,9 +81,23 @@ export function SearchableSelect({ id, options, value, disabled, isLoadingOption
     [options, query],
   );
 
+  const trimmedQuery = query.trim();
+  // Solo se ofrece crear si lo tecleado no coincide ya con una opción: sin esto
+  // se invitaría a duplicar un colegio que está en la lista con otra grafía.
+  const canOfferCreate = Boolean(
+    quickCreate
+      && onCreateOption
+      && trimmedQuery
+      && !options.some((option) => normalizeForSearch(option.label) === normalizeForSearch(trimmedQuery)),
+  );
+
   // Al cerrar, el input muestra lo elegido, no lo tecleado.
   useEffect(() => {
-    if (!isOpen) setQuery('');
+    if (!isOpen) {
+      setQuery('');
+      setIsCreating(false);
+      setCreateError(null);
+    }
   }, [isOpen]);
 
   // Un clic fuera cierra la lista: sin esto queda abierta encima del resto del
@@ -84,6 +118,38 @@ export function SearchableSelect({ id, options, value, disabled, isLoadingOption
   function commit(option: FormFieldOption) {
     onChange(option.value);
     setIsOpen(false);
+  }
+
+  function startCreate() {
+    if (!quickCreate) return;
+    // Los extras arrancan vacíos a propósito: preseleccionar una categoría haría
+    // que se guarde la del primer valor de la lista sin que nadie la mire.
+    setCreateExtras({});
+    setCreateError(null);
+    setIsCreating(true);
+  }
+
+  async function confirmCreate() {
+    if (!quickCreate || !onCreateOption) return;
+
+    const faltante = (quickCreate.extraFields ?? []).find((extra) => !createExtras[extra.name]);
+    if (faltante) {
+      setCreateError(`Indica ${faltante.label.toLowerCase()}.`);
+      return;
+    }
+
+    setIsSavingNew(true);
+    setCreateError(null);
+    try {
+      await onCreateOption({ [quickCreate.labelField]: trimmedQuery, ...createExtras });
+      // El padre deja seleccionada la opción nueva; aquí solo se cierra.
+      setIsCreating(false);
+      setIsOpen(false);
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : 'No se pudo crear el registro.');
+    } finally {
+      setIsSavingNew(false);
+    }
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -180,9 +246,55 @@ export function SearchableSelect({ id, options, value, disabled, isLoadingOption
                 </button>
               </li>
             ))
-          ) : (
+          ) : canOfferCreate ? null : (
             <li className={styles.searchableEmpty}>Sin resultados para “{query}”</li>
           )}
+
+          {canOfferCreate ? (
+            <li className={styles.searchableCreate}>
+              {isCreating ? (
+                <div className={styles.searchableCreateForm}>
+                  <strong>Crear “{trimmedQuery}”</strong>
+                  {(quickCreate?.extraFields ?? []).map((extra) => (
+                    <label key={extra.name}>
+                      <span>{extra.label}</span>
+                      <select
+                        value={createExtras[extra.name] ?? ''}
+                        disabled={isSavingNew}
+                        onChange={(event) =>
+                          setCreateExtras((current) => ({ ...current, [extra.name]: event.target.value }))
+                        }
+                      >
+                        <option value="">Seleccionar</option>
+                        {extra.options.map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                  {createError ? <small className={styles.searchableCreateError}>{createError}</small> : null}
+                  <div className={styles.searchableCreateActions}>
+                    <button type="button" disabled={isSavingNew} onClick={() => setIsCreating(false)}>
+                      Cancelar
+                    </button>
+                    <button type="button" disabled={isSavingNew} onClick={confirmCreate}>
+                      {isSavingNew ? 'Guardando...' : 'Guardar y usar'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    startCreate();
+                  }}
+                >
+                  + Crear “{trimmedQuery}”
+                </button>
+              )}
+            </li>
+          ) : null}
           {visibleOptions.length > 50 ? (
             <li className={styles.searchableEmpty}>
               {visibleOptions.length - 50} resultados más. Afina la búsqueda.

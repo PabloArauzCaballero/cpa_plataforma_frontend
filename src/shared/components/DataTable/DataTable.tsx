@@ -96,7 +96,10 @@ export function DataTable({
             return (
               <tr key={key} data-hour-tone={hourTone ?? undefined} data-inactive={inactive || undefined}>
                 {columns.map((column) => (
-                  <td key={`${key}-${column}`}>
+                  /* Las celdas se recortan con puntos suspensivos para que
+                     todas las filas midan lo mismo. El `title` conserva el
+                     valor completo, así que recortar nunca esconde el dato. */
+                  <td key={`${key}-${column}`} title={renderValue(record[column])}>
                     {isStatusColumn(column) && record[column] !== null && record[column] !== undefined && record[column] !== '' ? (
                       <span
                         className={styles.statusBadge}

@@ -1,4 +1,5 @@
 @import './theme.css';
+@import './backgrounds.css';
 
 * {
   box-sizing: border-box;
@@ -16,11 +17,24 @@ body {
   min-height: 100%;
   font-family: var(--font-family-base);
   font-weight: var(--font-body-weight);
-  background: var(--gradient-hero);
+  /* Color liso, no `--gradient-hero`: cada contexto (login, shell) pinta ya su
+     propio fondo por capas encima, así que el degradado de página completa sólo
+     añadía una pintura que nunca se llega a ver. */
+  background: var(--color-background);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Los títulos reparten mejor las líneas en vez de dejar una palabra suelta. */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-secondary) 32%, transparent);
+  color: inherit;
 }
 
 button,

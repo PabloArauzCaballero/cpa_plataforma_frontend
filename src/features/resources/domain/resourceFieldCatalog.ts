@@ -2772,6 +2772,12 @@ export const resourceFieldCatalog: Record<string, FieldCatalogPatch> = {
     ]
   },
   "estudiante.id_unidad_educativa": {
+    "quickCreate": {
+      "labelField": "nombre",
+      "extraFields": [
+        { "name": "categoria", "label": "Categoría", "options": ["fiscal", "privada", "convenio"] }
+      ]
+    },
     "type": "select",
     "relation": {
       "endpoint": "/api/personas/unidad-educativa",

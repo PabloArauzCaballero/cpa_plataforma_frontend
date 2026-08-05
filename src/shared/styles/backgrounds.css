@@ -1,0 +1,217 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   SISTEMA DE FONDOS POR CAPAS
+
+   Un fondo aquí no es un color: es una pila de capas independientes, cada
+   una con una función, que se apagan o simplifican según el contexto, el
+   dispositivo y las preferencias del usuario.
+
+     0. Color base ................. --bg-base
+     1. Malla de gradientes ........ ::before  (identidad y profundidad)
+     2. Rejilla técnica ............ ::before  (segunda capa, enmascarada)
+     3. Textura de ruido ........... ::after   (rompe el degradado plano)
+     4. Luces ambientales .......... <AmbientBackground /> (opcional)
+     5. Luz reactiva al cursor ..... <AmbientBackground /> (opcional)
+     6. Contenido .................. apilado normal (las capas van a -1)
+
+   Todas las capas decorativas viven detrás del contenido y son
+   `pointer-events: none`, así que nunca interceptan clics ni foco.
+
+   Se controla todo con custom properties, de modo que una vista puede
+   ajustar intensidad sin reescribir capas:
+
+     <div class="bgSurface" data-bg="data">   →  fondo tranquilo para tablas
+     <div class="bgSurface" data-bg="auth">   →  fondo expresivo para login
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* `isolation: isolate` abre un contexto de apilamiento propio, así que las
+   capas decorativas pueden ir en `z-index: -1`: quedan por detrás del
+   contenido pero por delante del color base, y el contenido sube solo, sin
+   necesidad de una regla que toque a todos los hijos.
+
+   Esto importa: una regla del tipo `.bgSurface > * { position: relative }`
+   pisaría el `position: sticky` de la cabecera y del menú lateral. */
+.bgSurface {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--bg-base);
+}
+
+/* ── Capas 1 y 2: malla de gradientes + rejilla ─────────────────────────
+   Van juntas en un solo pseudo-elemento para no crear una capa de
+   composición extra. La rejilla se enmascara con un degradado radial para
+   que se desvanezca hacia los bordes en vez de cortarse en seco. */
+.bgSurface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--bg-decor-opacity);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 88% -8%, var(--bg-mesh-a), transparent 62%),
+    radial-gradient(ellipse 70% 55% at 4% 6%, var(--bg-mesh-b), transparent 58%),
+    radial-gradient(ellipse 90% 70% at 50% 108%, var(--bg-mesh-c), transparent 60%),
+    linear-gradient(var(--bg-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid-line) 1px, transparent 1px);
+  background-size:
+    auto, auto, auto,
+    var(--bg-grid-size) var(--bg-grid-size),
+    var(--bg-grid-size) var(--bg-grid-size);
+}
+
+/* ── Capa 3: textura de ruido ───────────────────────────────────────────
+   feTurbulence en un data-URI: ~200 bytes, sin petición de red, sin
+   imagen que optimizar. Quita el bandeado de los degradados grandes y da
+   una sensación de material en vez de plano digital. */
+.bgSurface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: calc(var(--bg-noise-opacity) * var(--bg-decor-opacity));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   VARIANTES POR CONTEXTO
+
+   El mismo sistema, distinta intensidad. La regla es simple: cuanto más
+   denso es el contenido, más se apaga el fondo.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* AUTENTICACIÓN — la más expresiva. Es la primera pantalla del producto y
+   la única sin datos que proteger, así que puede permitirse identidad. */
+.bgSurface[data-bg='auth'] {
+  --bg-base: #021B3F;
+  --bg-mesh-a: rgba(32, 160, 197, 0.42);
+  --bg-mesh-b: rgba(14, 62, 116, 0.72);
+  --bg-mesh-c: rgba(1, 43, 101, 0.85);
+  --bg-grid-line: rgba(255, 255, 255, 0.038);
+  --bg-grid-size: 46px;
+  --bg-noise-opacity: 0.05;
+  --bg-glow-strength: 1;
+}
+
+/* DASHBOARD — ambiental y sobria. Se nota que el lienzo no es blanco,
+   pero no compite con tarjetas ni cifras. */
+.bgSurface[data-bg='app'] {
+  --bg-decor-opacity: 0.85;
+}
+
+/* FORMULARIOS — favorece la concentración: la decoración se aleja de los
+   campos y la rejilla casi desaparece. */
+.bgSurface[data-bg='form'] {
+  --bg-decor-opacity: 0.5;
+  --bg-grid-line: transparent;
+}
+
+/* TABLAS Y ADMINISTRACIÓN — prioridad absoluta a la legibilidad. Queda un
+   tinte ambiental mínimo, sin rejilla ni ruido. */
+.bgSurface[data-bg='data'] {
+  --bg-decor-opacity: 0.38;
+  --bg-grid-line: transparent;
+  --bg-noise-opacity: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CAPAS 4 Y 5 — luces ambientales y luz reactiva
+
+   Las pinta <AmbientBackground />. Se animan sólo con `transform` y
+   `opacity`, que el compositor resuelve en GPU sin recalcular layout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.bgAmbient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  /* `layout paint` y no `strict`: aísla el repintado de las luces del resto
+     del árbol sin añadir contención de tamaño, que en un elemento con
+     `inset: 0` es innecesaria y fácil de romper. */
+  contain: layout paint;
+}
+
+.bgOrb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: var(--bg-glow-strength);
+  will-change: transform;
+  /* Degradado radial en vez de `filter: blur()`: mismo resultado suave, sin
+     el coste de un paso de desenfoque a pantalla completa en cada frame. */
+  background: radial-gradient(circle closest-side, var(--orb-color), transparent 72%);
+  animation: bgOrbDrift var(--motion-ambient) var(--ease-in-out) infinite alternate;
+  animation-delay: var(--orb-delay, 0s);
+}
+
+.bgOrb:nth-child(2) { animation-duration: calc(var(--motion-ambient) * 1.45); }
+.bgOrb:nth-child(3) { animation-duration: calc(var(--motion-ambient) * 1.9); }
+
+@keyframes bgOrbDrift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(var(--orb-dx, 3%), var(--orb-dy, -4%), 0) scale(1.09); }
+}
+
+/* Luz que sigue al cursor. Su posición llega por `--mx`/`--my` (porcentajes)
+   desde el componente; sólo se mueve un elemento ya compuesto en GPU. */
+.bgPointer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 46rem;
+  height: 46rem;
+  margin: -23rem 0 0 -23rem;
+  border-radius: 50%;
+  opacity: calc(0.5 * var(--bg-glow-strength));
+  background: radial-gradient(circle closest-side, rgba(32, 160, 197, 0.5), transparent 70%);
+  transform: translate3d(var(--mx, 50vw), var(--my, 50vh), 0);
+  transition: opacity var(--motion-base) var(--ease-out);
+  will-change: transform;
+}
+
+/* Cuando la pestaña no está visible, el navegador puede seguir animando
+   capas compuestas. Pararlas explícitamente ahorra GPU y batería. */
+.bgAmbient[data-paused='true'] .bgOrb {
+  animation-play-state: paused;
+}
+
+/* ── Móvil: menos capas, menos batería ─────────────────────────────────
+   No es el diseño de escritorio reducido: se elimina la rejilla, se baja
+   el ruido y las luces ambientales se apagan por completo (la reactiva ya
+   no existe en táctil porque no hay cursor que seguir). */
+@media (max-width: 720px) {
+  /* Clase repetida a propósito: las variantes se seleccionan con
+     `.bgSurface[data-bg='…']`, que tiene más especificidad que `.bgSurface`.
+     Sin este refuerzo las variantes ganarían y la simplificación móvil no
+     llegaría a aplicarse nunca. */
+  .bgSurface.bgSurface {
+    --bg-grid-line: transparent;
+    --bg-noise-opacity: 0.02;
+  }
+
+  .bgAmbient {
+    display: none;
+  }
+}
+
+/* Sin cursor no hay luz reactiva: en táctil sería una mancha fija. */
+@media (pointer: coarse) {
+  .bgPointer {
+    display: none;
+  }
+}
+
+/* ── Movimiento reducido ───────────────────────────────────────────────
+   El fondo no desaparece: se congela. Se conserva toda la profundidad
+   estática (malla, rejilla, ruido, luces) y sólo se detiene el
+   desplazamiento, que es lo que provoca mareo. */
+@media (prefers-reduced-motion: reduce) {
+  .bgOrb {
+    animation: none;
+  }
+
+  .bgPointer {
+    display: none;
+  }
+}

@@ -34,6 +34,20 @@ export interface ResourceFieldDefinition {
   placeholder?: string;
   options?: Array<string | SelectOption>;
   relation?: ResourceLookupRelation;
+  /**
+   * Permite crear la opción desde el propio formulario cuando la búsqueda no la
+   * encuentra. Pensado para catálogos que nunca están completos —las unidades
+   * educativas, sobre todo—, donde obligar a salir a darla de alta aparte hace
+   * perder lo que se llevaba escrito.
+   *
+   * `labelField` es la columna donde va el texto tecleado. `extraFields` son las
+   * que el backend exige además y no se pueden adivinar, como la categoría del
+   * colegio: se preguntan en el momento en vez de inventar un valor.
+   */
+  quickCreate?: {
+    labelField: string;
+    extraFields?: Array<{ name: string; label: string; options: string[] }>;
+  };
   selectSource?: 'enum' | 'catalog' | 'foreignKey';
   valueKind?: FieldValueKind;
   min?: number;

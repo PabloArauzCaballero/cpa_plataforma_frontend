@@ -274,6 +274,12 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
                 placeholder={field.placeholder}
                 disabled={field.readOnly}
                 isLoadingOptions={viewModel.isLoadingFieldOptions(field)}
+                quickCreate={field.quickCreate}
+                onCreateOption={
+                  field.quickCreate && field.relation
+                    ? (values) => viewModel.createFieldOption(field, values)
+                    : undefined
+                }
                 onChange={(value) => viewModel.setField(field.name, value)}
               />
             );
