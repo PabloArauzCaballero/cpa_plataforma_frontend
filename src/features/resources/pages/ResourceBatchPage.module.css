@@ -12,7 +12,7 @@
 }
 
 .header span {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
@@ -25,13 +25,13 @@
 }
 
 .header h2 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: var(--font-title);
   letter-spacing: -0.02em;
 }
 
 .header p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   margin-top: var(--space-2);
   max-width: 58rem;
   line-height: 1.62;
@@ -76,7 +76,7 @@
   gap: var(--space-2);
   padding: var(--space-6);
   text-align: center;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   background:
     radial-gradient(circle at 50% 0%, rgba(32, 160, 197, 0.12), transparent 45%),
     linear-gradient(180deg, var(--color-white), var(--color-surface-soft));
@@ -104,7 +104,7 @@
 }
 
 .fileBox span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 700;
   line-height: 1.45;
 }
@@ -118,17 +118,17 @@
 .settings label {
   display: grid;
   gap: var(--space-2);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 900;
 }
 
 .settings select {
   min-height: 3rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
   padding: 0.85rem 1rem;
-  color: var(--color-primary);
-  background: var(--color-white);
+  color: var(--text-on-light);
+  background: var(--surface-1);
   font-weight: 700;
   outline: none;
 }
@@ -139,10 +139,10 @@
 }
 
 .templateButton {
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   padding: 0.9rem 1rem;
   font-weight: 900;
   cursor: pointer;
@@ -150,7 +150,7 @@
 }
 
 .templateButton:hover {
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
   transform: translateY(-1px);
 }
 
@@ -161,10 +161,10 @@
 }
 
 .processBox > div {
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
   padding: var(--space-4);
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
   display: grid;
   grid-template-columns: 44px 1fr;
   align-items: flex-start;
@@ -175,8 +175,8 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -184,12 +184,12 @@
 }
 
 .processBox strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .processBox p {
   margin: 0.3rem 0 0;
-  color: var(--color-text-muted);
+  color: var(--text-on-light-muted);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -200,7 +200,7 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(185, 28, 28, 0.22);
   background: #fff1f2;
-  color: #991b1b;
+  color: var(--state-danger-fg);
   font-weight: 800;
 }
 
@@ -221,26 +221,26 @@
   display: grid;
   gap: 0.25rem;
   padding: var(--space-4);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
 }
 
 .stats span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 900;
 }
 
 .stats strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.45rem;
 }
 
 .tableWrap {
   overflow: auto;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .table {
@@ -253,13 +253,13 @@
 .table td {
   padding: 0.9rem 1rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-neutral-light);
+  border-bottom: 1px solid var(--border-hairline);
   vertical-align: top;
 }
 
 .table th {
-  color: var(--color-primary);
-  background: var(--color-surface-soft);
+  color: var(--text-on-light);
+  background: var(--surface-2);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -279,18 +279,18 @@
 }
 
 .valid {
-  color: #166534;
+  color: var(--state-success-fg);
   background: #dcfce7;
 }
 
 .warning {
-  color: #92400e;
+  color: var(--state-warning-fg);
   background: #fef3c7;
 }
 
 .error.badge,
 .badge.error {
-  color: #991b1b;
+  color: var(--state-danger-fg);
   background: #fee2e2;
   border: none;
 }
@@ -301,12 +301,12 @@
 }
 
 .resultCard h3 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.18rem;
 }
 
 .resultCard p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 700;
   line-height: 1.55;
 }

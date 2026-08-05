@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 800;
 }
 
@@ -13,7 +13,7 @@
 }
 
 .field strong {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .field input,
@@ -21,9 +21,9 @@
 .field select {
   width: 100%;
   min-height: 3rem;
-  border: 1px solid var(--color-neutral-light);
-  background: var(--color-white);
-  color: var(--color-primary);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   border-radius: var(--radius-md);
   padding: 0.86rem 0.95rem;
   outline: none;
@@ -49,7 +49,7 @@
 }
 
 .field small {
-  color: var(--color-primary-dark);
+  color: var(--text-on-light);
   font-weight: 600;
   line-height: 1.4;
 }
@@ -60,9 +60,9 @@
   gap: var(--space-3);
   min-height: 3rem;
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .checkboxField input {
@@ -81,7 +81,7 @@
 
 .field .error,
 .checkboxField .error {
-  color: #b42318;
+  color: var(--state-danger-fg);
 }
 
 /* Campos de fecha-hora y hora: el atajo "Ahora" evita teclear dd/mm/aaaa --:--
@@ -102,10 +102,10 @@
   flex: 0 0 auto;
   min-height: 3rem;
   padding: 0 0.95rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 800;
   white-space: nowrap;
@@ -116,7 +116,7 @@
 .nowButton:hover {
   border-color: var(--color-secondary);
   background: color-mix(in srgb, var(--color-secondary) 8%, var(--color-white));
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .nowButton:disabled {
@@ -148,7 +148,7 @@
    selección muestra la opción elegida y debe leerse como un valor, no como un
    texto de ayuda en gris. */
 .searchable input[data-selected]::placeholder {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   opacity: 1;
 }
 
@@ -163,14 +163,14 @@
   justify-content: center;
   border: 0;
   background: none;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .searchableClear:hover {
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .searchableList {
@@ -187,8 +187,8 @@
   max-height: 15rem;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--color-white);
-  border: 1px solid var(--color-neutral-light);
+  background: var(--surface-1);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
   box-shadow: 0 14px 32px rgba(0, 37, 95, 0.16);
 }
@@ -200,7 +200,7 @@
   border: 0;
   border-radius: var(--radius-sm);
   background: none;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   text-align: left;
   cursor: pointer;
 }
@@ -216,14 +216,14 @@
 
 .searchableEmpty {
   padding: 0.6rem 0.65rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.92rem;
 }
 
 /* Alta de una opción sin salir del formulario, cuando la búsqueda no encuentra
    nada. El caso real es el colegio que todavía no está en el catálogo. */
 .searchableCreate {
-  border-top: 1px solid var(--color-neutral-light);
+  border-top: 1px solid var(--border-hairline);
   margin-top: 0.25rem;
   padding-top: 0.25rem;
 }
@@ -240,13 +240,13 @@
 }
 
 .searchableCreateForm strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .searchableCreateForm label {
   display: grid;
   gap: 0.25rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 0.9rem;
 }
 
@@ -256,10 +256,10 @@
   width: 100%;
   min-height: 2.5rem;
   padding: 0.4rem 0.5rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-sm);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
 }
 
 .searchableCreateActions {
@@ -271,9 +271,9 @@
 .searchableCreateActions button {
   width: auto;
   padding: 0.4rem 0.75rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-sm);
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
   font-weight: 700;
 }
 
@@ -284,6 +284,6 @@
 }
 
 .searchableCreateError {
-  color: #a01717;
+  color: var(--state-danger-fg);
   font-weight: 700;
 }

@@ -16,7 +16,7 @@
 }
 
 .eyebrow {
-  color: #147fa8;
+  color: var(--state-info-fg);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -24,12 +24,12 @@
 
 .card h1 {
   margin: 8px 0 12px;
-  color: #012b65;
+  color: var(--text-on-light);
   font-size: clamp(2rem, 5vw, 3.6rem);
 }
 
 .card p {
-  color: #195687;
+  color: var(--text-on-light-secondary);
   line-height: 1.6;
 }
 
@@ -52,5 +52,5 @@
 
 .actions button.secondary {
   background: #fff;
-  color: #012b65;
+  color: var(--text-on-light);
 }

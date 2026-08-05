@@ -11,15 +11,15 @@
   gap: var(--space-5);
   align-items: end;
   padding: clamp(1.25rem, 2.6vw, 1.9rem);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: var(--shadow-sm);
 }
 
 .eyebrow {
   margin: 0;
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.74rem;
   font-weight: 900;
   letter-spacing: 0.09em;
@@ -28,7 +28,7 @@
 
 .hero h1 {
   margin: 0.2rem 0 0.4rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: clamp(1.5rem, 2.6vw, 2rem);
   letter-spacing: -0.025em;
 }
@@ -36,7 +36,7 @@
 .lead {
   margin: 0;
   max-width: 46rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 650;
   line-height: 1.55;
 }
@@ -44,7 +44,7 @@
 .claseField {
   display: grid;
   gap: var(--space-2);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 800;
   min-width: 0;
 }
@@ -56,10 +56,10 @@
 .claseField select {
   width: 100%;
   min-height: 3rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   padding: 0.7rem 0.85rem;
   font: inherit;
   font-weight: 800;
@@ -72,7 +72,7 @@
 }
 
 .hint {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 650;
   line-height: 1.45;
 }
@@ -83,9 +83,9 @@
   display: grid;
   gap: var(--space-4);
   padding: clamp(1.1rem, 2.2vw, 1.6rem);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: var(--shadow-sm);
 }
 
@@ -102,20 +102,20 @@
   gap: 0.1rem;
   min-width: 6.5rem;
   padding: 0.65rem 0.9rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-neutral-light) 18%, var(--color-white));
 }
 
 .stat strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.45rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .stat span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -129,11 +129,11 @@
 
 .stat[data-tone='aviso'] {
   border-color: color-mix(in srgb, #b42318 32%, var(--color-neutral-light));
-  background: color-mix(in srgb, #b42318 7%, var(--color-white));
+  background: var(--state-danger-bg);
 }
 
 .stat[data-tone='aviso'] strong {
-  color: #8a1f11;
+  color: var(--state-danger-fg);
 }
 
 /* ------------------------------------------------------------------ acciones */
@@ -145,7 +145,7 @@
   align-items: end;
   gap: var(--space-4);
   padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-neutral-light);
+  border-bottom: 1px solid var(--border-hairline);
 }
 
 .grupoAcciones {
@@ -155,7 +155,7 @@
 }
 
 .grupoTitulo {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -171,10 +171,10 @@
 .chip {
   min-height: 2.35rem;
   padding: 0 0.8rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: 999px;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-size: 0.86rem;
   font-weight: 800;
@@ -185,7 +185,7 @@
 .chip:hover:not(:disabled) {
   border-color: var(--color-secondary);
   background: color-mix(in srgb, var(--color-secondary) 9%, var(--color-white));
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .chip:disabled {
@@ -197,7 +197,7 @@
 
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
 }
 
@@ -214,7 +214,7 @@
   text-align: left;
   padding: 0.6rem 0.7rem;
   background: color-mix(in srgb, var(--color-neutral-light) 26%, var(--color-white));
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.71rem;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -253,7 +253,7 @@
 }
 
 .estudianteCell strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 0.93rem;
   font-weight: 800;
   line-height: 1.3;
@@ -267,11 +267,11 @@
 }
 
 .marcaGuardado {
-  color: #166534;
+  color: var(--state-success-fg);
 }
 
 .marcaAviso {
-  color: #8a1f11;
+  color: var(--state-danger-fg);
 }
 
 /* ------------------------------------------------------------- controles fila */
@@ -282,7 +282,7 @@
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-neutral-light) 20%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
   padding: 0.4rem 0.6rem;
   font: inherit;
   font-size: 0.9rem;
@@ -297,7 +297,7 @@
 
 .rowControl:focus {
   border-color: var(--color-secondary);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 16%, transparent);
 }
 
@@ -321,28 +321,28 @@
 }
 
 .estadoControl[data-estado='Asistió'] {
-  background: color-mix(in srgb, #16a34a 13%, var(--color-white));
-  color: #166534;
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
 }
 
 .estadoControl[data-estado='Tardanza'] {
   background: color-mix(in srgb, #d97706 15%, var(--color-white));
-  color: #92400e;
+  color: var(--state-warning-fg);
 }
 
 .estadoControl[data-estado='Falta'] {
-  background: color-mix(in srgb, #b42318 12%, var(--color-white));
-  color: #8a1f11;
+  background: var(--state-danger-bg);
+  color: var(--state-danger-fg);
 }
 
 .estadoControl[data-estado='Justificado'] {
   background: color-mix(in srgb, var(--color-secondary) 14%, var(--color-white));
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .estadoControl[data-estado='En línea'] {
   background: color-mix(in srgb, #7c3aed 12%, var(--color-white));
-  color: #5b21b6;
+  color: var(--state-progress-fg);
 }
 
 .horaCell {
@@ -356,10 +356,10 @@
   flex: 0 0 auto;
   min-height: 2.4rem;
   padding: 0 0.65rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-secondary-dark);
+  background: var(--surface-1);
+  color: var(--text-brand);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -380,7 +380,7 @@
   border: 1px solid transparent;
   border-radius: 50%;
   background: transparent;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -388,8 +388,8 @@
 }
 
 .quitar:hover {
-  background: color-mix(in srgb, #b42318 10%, var(--color-white));
-  color: #b42318;
+  background: var(--state-danger-bg);
+  color: var(--state-danger-fg);
 }
 
 /* ------------------------------------------------------------------- estados */
@@ -412,14 +412,14 @@
 
 .message {
   border: 1px solid color-mix(in srgb, #16a34a 32%, var(--color-neutral-light));
-  background: color-mix(in srgb, #16a34a 8%, var(--color-white));
-  color: #166534;
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
 }
 
 .error {
   border: 1px solid color-mix(in srgb, #b42318 32%, var(--color-neutral-light));
-  background: color-mix(in srgb, #b42318 6%, var(--color-white));
-  color: #8a1f11;
+  background: var(--state-danger-bg);
+  color: var(--state-danger-fg);
 }
 
 .empty {
@@ -428,13 +428,13 @@
   gap: var(--space-3);
   padding: clamp(1.5rem, 4vw, 3rem);
   text-align: center;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 650;
   line-height: 1.6;
 }
 
 .empty strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.05rem;
 }
 
@@ -445,7 +445,7 @@
 
 .empty a,
 .hint a {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-weight: 800;
   text-decoration: underline;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CrudRecord, CrudResourceDefinition, ResourceFieldDefinition, SelectOption } from '../domain/CrudResource';
-import { createLookupOption, listLookupOptions } from '../services/lookupApi';
+import { createLookupOption, listAllLookupOptions } from '../services/lookupApi';
 import { validateResourcePayload } from '@/shared/validation/formValidation';
 
 function stringifyInitialValue(value: unknown): string | number | boolean {
@@ -159,7 +159,16 @@ export function useResourceFormViewModel(resource: CrudResourceDefinition, recor
     setLoadingRelationFields(fieldsWithRelation.reduce<Record<string, boolean>>((acc, field) => ({ ...acc, [field.name]: true }), {}));
 
     Promise.allSettled(fieldsWithRelation.map(async (field) => {
-      const options = field.relation ? await listLookupOptions(field.relation) : [];
+      // `listAllLookupOptions` y no `listLookupOptions`: la segunda pide una
+      // única página de 100 registros y no continúa.
+      //
+      // Con 143 unidades educativas sembradas, el desplegable de "Unidad
+      // educativa" del alta de estudiante se quedaba con las 100 primeras que
+      // devolvía el servidor y perdía el resto —entre ellas varios de los
+      // colegios más conocidos de Santa Cruz—. El recorte era además invisible:
+      // como las opciones se ordenan alfabéticamente DESPUÉS de recortar, la
+      // lista se veía completa de la A a la Z aunque le faltase un tercio.
+      const options = field.relation ? await listAllLookupOptions(field.relation, 300) : [];
       return [field.name, options] as const;
     })).then((results) => {
       if (!isMounted) return;

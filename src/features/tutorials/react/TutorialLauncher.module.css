@@ -6,7 +6,12 @@
 .launcher {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  /* 44×44: mínimo cómodo para el dedo. Sin esto el lanzador quedaba en 36 px
+     de alto dentro de la cabecera, la zona táctil más difícil de acertar. */
+  min-height: 2.75rem;
+  min-width: 2.75rem;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -23,7 +28,7 @@
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--color-secondary) 18%, transparent);
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.7rem;
   font-weight: 800;
   line-height: 1.5;

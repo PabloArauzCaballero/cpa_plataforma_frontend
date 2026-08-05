@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
 import { AmbientBackground } from '@/shared/components/Background';
+import { ThemeToggle } from '@/shared/components/ThemeToggle';
 import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
 import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
@@ -154,6 +155,7 @@ function AppShellLayout({ children }: AppShellProps) {
             </div>
           </div>
           <div className={styles.userBox}>
+            <ThemeToggle />
             <TutorialLauncher />
             <NavLink to="/perfil" {...tutorialAnchor(TUTORIAL_ANCHORS.headerProfile)}>
               <i className="fa-solid fa-user-circle" aria-hidden="true" />

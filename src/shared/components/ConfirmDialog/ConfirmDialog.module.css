@@ -23,9 +23,9 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-secondary) 18%, var(--color-border));
   border-radius: 22px;
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 28px 70px rgba(0, 37, 95, 0.28);
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .header {
@@ -33,7 +33,7 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1.35rem 1.45rem 1rem;
-  border-bottom: 1px solid var(--color-neutral-light);
+  border-bottom: 1px solid var(--border-hairline);
 }
 
 .icon {
@@ -44,12 +44,12 @@
   place-items: center;
   border-radius: 14px;
   background: color-mix(in srgb, var(--color-primary) 8%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .icon[data-variant='danger'] {
   background: #fff1f0;
-  color: #b42318;
+  color: var(--state-danger-fg);
 }
 
 .titleBlock h2 {
@@ -70,7 +70,7 @@
 
 .target {
   padding: 0.9rem 1rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: 14px;
   background: color-mix(in srgb, var(--color-neutral-light) 24%, var(--color-white));
   font-weight: 800;
@@ -79,7 +79,7 @@
 
 .warning {
   margin-top: 0.75rem;
-  color: #8a1f11;
+  color: var(--state-danger-fg);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -89,7 +89,7 @@
   justify-content: flex-end;
   gap: 0.8rem;
   padding: 1rem 1.45rem 1.35rem;
-  border-top: 1px solid var(--color-neutral-light);
+  border-top: 1px solid var(--border-hairline);
 }
 
 .actions button {
@@ -103,7 +103,7 @@
 
 .cancel {
   background: color-mix(in srgb, var(--color-neutral-light) 45%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .confirm {

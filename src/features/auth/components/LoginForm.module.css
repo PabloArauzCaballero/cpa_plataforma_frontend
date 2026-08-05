@@ -126,7 +126,7 @@
 }
 
 .control:focus-within > i {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .control:has(input:disabled) {
