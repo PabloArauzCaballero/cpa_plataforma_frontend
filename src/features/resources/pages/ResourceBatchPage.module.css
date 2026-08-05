@@ -237,10 +237,11 @@
 }
 
 .tableWrap {
+  composes: scrollShadow scrollShadowXY from global;
   overflow: auto;
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--surface-1);
+  background-color: var(--surface-1);
 }
 
 .table {

@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
 import { AmbientBackground } from '@/shared/components/Background';
 import { ThemeToggle } from '@/shared/components/ThemeToggle';
+import { ScrollCue } from '@/shared/components/ScrollCue';
 import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
 import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
@@ -172,6 +173,7 @@ function AppShellLayout({ children }: AppShellProps) {
             {children ?? <Outlet />}
           </div>
         </main>
+        <ScrollCue />
         <footer className={styles.footer}>
           <span>CPA Plataforma · Versión 1.1.37</span>
           <span>Todos los derechos reservados 2026</span>

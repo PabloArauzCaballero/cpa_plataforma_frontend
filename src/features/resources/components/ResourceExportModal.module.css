@@ -29,6 +29,7 @@
 }
 
 .filtersGrid {
+  composes: scrollShadow scrollShadowY from global;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   max-height: min(42vh, 360px);
   overflow: auto;

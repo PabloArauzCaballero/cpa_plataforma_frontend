@@ -93,10 +93,11 @@
 }
 
 .tableWrap {
+  composes: scrollShadow scrollShadowXY from global;
   overflow: auto;
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--surface-1);
+  background-color: var(--surface-1);
 }
 
 .table {
@@ -228,11 +229,13 @@
 }
 
 .preview {
+  composes: scrollShadow scrollShadowXY from global;
+  --scroll-cover: #071426;
   max-height: 18rem;
   overflow: auto;
   padding: 1rem;
   border-radius: var(--radius-md);
-  background: #071426;
+  background-color: #071426;
   color: #e5f0ff;
   font-size: 0.82rem;
 }

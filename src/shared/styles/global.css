@@ -1,5 +1,6 @@
 @import './theme.css';
 @import './backgrounds.css';
+@import './scroll.css';
 
 * {
   box-sizing: border-box;

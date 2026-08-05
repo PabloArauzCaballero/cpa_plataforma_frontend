@@ -196,6 +196,7 @@
 /* -------------------------------------------------------------------- tabla */
 
 .tableWrap {
+  composes: scrollShadow scrollShadowX from global;
   overflow-x: auto;
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
