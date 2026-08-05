@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { PageState } from '@/shared/components/PageState';
 import { explainVentaClaseError, registrarVentaClaseBatch, type VentaClaseRowPayload } from '../services/ventaClaseApi';
 import {
@@ -168,6 +169,7 @@ function getSelectedLabel(options: VentaClaseLookupOption[], value: string): str
 export function VentaClaseBatchPage() {
   const [rows, setRows] = useState<VentaClaseDraftRow[]>(() => [createEmptyRow(1), createEmptyRow(2), createEmptyRow(3)]);
   const [isSaving, setIsSaving] = useState(false);
+  const [confirmSubmit, setConfirmSubmit] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [responsePreview, setResponsePreview] = useState('');
@@ -362,8 +364,24 @@ export function VentaClaseBatchPage() {
     return <PageState title="Formulario no disponible" message="No se pudo preparar la tabla editable." />;
   }
 
+  const filasConDatos = rows.filter((row) => row.id_estudiante || row.id_tutor).length;
+
   return (
     <section className={styles.page}>
+      <ConfirmDialog
+        isOpen={confirmSubmit}
+        title="Confirmar parte de clases"
+        message="Se enviarán todas las filas completas del parte en una sola operación."
+        details={[
+          { label: 'Filas con datos', value: String(filasConDatos) },
+          { label: 'Filas en la planilla', value: String(rows.length) },
+        ]}
+        confirmLabel="Sí, enviar parte"
+        cancelLabel="Revisar filas"
+        isLoading={isSaving}
+        onCancel={() => setConfirmSubmit(false)}
+        onConfirm={() => { setConfirmSubmit(false); void submit(); }}
+      />
       <div className={styles.hero}>
         <div>
           <span>Contabilidad · clases pasadas</span>
@@ -526,7 +544,7 @@ export function VentaClaseBatchPage() {
 
         <div className={styles.actions}>
           <Button type="button" variant="ghost" onClick={clearRows}>Cancelar / limpiar</Button>
-          <Button type="button" disabled={isSaving} onClick={() => void submit()}>{isSaving ? 'Enviando...' : 'Enviar parte de clases'}</Button>
+          <Button type="button" disabled={isSaving} onClick={() => setConfirmSubmit(true)}>{isSaving ? 'Enviando...' : 'Enviar parte de clases'}</Button>
         </div>
       </div>
 

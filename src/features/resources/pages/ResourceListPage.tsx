@@ -8,6 +8,7 @@ import { SearchFilterBar } from '@/shared/components/SearchFilterBar';
 import { HelpGuideModal } from '../components/HelpGuideModal';
 import { ResourceExportModal } from '../components/ResourceExportModal';
 import { ResourceForm } from '../components/ResourceForm';
+import { summarizeCreate, summarizeUpdate, type ResolvedOptions } from '../domain/changeSummary';
 import { ResourceHeader } from '../components/ResourceHeader';
 import { TransactionForm } from '../components/TransactionForm';
 import { VentaClaseBatchPage } from './VentaClaseBatchPage';
@@ -115,6 +116,9 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
   const viewModel = useResourceListViewModel(resource);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [recordPendingDisable, setRecordPendingDisable] = useState<CrudRecord | null>(null);
+  /** Datos a la espera de confirmación. `null` = no hay nada pendiente. */
+  const [pendingSave, setPendingSave] = useState<CrudRecord | null>(null);
+  const [pendingOptions, setPendingOptions] = useState<ResolvedOptions>({});
   const showHourColors = isHourVisualResource(resource);
   const canCreate = userHasAnyPermission(resolveActionPermission(resource, 'create'));
   const canUpdate = userHasAnyPermission(resolveActionPermission(resource, 'update'));
@@ -128,6 +132,14 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
   if (viewModel.isLoading && viewModel.records.length === 0) {
     return <PageState title="Cargando registros" message={`Preparando información de ${resource.label}.`} />;
   }
+
+  const isEditingPending = Boolean(viewModel.editingRecord);
+  const resourceTitle = humanizeTitleLabel(resource.label, resource.key);
+  const saveDetails = pendingSave
+    ? isEditingPending
+      ? summarizeUpdate(resource, viewModel.editingRecord ?? {}, pendingSave, pendingOptions)
+      : summarizeCreate(resource, pendingSave, pendingOptions)
+    : [];
 
   return (
     <section className={styles.page}>
@@ -215,6 +227,32 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
 
       <HelpGuideModal isOpen={isHelpOpen} resource={resource} onClose={() => setIsHelpOpen(false)} />
 
+      {/* Confirmación de alta y de edición. En edición sólo se listan los
+          campos que CAMBIAN, con su valor anterior: así se revisa de verdad lo
+          que se va a tocar en vez de aceptar un "¿estás seguro?" sin leer. */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingSave)}
+        title={isEditingPending ? 'Confirmar cambios' : `Confirmar alta de ${resourceTitle}`}
+        message={
+          isEditingPending
+            ? saveDetails.length === 0
+              ? 'No has modificado ningún campo. Puedes guardar igualmente o volver al formulario.'
+              : `Vas a actualizar este registro de ${resourceTitle}. Revisa los cambios antes de guardar.`
+            : `Se creará un nuevo registro de ${resourceTitle} con los datos siguientes.`
+        }
+        details={saveDetails}
+        confirmLabel={isEditingPending ? 'Sí, guardar cambios' : 'Sí, crear registro'}
+        cancelLabel="Volver al formulario"
+        isLoading={viewModel.isSaving}
+        onCancel={() => setPendingSave(null)}
+        onConfirm={() => {
+          const payload = pendingSave;
+          if (!payload) return;
+          setPendingSave(null);
+          void viewModel.save(payload);
+        }}
+      />
+
       <ConfirmDialog
         isOpen={Boolean(recordPendingDisable)}
         title="Confirmar inhabilitación"
@@ -265,7 +303,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
             resource={resource}
             record={viewModel.editingRecord}
             isSaving={viewModel.isSaving}
-            onSubmit={(payload) => void viewModel.save(payload)}
+            onSubmit={(payload, options) => { setPendingOptions(options ?? {}); setPendingSave(payload); }}
             onCancel={() => viewModel.setIsFormOpen(false)}
           />
         ) : (
@@ -273,7 +311,7 @@ function ResourceListContent({ resource }: { resource: CrudResourceDefinition })
             resource={resource}
             record={viewModel.editingRecord}
             isSaving={viewModel.isSaving}
-            onSubmit={(payload) => void viewModel.save(payload)}
+            onSubmit={(payload, options) => { setPendingOptions(options ?? {}); setPendingSave(payload); }}
             onCancel={() => viewModel.setIsFormOpen(false)}
           />
         )}

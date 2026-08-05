@@ -119,3 +119,68 @@
   cursor: not-allowed;
   opacity: 0.65;
 }
+
+/* ── Resumen de lo que se va a guardar ───────────────────────────────────
+   Lista desplazable: un formulario con veinte campos no debe empujar los
+   botones fuera de la pantalla. */
+.details {
+  composes: scrollShadow scrollShadowY from global;
+  --scroll-cover: var(--surface-2);
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-2);
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: minmax(7rem, 34%) 1fr;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.detailRow:last-child {
+  border-bottom: 0;
+}
+
+.detailRow dt {
+  color: var(--text-on-light-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.detailRow dd {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--text-on-light);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+/* El valor anterior queda tachado y atenuado: se ve que se sustituye, pero no
+   compite con el valor nuevo. */
+.previous {
+  color: var(--text-on-light-muted);
+  text-decoration-thickness: 1px;
+}
+
+.detailRow dd i {
+  color: var(--color-secondary);
+  font-size: 0.7rem;
+}
+
+.moreDetails {
+  margin: 0;
+  color: var(--text-on-light-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+}

@@ -1,6 +1,8 @@
 import type { FormEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { Button } from '@/shared/components/Button';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
+import type { ResolvedOptions } from '../domain/changeSummary';
 import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource';
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
 import { useTransactionMovementsViewModel } from '../hooks/transaction/useTransactionMovementsViewModel';
@@ -25,7 +27,7 @@ interface TransactionFormProps {
   resource: CrudResourceDefinition;
   record: CrudRecord | null;
   isSaving: boolean;
-  onSubmit: (payload: CrudRecord) => void | Promise<void>;
+  onSubmit: (payload: CrudRecord, resolvedOptions?: ResolvedOptions) => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -33,6 +35,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
   const headerViewModel = useResourceFormViewModel(resource, record);
   const movementsViewModel = useTransactionMovementsViewModel(record);
   const [error, setError] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const recordId = resolveTransactionDraftRecordId(resource, record);
   const draftOperation: DraftOperation = record ? 'update' : 'create';
@@ -115,10 +118,18 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
     }
 
     setError(null);
+    // Igual que en `ResourceForm`: las opciones de las listas que apuntan a un
+    // catálogo viven aquí, así que viajan con el payload para que el resumen de
+    // confirmación pueda enseñar nombres en vez de identificadores.
+    const resolvedOptions = resource.fields.reduce<ResolvedOptions>((acc, field) => {
+      acc[field.name] = headerViewModel.getFieldOptions(field);
+      return acc;
+    }, {});
+
     onSubmit({
       ...headerPayload,
       movimientos: movementsViewModel.movements.map(getMovementPayload),
-    });
+    }, resolvedOptions);
   }
 
   return (
@@ -181,6 +192,26 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
 
       {error ? <p className={styles.error}>{error}</p> : null}
 
+      <ConfirmDialog
+        isOpen={confirmClear}
+        title="Limpiar campos"
+        message={record
+          ? 'La cabecera y los movimientos volverán a los valores guardados del registro. No se modifica nada en la base de datos.'
+          : 'Se vaciarán la cabecera y todos los movimientos cargados.'}
+        warning="Los borradores guardados no se tocan."
+        confirmLabel="Sí, limpiar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onCancel={() => setConfirmClear(false)}
+        onConfirm={() => {
+          setConfirmClear(false);
+          headerViewModel.resetFields();
+          movementsViewModel.replaceMovements([]);
+          movementsViewModel.resetMovementEditor();
+          setError(null);
+        }}
+      />
+
       <TransactionDraftActions
         hasDraft={draftViewModel.hasDraft}
         storedDraftCount={draftViewModel.storedDraftCount}
@@ -194,6 +225,7 @@ export function TransactionForm({ resource, record, isSaving, onSubmit, onCancel
         onSaveDraft={draftViewModel.saveDraft}
         onLoadDraft={draftViewModel.loadDraft}
         onDiscardDraft={draftViewModel.discardDraft}
+        onClearFields={() => setConfirmClear(true)}
         onPreviousDraft={draftViewModel.goToPreviousDraft}
         onNextDraft={draftViewModel.goToNextDraft}
       />

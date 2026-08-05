@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/Button';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { PageState } from '@/shared/components/PageState';
 import { userHasAnyPermission } from '@/shared/auth/session';
 import { listAllLookupOptions } from '../services/lookupApi';
@@ -86,6 +87,7 @@ function nuevaFila(idEstudiante = '', inscrito = false): FilaAsistencia {
  */
 export function AsistenciaMasivaPage() {
   const puedeRegistrar = userHasAnyPermission('create=SERVICIOS_EDUCATIVOS.ASISTENCIA_CLASE_CURSO.CREATE');
+  const [confirmarGuardado, setConfirmarGuardado] = useState(false);
 
   const [clases, setClases] = useState<ClaseDelCurso[]>([]);
   const [estudiantes, setEstudiantes] = useState<SelectOption[]>([]);
@@ -248,6 +250,21 @@ export function AsistenciaMasivaPage() {
 
   return (
     <section className={styles.page}>
+      <ConfirmDialog
+        isOpen={confirmarGuardado}
+        title="Confirmar registro de asistencia"
+        message="Se guardará la asistencia de toda la planilla en un solo envío."
+        details={[
+          { label: 'Estudiantes en planilla', value: String(resumen.enPlanilla) },
+          { label: 'Ya guardados', value: String(resumen.guardados) },
+          { label: 'Sin matrícula', value: String(resumen.sinMatricula) },
+        ]}
+        confirmLabel="Sí, guardar asistencia"
+        cancelLabel="Revisar planilla"
+        isLoading={guardando}
+        onCancel={() => setConfirmarGuardado(false)}
+        onConfirm={() => { setConfirmarGuardado(false); void guardar(); }}
+      />
       <header className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>Servicios educativos</p>
@@ -454,7 +471,7 @@ export function AsistenciaMasivaPage() {
                 <Button type="button" variant="ghost" onClick={() => void cargarClase(idClase)} disabled={guardando}>
                   Recargar clase
                 </Button>
-                <Button type="button" onClick={() => void guardar()} disabled={guardando || resumen.enPlanilla === 0}>
+                <Button type="button" onClick={() => setConfirmarGuardado(true)} disabled={guardando || resumen.enPlanilla === 0}>
                   {guardando ? 'Guardando...' : `Guardar asistencia (${resumen.enPlanilla})`}
                 </Button>
               </div>
