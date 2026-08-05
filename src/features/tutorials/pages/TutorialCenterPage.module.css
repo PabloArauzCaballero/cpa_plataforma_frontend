@@ -91,7 +91,7 @@
   margin: 0;
   font-size: var(--font-heading);
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .shortcutList {
@@ -105,17 +105,17 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   text-align: left;
   cursor: pointer;
   transition: background var(--transition-base), box-shadow var(--transition-base);
 }
 
 .shortcut:hover {
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
   box-shadow: var(--shadow-sm);
 }
 
@@ -135,7 +135,7 @@
 .shortcut small {
   font-weight: 700;
   font-size: 0.72rem;
-  color: var(--color-text-muted);
+  color: var(--text-on-light-muted);
 }
 
 /* --------------------------------------------------------------- filtros */
@@ -145,9 +145,9 @@
   grid-template-columns: minmax(14rem, 2fr) repeat(auto-fit, minmax(11rem, 1fr));
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .searchBox,
@@ -163,17 +163,17 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--text-on-light-muted);
 }
 
 .searchBox input,
 .field select {
   width: 100%;
   padding: 0.6rem 0.7rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-sm);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font-size: 0.86rem;
 }
 
@@ -200,10 +200,10 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-5);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
 }
 
 .settings h3 {
@@ -217,7 +217,7 @@
   max-width: 52ch;
   font-size: 0.82rem;
   line-height: 1.5;
-  color: var(--color-text-muted);
+  color: var(--text-on-light-muted);
 }
 
 .settingsActions {
@@ -240,8 +240,8 @@
   padding: 0.55rem 0.9rem;
   border: 1px solid rgba(180, 85, 31, 0.4);
   border-radius: var(--radius-md);
-  background: var(--color-white);
-  color: #8a4116;
+  background: var(--surface-1);
+  color: var(--state-warning-fg);
   font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;

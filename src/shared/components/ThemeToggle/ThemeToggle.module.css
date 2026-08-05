@@ -1,0 +1,61 @@
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  /* 44×44 de zona táctil aunque el interruptor dibujado sea más pequeño. */
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.track {
+  position: relative;
+  display: block;
+  width: 3.1rem;
+  height: 1.7rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-3);
+  transition: background var(--motion-base) var(--ease-in-out),
+    border-color var(--motion-base) var(--ease-in-out);
+}
+
+.toggle[data-theme-state='dark'] .track {
+  background: color-mix(in srgb, var(--color-secondary) 30%, var(--surface-3));
+  border-color: var(--border-brand);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: 0.16rem;
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--surface-1);
+  color: var(--text-brand);
+  font-size: 0.68rem;
+  box-shadow: var(--shadow-xs);
+  /* Sólo se anima `transform`: el desplazamiento lo resuelve el compositor. */
+  transform: translateY(-50%);
+  transition: transform var(--motion-base) var(--ease-out);
+}
+
+.toggle[data-theme-state='dark'] .thumb {
+  transform: translateY(-50%) translateX(1.4rem);
+}
+
+.toggle:hover .track {
+  border-color: var(--color-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .thumb {
+    transition: none;
+  }
+}

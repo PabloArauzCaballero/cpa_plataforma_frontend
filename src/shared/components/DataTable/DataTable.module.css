@@ -3,7 +3,7 @@
   border-radius: calc(var(--radius-lg) + 2px);
   border: 1px solid var(--border-hairline);
   background: var(--surface-1);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--surface-sheen);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -148,7 +148,7 @@
 .actions button:hover {
   background: var(--surface-2);
   border-color: var(--color-secondary);
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   transform: translateY(-1px);
 }
 

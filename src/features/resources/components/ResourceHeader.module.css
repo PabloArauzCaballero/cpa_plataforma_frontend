@@ -6,7 +6,7 @@
 }
 
 .header span {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-brand);
@@ -83,6 +83,6 @@
 .actions a:hover {
   background: var(--surface-2);
   border-color: var(--color-secondary);
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   transform: translateY(-1px);
 }

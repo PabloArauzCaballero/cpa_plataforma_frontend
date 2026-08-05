@@ -6,7 +6,7 @@
   border: 1px solid var(--border-hairline);
   border-radius: calc(var(--radius-lg) + 2px);
   padding: var(--space-5);
-  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--surface-sheen);
 }
 
 .topRow {

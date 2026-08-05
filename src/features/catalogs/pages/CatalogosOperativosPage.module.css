@@ -18,7 +18,7 @@
 }
 
 .hero span {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.78rem;
   font-weight: 950;
   text-transform: uppercase;
@@ -27,7 +27,7 @@
 
 .hero h2 {
   margin: 0.35rem 0;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: var(--font-display);
   line-height: 1.05;
   text-transform: uppercase;
@@ -37,7 +37,7 @@
 .hero p {
   max-width: 62rem;
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.55;
   font-weight: 650;
 }
@@ -58,7 +58,7 @@
   padding: 0.72rem 1rem;
   border-radius: 0.9rem;
   border: 1px solid var(--color-primary);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 900;
   text-decoration: none;
   white-space: nowrap;
@@ -78,21 +78,21 @@
 
 .metrics div {
   padding: 1.1rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 10px 24px rgba(0, 37, 95, 0.06);
 }
 
 .metrics strong {
   display: block;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.8rem;
   line-height: 1;
 }
 
 .metrics span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 850;
 }
 
@@ -106,8 +106,8 @@
   border: 1px solid var(--color-primary);
   border-radius: 999px;
   padding: 0.82rem 1.05rem;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 900;
   cursor: pointer;
@@ -125,7 +125,7 @@
   border-radius: var(--radius-md);
   border-left: 5px solid var(--color-secondary);
   background: color-mix(in srgb, var(--color-secondary) 10%, var(--color-white));
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 850;
 }
 
@@ -136,7 +136,7 @@
   padding: clamp(1rem, 2vw, 1.5rem);
   border: 1px solid color-mix(in srgb, var(--color-neutral-light) 85%, var(--color-secondary));
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 14px 32px rgba(0, 37, 95, 0.08);
 }
 
@@ -153,13 +153,13 @@
 }
 
 .panelHeader h3 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: clamp(1.45rem, 2.6vw, 2.1rem);
   text-transform: uppercase;
 }
 
 .panelHeader p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.5;
   font-weight: 650;
 }
@@ -168,7 +168,7 @@
 .accountCard label {
   display: grid;
   gap: 0.45rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 900;
 }
 
@@ -179,8 +179,8 @@
   padding: 0.8rem 0.95rem;
   border: 1px solid color-mix(in srgb, var(--color-neutral-muted) 42%, var(--color-neutral-light));
   border-radius: 0.9rem;
-  background: var(--color-surface-soft);
-  color: var(--color-primary);
+  background: var(--surface-2);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 750;
   outline: none;
@@ -208,8 +208,8 @@
   gap: var(--space-3);
   padding: 1.1rem;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-neutral-light);
-  background: var(--color-surface-soft);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-2);
 }
 
 .accountCard h4,
@@ -223,13 +223,13 @@
 .accountCard h4,
 .catalogCard h4,
 .flowGrid h4 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.18rem;
 }
 
 .accountCard p,
 .flowGrid p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.45;
   font-weight: 650;
 }
@@ -240,7 +240,7 @@
   border-radius: 999px;
   padding: 0.35rem 0.6rem;
   background: color-mix(in srgb, var(--color-primary) 9%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 0.72rem;
   font-weight: 950;
 }
@@ -250,12 +250,12 @@
   gap: var(--space-2);
   padding: 0.8rem;
   border-radius: 0.9rem;
-  background: var(--color-white);
-  border: 1px solid var(--color-neutral-light);
+  background: var(--surface-1);
+  border: 1px solid var(--border-hairline);
 }
 
 .topicBlock strong {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
 }
 
 .chips {
@@ -269,7 +269,7 @@
   border-radius: 999px;
   padding: 0.36rem 0.6rem;
   background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 0.78rem;
   font-weight: 850;
 }
@@ -287,7 +287,7 @@
 
 .tableWrap {
   overflow: auto;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
 }
 
@@ -295,7 +295,7 @@
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .table th {
@@ -310,8 +310,8 @@
 
 .table td {
   padding: 0.78rem;
-  border-bottom: 1px solid var(--color-neutral-light);
-  color: var(--color-primary);
+  border-bottom: 1px solid var(--border-hairline);
+  color: var(--text-on-light);
   font-weight: 650;
 }
 

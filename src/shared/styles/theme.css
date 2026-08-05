@@ -77,6 +77,10 @@
   --surface-sunken: #E7EDF4;
   --surface-glass: rgba(255, 255, 255, 0.78);
   --surface-glass-strong: rgba(255, 255, 255, 0.92);
+  /* Brillo interior del canto superior de una tarjeta. Es un realce de
+     material pensado para superficies claras; en oscuro se atenúa, si no se
+     lee como una línea blanca dibujada sobre el borde. */
+  --surface-sheen: rgba(255, 255, 255, 0.9);
 
   /* Bordes sobre superficie clara. `--color-border` (#195687) es azul
      oscuro: sirve sobre fondos oscuros, pero como contorno de una tarjeta
@@ -97,6 +101,10 @@
      sobre el pie translúcido, por debajo del 4.5:1 que pide AA para texto
      normal. Este valor da 4.63:1 sobre `--surface-3` y 5.22:1 sobre blanco. */
   --text-on-light-muted: #5C6E85;
+  /* Cian de marca USADO COMO TEXTO. `--color-secondary-dark` (#1A7BA6) es un
+     color de relleno: como texto sobre el lienzo daba 4.25:1, por debajo de
+     AA. Éste da 5.40:1 sobre el lienzo y 6.08:1 sobre blanco. */
+  --text-brand: #17698F;
 
   /* ══════════════════════════════════════════════════════════════════════
      MOTION
@@ -162,22 +170,100 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   MODO OSCURO — capa de fondo y tokens de superficie
+   MODO OSCURO
 
-   Alcance deliberado: se adaptan el sistema de fondos, las superficies,
-   los bordes y los estados. NO es una inversión automática de toda la
-   aplicación: las pantallas de módulos todavía fijan colores claros en sus
-   propios módulos CSS y convertirlas requiere tocar archivos que ahora
-   mismo están siendo editados por otros agentes. Ver el informe final.
+   Se activa con `data-theme="dark"` en <html>, que pone el interruptor de la
+   cabecera (y, antes del primer pintado, el script de index.html).
+
+   Deliberadamente NO se ata a `@media (prefers-color-scheme: dark)`: el
+   atributo ya arranca siguiendo la preferencia del sistema, y dejar además
+   una media query activa haría que la elección manual de "vista clara" no
+   pudiera ganarle al sistema.
+
+   Sólo se redefinen tokens SEMÁNTICOS (superficie, borde, texto, estado).
+   Los tokens de marca —`--color-secondary`, `--color-white`— no se tocan:
+   `--color-white` se usa como color de texto sobre botones oscuros y debe
+   seguir siendo blanco en ambos temas.
    ════════════════════════════════════════════════════════════════════════ */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-base: #07142B;
-    --bg-mesh-a: rgba(32, 160, 197, 0.20);
-    --bg-mesh-b: rgba(14, 62, 116, 0.34);
-    --bg-mesh-c: rgba(1, 43, 101, 0.30);
-    --bg-grid-line: rgba(255, 255, 255, 0.045);
-    --bg-noise-opacity: 0.035;
-    --bg-glow-strength: 0.72;
-  }
+:root[data-theme='dark'] {
+  /* Fondo por capas */
+  --bg-base: #07142B;
+  --bg-mesh-a: rgba(32, 160, 197, 0.20);
+  --bg-mesh-b: rgba(14, 62, 116, 0.34);
+  --bg-mesh-c: rgba(1, 43, 101, 0.30);
+  --bg-grid-line: rgba(255, 255, 255, 0.05);
+  --bg-noise-opacity: 0.035;
+  --bg-glow-strength: 0.72;
+
+  /* Superficies: la escala se invierte, cada nivel se ACLARA sobre el lienzo.
+     Es como funciona la elevación en oscuro —más cerca, más luz— al revés que
+     en claro, donde lo elevado se separa con sombra. */
+  --surface-canvas: #07142B;
+  --surface-1: #10233D;
+  --surface-2: #162B47;
+  --surface-3: #1D3452;
+  --surface-sunken: #0B1B31;
+  --surface-glass: rgba(16, 35, 61, 0.78);
+  --surface-glass-strong: rgba(16, 35, 61, 0.92);
+  --surface-sheen: rgba(255, 255, 255, 0.06);
+
+  /* Bordes: claros y translúcidos, no oscuros */
+  --border-hairline: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.15);
+  --border-strong: rgba(255, 255, 255, 0.26);
+
+  /* Texto. El nombre `--text-on-light` se conserva a propósito: renombrarlo
+     obligaría a repasar las ~300 declaraciones que ya lo usan. Léase como
+     "texto sobre superficie", que es lo que significa en ambos temas.
+     `--text-on-light-muted` está calibrado a 5.2:1 sobre `--surface-3`. */
+  --text-on-light: #E9F0F8;
+  --text-on-light-secondary: #B8CCE4;
+  --text-on-light-muted: #93A9C4;
+  --text-brand: #6FC5E8;
+
+  /* Azul de marca como superficie: #012B65 sobre un lienzo #07142B queda
+     casi invisible, así que los botones y cabeceras de marca se aclaran. */
+  --color-primary: #1E4A85;
+  --color-primary-dark: #163A6B;
+  --color-primary-soft: #2A5C9E;
+
+  /* Neutros heredados que todavía aparecen sueltos en algún módulo */
+  --color-surface-soft: #162B47;
+  --color-neutral-light: rgba(255, 255, 255, 0.14);
+  --color-accent: #B8CCE4;
+
+  /* Estados: fondo oscuro teñido y texto claro, invirtiendo la relación del
+     tema claro pero conservando el mismo significado cromático. */
+  --state-success-fg: #6FDBA4;
+  --state-success-bg: rgba(20, 102, 61, 0.28);
+  --state-success-border: rgba(111, 219, 164, 0.34);
+
+  --state-warning-fg: #F5C169;
+  --state-warning-bg: rgba(138, 83, 0, 0.28);
+  --state-warning-border: rgba(245, 193, 105, 0.32);
+
+  --state-danger-fg: #FF9B90;
+  --state-danger-bg: rgba(164, 35, 26, 0.28);
+  --state-danger-border: rgba(255, 155, 144, 0.34);
+
+  --state-info-fg: #7CCBEC;
+  --state-info-bg: rgba(26, 95, 138, 0.28);
+  --state-info-border: rgba(124, 203, 236, 0.32);
+
+  --state-neutral-fg: #B8CCE4;
+  --state-neutral-bg: rgba(255, 255, 255, 0.07);
+  --state-neutral-border: rgba(255, 255, 255, 0.16);
+
+  --state-progress-fg: #B6A8F5;
+  --state-progress-bg: rgba(74, 58, 158, 0.30);
+  --state-progress-border: rgba(182, 168, 245, 0.32);
+
+  /* Las sombras dejan de funcionar sobre fondo oscuro: se sustituyen por
+     sombras más profundas, que sí se perciben. */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.32);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.36);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.48);
+  --shadow-strong: 0 20px 48px rgba(0, 0, 0, 0.58);
 }
+

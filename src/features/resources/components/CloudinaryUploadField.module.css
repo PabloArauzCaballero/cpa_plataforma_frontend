@@ -11,7 +11,7 @@
 }
 
 .field strong {
-  color: #b42318;
+  color: var(--state-danger-fg);
 }
 
 .field input[type='file'] {
@@ -40,5 +40,5 @@
 }
 
 .error {
-  color: #b42318 !important;
+  color: var(--state-danger-fg)!important;
 }

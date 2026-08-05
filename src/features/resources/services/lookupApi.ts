@@ -1,6 +1,6 @@
 import { httpClient } from '@/shared/api/httpClient';
 import type { ResourceLookupRelation, SelectOption } from '../domain/CrudResource';
-import { normalizeListResponse } from './resourceMapper';
+import { normalizeListResponse, normalizeRecordResponse } from './resourceMapper';
 
 function withPaging(path: string, limit = 100, offset = 0): string {
   const separator = path.includes('?') ? '&' : '?';
@@ -125,9 +125,19 @@ export async function createLookupOption(
   payload: Record<string, unknown>,
 ): Promise<SelectOption> {
   const response = await httpClient.post<unknown, Record<string, unknown>>(relation.endpoint, payload);
-  const [created] = normalizeListResponse(response);
 
-  const record = created ?? payload;
+  // Un POST devuelve el registro creado como OBJETO (`{ data: { ... } }`), no
+  // como lista. `normalizeListResponse` sólo sabe extraer arrays, así que
+  // devolvía vacío y se caía al `payload` —que nunca lleva id— y de ahí al
+  // error "el servidor no devolvió el identificador".
+  //
+  // El efecto era el peor posible: el colegio SÍ quedaba creado en el
+  // servidor, pero la pantalla informaba de un fallo, así que al reintentar se
+  // creaban duplicados. Se prueba primero la forma de lista por si algún
+  // endpoint responde `[creado]`, y si no, la de registro suelto.
+  const [fromList] = normalizeListResponse(response);
+  const record = fromList ?? normalizeRecordResponse(response);
+
   const value = record[relation.valueField];
   if (value === undefined || value === null || String(value).trim() === '') {
     throw new Error('El servidor no devolvió el identificador del registro creado.');

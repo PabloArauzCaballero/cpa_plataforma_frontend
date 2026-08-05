@@ -80,8 +80,8 @@
 }
 
 .tutorialButton:hover {
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   transform: translateY(-2px);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
 }
@@ -91,7 +91,7 @@
 }
 
 .tutorialButton:hover i {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .toolbar {
@@ -103,7 +103,7 @@
   border: 1px solid var(--border-hairline);
   border-radius: calc(var(--radius-lg) + 2px);
   background: var(--surface-1);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--surface-sheen);
 }
 
 .toolbar div {
@@ -112,7 +112,7 @@
 }
 
 .toolbar span {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.76rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -174,7 +174,7 @@
   border: 1px solid var(--border-hairline);
   border-radius: calc(var(--radius-lg) + 2px);
   background: var(--surface-1);
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--surface-sheen);
   transition: transform var(--motion-base) var(--ease-out),
     box-shadow var(--motion-base) var(--ease-out),
     border-color var(--motion-base) var(--ease-out);
@@ -234,7 +234,7 @@
   flex: 0 0 auto;
   border-radius: 0.9rem;
   background: color-mix(in srgb, var(--color-secondary) 13%, var(--color-white));
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .cardBody {
@@ -295,7 +295,7 @@
 .secondaryAction {
   padding: 0.78rem 0.8rem;
   border: 1px solid var(--border-brand);
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   background: var(--surface-1);
   transition: background var(--motion-micro) var(--ease-in-out);
 }

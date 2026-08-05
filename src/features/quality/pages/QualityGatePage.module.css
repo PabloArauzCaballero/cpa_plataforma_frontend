@@ -12,7 +12,7 @@
 }
 
 .hero span {
-  color: #147fa8;
+  color: var(--state-info-fg);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -20,7 +20,7 @@
 
 .hero h2 {
   margin: 8px 0 12px;
-  color: #012b65;
+  color: var(--text-on-light);
   font-size: var(--font-display);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -43,14 +43,14 @@
 
 .card strong {
   display: block;
-  color: #012b65;
+  color: var(--text-on-light);
   font-size: 1.25rem;
   margin-bottom: 8px;
 }
 
 .card p {
   margin: 0;
-  color: #195687;
+  color: var(--text-on-light-secondary);
   line-height: 1.55;
 }
 
@@ -62,7 +62,7 @@
   border-radius: 999px;
   padding: 8px 12px;
   background: #eaf8ed;
-  color: #136b34;
+  color: var(--state-success-fg);
   font-weight: 900;
 }
 
@@ -79,6 +79,6 @@
   border-radius: 18px;
   padding: 14px 16px;
   background: #f8fbfd;
-  color: #0b4f88;
+  color: var(--state-info-fg);
   font-weight: 800;
 }

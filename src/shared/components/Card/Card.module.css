@@ -12,7 +12,7 @@
   color: var(--text-on-light);
   /* Luz interior en el canto superior: el realce de material que separa la
      tarjeta del lienzo sin tener que subir la opacidad de la sombra. */
-  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 var(--surface-sheen);
 }
 
 .dark {

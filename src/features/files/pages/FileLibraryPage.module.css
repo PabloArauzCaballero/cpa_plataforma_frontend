@@ -8,7 +8,7 @@
 .libraryPanel {
   border: 1px solid color-mix(in srgb, var(--color-secondary) 32%, var(--color-neutral-light));
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 18px 42px rgba(0, 37, 95, 0.08);
 }
 
@@ -24,7 +24,7 @@
 }
 
 .hero span {
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.78rem;
   font-weight: 950;
   letter-spacing: var(--letter-spacing-brand);
@@ -33,7 +33,7 @@
 
 .hero h2 {
   margin: 0.35rem 0;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: var(--font-display);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -43,7 +43,7 @@
 .hero p {
   max-width: 58rem;
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 650;
   line-height: 1.55;
 }
@@ -99,7 +99,7 @@
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: var(--font-heading);
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -107,7 +107,7 @@
 
 .panelHeader p {
   margin-top: 0.3rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.45;
   font-weight: 650;
 }
@@ -132,8 +132,8 @@
   border: 1px solid var(--color-primary);
   border-radius: 0.85rem;
   padding: 0.72rem 1rem;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 900;
   text-decoration: none;
@@ -178,7 +178,7 @@ button:disabled {
 .filters label {
   display: grid;
   gap: 0.48rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 900;
 }
 
@@ -191,8 +191,8 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--color-neutral-muted) 42%, var(--color-neutral-light));
   border-radius: 0.9rem;
   padding: 0.86rem 1rem;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 750;
   outline: none;
@@ -228,17 +228,17 @@ button:disabled {
 
 .fileDrop svg {
   justify-self: center;
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 2.2rem;
 }
 
 .fileDrop strong {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   word-break: break-word;
 }
 
 .fileDrop small {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
 }
 
 .fileDrop input {
@@ -257,7 +257,7 @@ button:disabled {
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .inputIcon input {
@@ -273,8 +273,8 @@ button:disabled {
 }
 
 .success {
-  background: color-mix(in srgb, #16a34a 10%, var(--color-white));
-  color: #166534;
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
   border-left: 5px solid #16a34a;
 }
 
@@ -283,13 +283,13 @@ button:disabled {
   gap: 0.6rem;
   align-items: center;
   background: color-mix(in srgb, #b91c1c 10%, var(--color-white));
-  color: #991b1b;
+  color: var(--state-danger-fg);
   border-left: 5px solid #b91c1c;
 }
 
 .empty {
-  background: var(--color-surface-soft);
-  color: var(--color-accent);
+  background: var(--surface-2);
+  color: var(--text-on-light-secondary);
   text-align: center;
 }
 
@@ -303,9 +303,9 @@ button:disabled {
   overflow: hidden;
   display: grid;
   grid-template-rows: 11rem 1fr auto;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
@@ -322,7 +322,7 @@ button:disabled {
   background:
     radial-gradient(circle at 70% 10%, rgba(32, 160, 197, 0.16), transparent 30%),
     var(--color-surface-soft);
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .preview img {
@@ -333,7 +333,7 @@ button:disabled {
 
 .preview svg {
   font-size: 3.4rem;
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
 }
 
 .fileBody {
@@ -344,21 +344,21 @@ button:disabled {
 
 .fileBody h4 {
   margin: 0;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   line-height: 1.2;
   word-break: break-word;
 }
 
 .fileBody p {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   line-height: 1.4;
 }
 
 .metaGrid {
   display: grid;
   gap: 0.35rem;
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.88rem;
   font-weight: 800;
 }
@@ -372,7 +372,7 @@ button:disabled {
 }
 
 .urlHint {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-size: 0.85rem;
   font-weight: 800;
 }
@@ -383,7 +383,7 @@ button:disabled {
 }
 
 .pagination span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 900;
 }
 
@@ -417,14 +417,14 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: 1.12rem;
   text-transform: uppercase;
 }
 
 .folderPanel p,
 .fieldHint {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 750;
   line-height: 1.4;
 }
@@ -441,7 +441,7 @@ button:disabled {
   border: 1px solid color-mix(in srgb, var(--color-neutral-muted) 42%, var(--color-neutral-light));
   border-radius: 0.9rem;
   padding: 0.86rem 1rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 750;
   outline: none;
@@ -454,8 +454,8 @@ button:disabled {
   border: 1px solid var(--color-primary);
   border-radius: 0.85rem;
   padding: 0.72rem 1rem;
-  background: var(--color-white);
-  color: var(--color-primary);
+  background: var(--surface-1);
+  color: var(--text-on-light);
   font: inherit;
   font-weight: 900;
   cursor: pointer;
@@ -510,7 +510,7 @@ button:disabled {
 
 .folderDeleteButton:hover {
   background: rgba(180, 35, 24, 0.12);
-  color: #b42318;
+  color: var(--state-danger-fg);
 }
 
 .folderBadge {
@@ -521,7 +521,7 @@ button:disabled {
   padding: 0.32rem 0.55rem;
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-white));
-  color: var(--color-secondary-dark);
+  color: var(--text-brand);
   font-size: 0.78rem;
   font-weight: 950;
 }

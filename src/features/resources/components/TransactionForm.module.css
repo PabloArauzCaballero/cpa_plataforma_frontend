@@ -14,7 +14,7 @@
   background:
     linear-gradient(135deg, rgba(32, 160, 197, 0.1), transparent),
     var(--color-surface-soft);
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .notice strong {
@@ -24,7 +24,7 @@
 
 .notice span,
 .sectionTitle p {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 700;
   line-height: 1.55;
 }
@@ -41,7 +41,7 @@
 }
 
 .section h3 {
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-size: clamp(1.08rem, 1.8vw, 1.28rem);
   letter-spacing: -0.02em;
 }
@@ -52,9 +52,9 @@
   gap: clamp(1rem, 2vw, 1.4rem) clamp(1.1rem, 2.4vw, 1.75rem);
   min-width: 0;
   padding: clamp(1rem, 2vw, 1.25rem);
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .sectionTitle {
@@ -74,7 +74,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-2);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   max-width: 34rem;
 }
 
@@ -82,8 +82,8 @@
 .balance strong {
   border-radius: 999px;
   padding: 0.55rem 0.85rem;
-  background: var(--color-surface-soft);
-  border: 1px solid var(--color-neutral-light);
+  background: var(--surface-2);
+  border: 1px solid var(--border-hairline);
   font-size: 0.82rem;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 37, 95, 0.04);
@@ -92,13 +92,13 @@
 .balance[data-balanced='true'] strong {
   background: #dcfce7;
   border-color: #bbf7d0;
-  color: #166534;
+  color: var(--state-success-fg);
 }
 
 .balance[data-balanced='false'] strong {
   background: #fee2e2;
   border-color: #fecaca;
-  color: #991b1b;
+  color: var(--state-danger-fg);
 }
 
 .movementGrid {
@@ -109,14 +109,14 @@
   padding: clamp(1rem, 2vw, 1.35rem);
   border: 1px solid color-mix(in srgb, var(--color-secondary) 16%, var(--color-neutral-light));
   border-radius: var(--radius-lg);
-  background: var(--color-surface-soft);
+  background: var(--surface-2);
   min-width: 0;
 }
 
 .movementGrid label {
   display: grid;
   gap: var(--space-2);
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 900;
   min-width: 0;
 }
@@ -129,11 +129,11 @@
 .movementGrid select {
   width: 100%;
   min-height: 3.15rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
   padding: 0.88rem 1rem;
-  color: var(--color-primary);
-  background: var(--color-white);
+  color: var(--text-on-light);
+  background: var(--surface-1);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -167,9 +167,9 @@
 
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-1);
   box-shadow: 0 8px 22px rgba(0, 37, 95, 0.05);
 }
 
@@ -183,13 +183,13 @@
 .table td {
   padding: 1rem 1.15rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-neutral-light);
+  border-bottom: 1px solid var(--border-hairline);
   vertical-align: middle;
 }
 
 .table th {
-  color: var(--color-primary);
-  background: var(--color-surface-soft);
+  color: var(--text-on-light);
+  background: var(--surface-2);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -219,7 +219,7 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(185, 28, 28, 0.22);
   background: #fff1f2;
-  color: #991b1b;
+  color: var(--state-danger-fg);
   font-weight: 800;
 }
 
@@ -271,7 +271,7 @@
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--color-secondary) 18%, var(--color-neutral-light));
   background: color-mix(in srgb, var(--color-surface-soft) 78%, var(--color-white));
-  color: var(--color-primary);
+  color: var(--text-on-light);
 }
 
 .contextBox strong {
@@ -281,7 +281,7 @@
 }
 
 .contextBox span {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 700;
   line-height: 1.45;
 }
@@ -304,7 +304,7 @@
 }
 
 .accountPicker small {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 800;
   line-height: 1.35;
 }
@@ -316,7 +316,7 @@
 }
 
 .secondaryButton {
-  background: var(--color-white) !important;
+  background: var(--surface-1) !important;
   color: var(--color-primary) !important;
   border: 1px solid color-mix(in srgb, var(--color-primary) 45%, var(--color-neutral-light)) !important;
   box-shadow: none !important;
@@ -344,19 +344,19 @@
 }
 
 .draftSuccess {
-  color: #17663a;
+  color: var(--state-success-fg);
   font-weight: 800;
 }
 
 .draftError {
-  color: #a01717;
+  color: var(--state-danger-fg);
   font-weight: 800;
 }
 
 .draftInfo {
   display: grid;
   gap: 0.2rem;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   min-width: 0;
 }
 
@@ -367,7 +367,7 @@
 }
 
 .draftMeta {
-  color: var(--color-accent);
+  color: var(--text-on-light-secondary);
   font-weight: 900;
 }
 
@@ -383,9 +383,9 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.35rem;
-  border: 1px solid var(--color-neutral-light);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: var(--surface-1);
 }
 
 .draftPager button {
@@ -393,8 +393,8 @@
   min-width: 2.35rem;
   border: 1px solid color-mix(in srgb, var(--color-primary) 28%, var(--color-neutral-light));
   border-radius: var(--radius-sm);
-  background: var(--color-surface-soft);
-  color: var(--color-primary);
+  background: var(--surface-2);
+  color: var(--text-on-light);
   cursor: pointer;
 }
 
@@ -406,6 +406,6 @@
 .draftPager span {
   min-width: 5.8rem;
   text-align: center;
-  color: var(--color-primary);
+  color: var(--text-on-light);
   font-weight: 900;
 }
