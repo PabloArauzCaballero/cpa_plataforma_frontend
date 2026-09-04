@@ -1,0 +1,45 @@
+# Despliegue en Coolify (entorno dev).
+#
+# `docker-compose.yml` levanta el contenedor en la máquina de un desarrollador y
+# publica el puerto 5173. Este archivo es para publicarlo en Coolify: se crea un
+# recurso "Docker Compose", se apunta a este repositorio y se selecciona este
+# archivo. Los valores van en la pestaña Environment Variables del recurso.
+#
+# SERVICE_FQDN_WEB_80 es una variable mágica de Coolify: al verla declarada en
+# forma de lista y asignada con ${...}, genera el dominio público y enruta hacia
+# el puerto 80 del contenedor. Por eso NO hay `ports:`: publicar el puerto
+# saltaría el proxy y el servicio quedaría sin dominio ni TLS, es decir sin nada
+# que abrir desde la interfaz.
+#
+# OJO con las VITE_*: Vite las congela dentro del bundle durante el build, así
+# que viajan como build args, no como variables de runtime. Cambiar cualquiera
+# de ellas obliga a RECONSTRUIR la imagen; reiniciar el contenedor no basta.
+#
+# Uso local:  docker compose -f docker-compose.dev.yml up --build
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Dominio público del backend, sin /api al final: las rutas ya lo llevan.
+        # Si queda vacío, el frontend pide /api/... contra su propio dominio,
+        # donde no hay API, y la pantalla carga sin datos.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:?define VITE_API_BASE_URL con el dominio del backend}
+        # Cloudinary: sin estas dos el grid del cajero muestra el placeholder
+        # y la subida de imágenes falla. El preset debe ser UNSIGNED.
+        VITE_CLOUDINARY_CLOUD_NAME: ${VITE_CLOUDINARY_CLOUD_NAME:-}
+        VITE_CLOUDINARY_UPLOAD_PRESET: ${VITE_CLOUDINARY_UPLOAD_PRESET:-}
+        VITE_CLOUDINARY_FOLDER: ${VITE_CLOUDINARY_FOLDER:-cpa/archivos}
+        VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER: ${VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER:-cpa/archivos}
+        VITE_CLOUDINARY_PRODUCTOS_FOLDER: ${VITE_CLOUDINARY_PRODUCTOS_FOLDER:-cpa/productos}
+    restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_WEB_80=${SERVICE_FQDN_WEB_80}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
