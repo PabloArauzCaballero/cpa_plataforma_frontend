@@ -10,6 +10,7 @@ services:
         VITE_CLOUDINARY_UPLOAD_PRESET: ${VITE_CLOUDINARY_UPLOAD_PRESET:-}
         VITE_CLOUDINARY_FOLDER: ${VITE_CLOUDINARY_FOLDER:-cpa/archivos}
         VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER: ${VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER:-cpa/archivos}
+        VITE_CLOUDINARY_PRODUCTOS_FOLDER: ${VITE_CLOUDINARY_PRODUCTOS_FOLDER:-cpa/productos}
     image: cpa-plataforma-frontend:local
     container_name: cpa-plataforma-frontend
     ports:
