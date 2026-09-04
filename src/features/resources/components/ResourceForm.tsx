@@ -38,6 +38,22 @@ function isCloudinaryArchivoTransaccionField(resource: CrudResourceDefinition, f
   return resource.key === 'archivos-transaccion' && fieldName === 'link_achivo';
 }
 
+/**
+ * Campos de imagen que se suben a Cloudinary en vez de pedir la URL a mano.
+ * Se declara por nombre de campo para que un recurso nuevo con `imagen_url`
+ * herede el uploader sin tocar este componente.
+ */
+const CLOUDINARY_IMAGE_FIELDS: Record<string, { label: string; folder: string }> = {
+  imagen_url: {
+    label: 'Imagen del producto',
+    folder: import.meta.env.VITE_CLOUDINARY_PRODUCTOS_FOLDER || 'cpa/productos',
+  },
+};
+
+function getCloudinaryImageField(fieldName: string) {
+  return CLOUDINARY_IMAGE_FIELDS[fieldName];
+}
+
 function shouldHideTechnicalMirrorField(resource: CrudResourceDefinition, fieldName: string): boolean {
   return resource.key === 'archivos-transaccion' && fieldName === 'link_archivo';
 }
@@ -254,6 +270,22 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
         <div className={styles.grid}>
           {visibleFields.map((field) => {
             const label = humanizeFieldLabel(field.label, field.name);
+
+            const imagenCloudinary = getCloudinaryImageField(field.name);
+            if (imagenCloudinary) {
+              return (
+                <CloudinaryUploadField
+                  key={field.name}
+                  id={field.name}
+                  label={imagenCloudinary.label}
+                  value={String(viewModel.payload[field.name] ?? '')}
+                  error={viewModel.errors[field.name]}
+                  required={field.required}
+                  folder={imagenCloudinary.folder}
+                  onUploaded={(url) => viewModel.setField(field.name, url)}
+                />
+              );
+            }
 
             if (isCloudinaryArchivoTransaccionField(resource, field.name)) {
               return (

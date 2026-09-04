@@ -4,7 +4,12 @@ import { getModuleVisualMeta } from '@/features/dashboard/moduleMeta';
 import { AmbientBackground } from '@/shared/components/Background';
 import { ThemeToggle } from '@/shared/components/ThemeToggle';
 import { ScrollCue } from '@/shared/components/ScrollCue';
-import { clearStoredSession, getSessionDisplayName, userHasAnyPermission } from '@/shared/auth/session';
+import {
+  clearStoredSession,
+  getSessionDisplayName,
+  isCashierOnlyUser,
+  userHasAnyPermission,
+} from '@/shared/auth/session';
 import { resourceModules } from '@/features/resources/domain/resourceDefinitions';
 import { TUTORIAL_ANCHORS, tutorialAnchor, tutorialAnchorFor } from '@/features/tutorials/domain/tutorialAnchors';
 import { TUTORIAL_CENTER_ROUTE } from '@/features/tutorials/domain/tutorialRoutes';
@@ -33,6 +38,9 @@ function AppShellLayout({ children }: AppShellProps) {
   const location = useLocation();
   const email = getSessionDisplayName();
   const [navOpen, setNavOpen] = useState(false);
+  // El cajero sólo cobra: mostrarle el árbol completo de módulos le ofrece
+  // pantallas que el backend le va a negar de todos modos.
+  const soloCaja = isCashierOnlyUser();
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => {
@@ -69,19 +77,34 @@ function AppShellLayout({ children }: AppShellProps) {
           <span>Centro de Preparación Académica</span>
         </div>
         <nav className={styles.nav} aria-label="Navegación principal">
-          <NavLink to="/" end className={styles.homeLink} {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarHome)}>
-            <i className="fa-solid fa-house" aria-hidden="true" />
-            <span>Inicio</span>
-          </NavLink>
-          <NavLink
-            to={TUTORIAL_CENTER_ROUTE}
-            className={styles.homeLink}
-            {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarTutorials)}
-          >
-            <i className="fa-solid fa-graduation-cap" aria-hidden="true" />
-            <span>Tutoriales</span>
-          </NavLink>
-          {resourceModules.map((module) => {
+          {soloCaja ? (
+            <NavLink to="/caja/venta" className={styles.homeLink}>
+              <i className="fa-solid fa-cash-register" aria-hidden="true" />
+              <span>Registrar venta</span>
+            </NavLink>
+          ) : (
+            <>
+              <NavLink to="/" end className={styles.homeLink} {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarHome)}>
+                <i className="fa-solid fa-house" aria-hidden="true" />
+                <span>Inicio</span>
+              </NavLink>
+              {userHasAnyPermission('CONTABILIDAD.VENTA_PRODUCTO.REGISTRAR') ? (
+                <NavLink to="/caja/venta" className={styles.homeLink}>
+                  <i className="fa-solid fa-cash-register" aria-hidden="true" />
+                  <span>Punto de venta</span>
+                </NavLink>
+              ) : null}
+              <NavLink
+                to={TUTORIAL_CENTER_ROUTE}
+                className={styles.homeLink}
+                {...tutorialAnchor(TUTORIAL_ANCHORS.sidebarTutorials)}
+              >
+                <i className="fa-solid fa-graduation-cap" aria-hidden="true" />
+                <span>Tutoriales</span>
+              </NavLink>
+            </>
+          )}
+          {(soloCaja ? [] : resourceModules).map((module) => {
             const meta = getModuleVisualMeta(module.key);
             const visibleResources = module.resources.filter((resource) => userHasAnyPermission(resource.permissions));
             if (visibleResources.length === 0) return null;
@@ -175,7 +198,7 @@ function AppShellLayout({ children }: AppShellProps) {
         </main>
         <ScrollCue />
         <footer className={styles.footer}>
-          <span>CPA Plataforma · Versión 1.1.37</span>
+          <span>CPA Plataforma · Versión 1.1.38</span>
           <span>Todos los derechos reservados 2026</span>
         </footer>
       </div>

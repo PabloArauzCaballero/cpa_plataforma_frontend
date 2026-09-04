@@ -172,6 +172,35 @@ export function userHasAnyPermission(required: string | string[] | undefined): b
   return requiredPermissions.some((permission) => userPermissions.has(permission) || userRoles.has(permission));
 }
 
+/**
+ * Roles cuyo único trabajo en el sistema es cobrar. A estos usuarios la
+ * aplicación los lleva directo al punto de venta en lugar del tablero general.
+ * Un usuario que además tenga cualquier otro rol NO se considera cajero puro.
+ */
+const CASHIER_ONLY_ROLES = new Set(['CAJERO']);
+
+export function userHasAnyRole(required: string | string[]): boolean {
+  const session = getStoredSession();
+  if (!session) return false;
+
+  const requiredRoles = (Array.isArray(required) ? required : [required]).map(normalizeToken);
+  const userRoles = new Set(session.roles.map(normalizeToken));
+  return requiredRoles.some((role) => userRoles.has(role));
+}
+
+/**
+ * Cierto sólo cuando todos los roles del usuario son de caja. Un super usuario
+ * o alguien con un rol adicional conserva la navegación completa.
+ */
+export function isCashierOnlyUser(): boolean {
+  const session = getStoredSession();
+  if (!session || session.esSuperUsuario) return false;
+
+  const roles = session.roles.map(normalizeToken).filter(Boolean);
+  if (roles.length === 0) return false;
+  return roles.every((role) => CASHIER_ONLY_ROLES.has(role));
+}
+
 export function getSessionDisplayName(): string {
   const session = getStoredSession();
   return session?.nombreCompleto || session?.nombreUsuario || session?.email || 'Usuario CPA';

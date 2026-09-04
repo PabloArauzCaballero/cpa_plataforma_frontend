@@ -13,6 +13,7 @@ const UserProfilePage = lazy(() => import('@/features/profile/pages/UserProfileP
 const CatalogosOperativosPage = lazy(() => import('@/features/catalogs/pages/CatalogosOperativosPage').then((module) => ({ default: module.CatalogosOperativosPage })));
 const FileLibraryPage = lazy(() => import('@/features/files/pages/FileLibraryPage').then((module) => ({ default: module.FileLibraryPage })));
 const TutorialCenterPage = lazy(() => import('@/features/tutorials/pages/TutorialCenterPage').then((module) => ({ default: module.TutorialCenterPage })));
+const CajaVentaPage = lazy(() => import('@/features/caja/pages/CajaVentaPage').then((module) => ({ default: module.CajaVentaPage })));
 
 function withSuspense(element: ReactElement) {
   return (
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
       { path: 'modulos/:module', element: withSuspense(<ModuleResourcePickerPage />) },
       { path: 'modulos/:module/:resource', element: withSuspense(<ResourceListPage />) },
       { path: 'batch/:module/:resource', element: withSuspense(<ResourceBatchPage />) },
+      { path: 'caja/venta', element: withSuspense(<CajaVentaPage />) },
       { path: 'contabilidad/catalogos-cuentas-operativas', element: withSuspense(<CatalogosOperativosPage />) },
       { path: 'contabilidad/archivos', element: withSuspense(<FileLibraryPage />) },
       { path: 'tutoriales', element: withSuspense(<TutorialCenterPage />) },

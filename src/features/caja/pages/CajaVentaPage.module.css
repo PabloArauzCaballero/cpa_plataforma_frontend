@@ -1,0 +1,124 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.catalogo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.1rem;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+}
+
+.catalogoHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.catalogoHeader h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-primary);
+}
+
+.catalogoHeader p {
+  max-width: 46ch;
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.busqueda input {
+  min-width: 15rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-neutral-light);
+  border-radius: var(--radius-pill);
+}
+
+.busqueda input:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+
+.venta {
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-2);
+}
+
+.venta h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-primary);
+}
+
+.aviso,
+.error {
+  padding: 0.55rem 0.7rem;
+  margin: 0;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+.aviso {
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+}
+
+.error {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.exito {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.7rem;
+  font-size: 0.88rem;
+  color: var(--color-success);
+  background: var(--color-success-soft);
+  border-radius: var(--radius-sm);
+}
+
+.exito button {
+  align-self: flex-start;
+  padding: 0;
+  font-weight: 600;
+  color: var(--color-success);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .venta {
+    position: static;
+  }
+}
