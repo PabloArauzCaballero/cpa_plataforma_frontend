@@ -91,6 +91,6 @@ comodidad, no control de acceso.
 1. Rellenar `VITE_CLOUDINARY_CLOUD_NAME` y `VITE_CLOUDINARY_UPLOAD_PRESET` en
    `.env` (preset **unsigned**). Sin ellas el grid muestra el placeholder y la
    subida de imágenes falla.
-2. Aplicar las migraciones `018` y `019`.
+2. Aplicar las migraciones `025_punto_venta_tienda.sql` y `026_permisos_cajero_punto_venta.sql`.
 3. Marcar los productos con `es_producto_tienda`, ponerles `precio_referencia`
    y subirles imagen desde Inventario > Bien.
