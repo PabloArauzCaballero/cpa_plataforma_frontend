@@ -57,7 +57,7 @@ sequenceDiagram
 `resourceApi.ts:41-74`. Un mismo valor se envía con varios nombres para tolerar variantes del backend:
 
 | Concepto | Parámetros emitidos |
-|---|---|
+| --- | --- |
 | Paginación | `page`, `limit`, `offset` |
 | Orden | `orderBy`, `orderDir` |
 | Búsqueda | `q`, `search`, `term` |
@@ -99,7 +99,7 @@ allRecords
 Reglas de coincidencia (`recordMatchesFilters`, líneas 311-333):
 
 | Tipo de dato | Comparación |
-|---|---|
+| --- | --- |
 | Booleano en el registro | El texto del filtro se traduce a booleano con `statusTextToBoolean` |
 | Campo tipo `id_*` o valor numérico | **Exacta**, para evitar coincidencias accidentales |
 | Texto | **Contiene**, sin acentos ni mayúsculas (`normalizeForCompare`) |
@@ -147,7 +147,7 @@ sequenceDiagram
 Dos vías coexisten:
 
 | Vía | Servicio | Almacenamiento |
-|---|---|---|
+| --- | --- | --- |
 | Local | `shared/services/localDraftStore.ts` | `localStorage` |
 | Remota | `persistentDraftApi.ts` **y** `backendDraftApi.ts` | `POST/PATCH /api/administracion/registro-borrador` |
 
@@ -184,7 +184,7 @@ sequenceDiagram
 ## Puntos de fallo del flujo
 
 | # | Punto | Comportamiento | Visibilidad |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | `assertEnv()` | Lanza excepción antes de cualquier fetch | Error en pantalla |
 | 2 | Red caída | `fetch` rechaza; el hook captura | `PageState` + «Reintentar» |
 | 3 | Respuesta no OK | `HttpError` con mensaje saneado | `PageState` |
@@ -202,7 +202,7 @@ Los puntos **5** y **6** son fallos silenciosos: la interfaz muestra un estado n
 `sanitizeTechnicalPaths` (`httpClient.ts:40-48`) reescribe el mensaje del backend antes de mostrarlo:
 
 | Patrón | Sustitución |
-|---|---|
+| --- | --- |
 | `https?://…` | `servicio interno` |
 | `GET/POST/PUT/PATCH/DELETE /ruta` | `acción del sistema` |
 | `/api/…` | `servicio interno` |

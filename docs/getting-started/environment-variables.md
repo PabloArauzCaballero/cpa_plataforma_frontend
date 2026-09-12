@@ -2,12 +2,12 @@
 
 Todas las variables del frontend llevan el prefijo `VITE_` y **se resuelven en tiempo de build**, no en runtime. Vite las sustituye literalmente en el bundle.
 
-> **Consecuencia de seguridad, no negociable:** cualquier valor `VITE_*` queda escrito en texto plano dentro de los archivos JavaScript publicados y es legible por cualquiera que abra la aplicación. **Nunca pongas un secreto aquí.** Ver [security/frontend-security.md](../security/frontend-security.md#variables-públicas-y-privadas).
+> **Consecuencia de seguridad, no negociable:** cualquier valor `VITE_*` queda escrito en texto plano dentro de los archivos JavaScript publicados y es legible por cualquiera que abra la aplicación. **Nunca pongas un secreto aquí.** Ver [operations/configuration.md](../operations/configuration.md).
 
 ## Inventario
 
 | Variable | Obligatoria | Consumida en | Efecto si falta |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `VITE_API_BASE_URL` | **Sí** | `src/config/env.ts:2` | `assertEnv()` lanza `Missing environment variable: VITE_API_BASE_URL` en la **primera** petición HTTP. La aplicación carga pero ninguna pantalla con datos funciona |
 | `VITE_CLOUDINARY_CLOUD_NAME` | Solo para archivos | `src/shared/services/cloudinaryUpload.ts:1` | `assertCloudinaryConfig()` lanza `Falta configurar VITE_CLOUDINARY_CLOUD_NAME` al intentar subir |
 | `VITE_CLOUDINARY_UPLOAD_PRESET` | Solo para archivos | `src/shared/services/cloudinaryUpload.ts:2` | Igual que la anterior, con su propio mensaje |
@@ -43,7 +43,7 @@ El frontend sube archivos **directamente a Cloudinary desde el navegador**, sin 
 ## Archivos de entorno del repositorio
 
 | Archivo | Versionado | Uso |
-|---|---|---|
+| --- | --- | --- |
 | `.env.example` | ✅ Sí | Plantilla documentada. Cópiala a `.env` |
 | `.env` | ❌ No (`.gitignore:17`) | Tu entorno local |
 | `.env.production` | ✅ Sí | El que consume `yarn build` para el bundle publicado |
@@ -54,7 +54,7 @@ El frontend sube archivos **directamente a Cloudinary desde el navegador**, sin 
 ## Cómo se inyectan en cada entorno
 
 | Entorno | Mecanismo |
-|---|---|
+| --- | --- |
 | Desarrollo local | Archivo `.env` leído por Vite |
 | Build de producción local | Archivo `.env.production` leído por `vite build` |
 | Docker | `ARG` en `Dockerfile` → `ENV` → disponibles durante `yarn build`. Ver `Dockerfile:8-19` |

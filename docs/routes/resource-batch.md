@@ -1,7 +1,7 @@
 # Ruta `/batch/:module/:resource`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/batch/:module/:resource` |
 | **Componente** | `ResourceBatchPage` |
 | **Archivo** | `src/features/resources/pages/ResourceBatchPage.tsx` (243 líneas) |
@@ -32,7 +32,7 @@ Registrado como inconsistencia MEDIUM en [reports/documentation-gap-analysis.md]
 ## Estados de interfaz
 
 | Estado | Origen |
-|---|---|
+| --- | --- |
 | Recurso inexistente | `PageState`, línea 57 |
 | Sin archivo | Botones inactivos |
 | Validando | `isValidating` |
@@ -48,7 +48,7 @@ Siete estados sobre siete `useState` (líneas 64-70).
 Los endpoints se derivan del recurso, con valor por defecto si no se declaran (`resourceApi.ts:133-139`):
 
 | Operación | Endpoint | Por defecto |
-|---|---|---|
+| --- | --- | --- |
 | Validar | `resource.endpoints.batchValidate` | `{list}/batch/validate` |
 | Procesar | `resource.endpoints.batchProcess` | `{list}/batch/process` |
 
@@ -61,7 +61,7 @@ Los endpoints se derivan del recurso, con valor por defecto si no se declaran (`
 `buildBatchFormData` (`resourceApi.ts:205-218`) envía un `FormData` con el archivo **duplicado bajo dos nombres**, otra vez por tolerancia:
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | `file` | el archivo |
 | `archivo` | el mismo archivo |
 | `module` | `resource.module` |
@@ -76,7 +76,7 @@ Se envía con `httpClient.upload`, que **no** fija `Content-Type` (lo pone el na
 `normalizeBatchValidationResponse` y `normalizeBatchProcessResponse` (`resourceApi.ts:173-203`) aceptan alias en español e inglés:
 
 | Concepto | Claves aceptadas |
-|---|---|
+| --- | --- |
 | Filas | `rows`, `detalle`, `data`, o la raíz si es array |
 | Estado de fila | `status`, `estado`, `validacion`; se clasifica por subcadena: `error` → error, `warn`/`observ` → warning, resto → valid |
 | Número de fila | `rowNumber`, `row`, `fila`, o el índice + 1 |
@@ -97,7 +97,7 @@ Ninguna.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Campo de archivo | ⚠️ `<input type="file">` nativo; conviene verificar que tenga etiqueta asociada |
 | Tabla de resultados | ⚠️ Sin `<caption>` ni `scope` |
 | Estado de fila | ⚠️ Comunicado por color y texto; el texto existe |

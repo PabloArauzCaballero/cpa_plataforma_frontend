@@ -3,7 +3,7 @@
 ## Configuración de la conexión
 
 | Aspecto | Valor | Origen |
-|---|---|---|
+| --- | --- | --- |
 | Base URL | `VITE_API_BASE_URL`, sin barra final | `config/env.ts:2` |
 | Momento de resolución | **Tiempo de build** | Vite sustituye literalmente |
 | Prefijo de rutas | `/api` incluido en cada ruta del código | `resourceDefinitions.ts`, `*Endpoints.ts` |
@@ -21,7 +21,7 @@
 ### 1. Autenticación
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Iniciar sesión | POST | `/api/auth/publicAuth/login` |
 | Perfil de la sesión | GET | `/api/auth/privateAuth/me` |
 
@@ -34,7 +34,7 @@ Detalle en [authentication.md](authentication.md).
 Patrón uniforme declarado en `resourceDefinitions.ts`:
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Listar | GET | `/api/{modulo}/{recurso}` |
 | Detalle | GET | `/api/{modulo}/{recurso}/{id}` |
 | Crear | POST | `/api/{modulo}/{recurso}` |
@@ -45,7 +45,7 @@ Patrón uniforme declarado en `resourceDefinitions.ts`:
 #### Excepciones al patrón
 
 | Recurso | Endpoint de alta | Motivo |
-|---|---|---|
+| --- | --- | --- |
 | `personas/estudiante` | `/api/personas/estudiante/registrar` | Crea la persona base en la misma transacción |
 | `personas/padre` | `/api/personas/padre/registrar` | Ídem |
 | `personas/tutor` | `/api/personas/tutor/registrar` | Ídem |
@@ -67,7 +67,7 @@ Cada parte se codifica con `encodeURIComponent` (`useResourceListViewModel.ts:14
 ### 3. Importación por lotes
 
 | Operación | Ruta | Cuerpo |
-|---|---|---|
+| --- | --- | --- |
 | Validar | `{list}/batch/validate` | multipart |
 | Procesar | `{list}/batch/process` | multipart |
 
@@ -76,7 +76,7 @@ Cada parte se codifica con `encodeURIComponent` (`useResourceListViewModel.ts:14
 ### 4. Catálogos operativos
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Listar configuración | GET | `/api/contabilidad/configuracion-cuenta-operativa` |
 | Crear configuración | POST | `/api/contabilidad/configuracion-cuenta-operativa` |
 | Actualizar configuración | PATCH | `/api/contabilidad/configuracion-cuenta-operativa/{id_configuracion_cuenta}` |
@@ -84,7 +84,7 @@ Cada parte se codifica con `encodeURIComponent` (`useResourceListViewModel.ts:14
 ### 5. Archivos
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Listar | GET | `/api/contabilidad/archivo?{query}` |
 | Registrar | POST | `/api/contabilidad/archivo/registrar` |
 | Asociar a transacción | POST | `/api/contabilidad/archivo-transaccion/registrar` |
@@ -92,7 +92,7 @@ Cada parte se codifica con `encodeURIComponent` (`useResourceListViewModel.ts:14
 ### 6. Borradores
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Listar / crear / actualizar | GET / POST / PATCH | `/api/administracion/registro-borrador` |
 
 Consumido por **dos** servicios equivalentes: `persistentDraftApi` y `backendDraftApi`.
@@ -100,7 +100,7 @@ Consumido por **dos** servicios equivalentes: `persistentDraftApi` y `backendDra
 ### 7. Progreso de tutoriales
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Consultar todo | GET | `/api/onboarding/tutoriales/progreso` |
 | Actualizar uno | PUT | `/api/onboarding/tutoriales/progreso/{tutorialId}` |
 | Reiniciar uno | DELETE | `/api/onboarding/tutoriales/progreso/{tutorialId}` |
@@ -111,7 +111,7 @@ Consumido por **dos** servicios equivalentes: `persistentDraftApi` y `backendDra
 ### 8. Asistencia masiva
 
 | Operación | Método | Ruta |
-|---|---|---|
+| --- | --- | --- |
 | Clases recientes | GET | `/api/servicios_educativos/clase-curso?limit=100&orderBy=fecha&orderDir=DESC` |
 | Matrículas del curso | GET | `/api/servicios_educativos/inscripcion-curso?{query}` |
 | Asistencias | GET/POST/PUT | `/api/servicios_educativos/asistencia-clase-curso` |
@@ -126,7 +126,7 @@ Consumido por **dos** servicios equivalentes: `persistentDraftApi` y `backendDra
 `appendQuery` envía cada concepto con varios nombres:
 
 | Concepto | Parámetros emitidos |
-|---|---|
+| --- | --- |
 | Búsqueda | `q`, `search`, `term` |
 | Solo activos | `onlyActivos`, `only_activos` |
 | Incluir inactivos | `includeInactive`, `include_inactive` |
@@ -138,7 +138,7 @@ Consumido por **dos** servicios equivalentes: `persistentDraftApi` y `backendDra
 ## Tolerancia de respuestas
 
 | Mapper | Formas aceptadas |
-|---|---|
+| --- | --- |
 | `normalizeListResult` | array directo; `rows`/`items`/`results`/`records`/`data`; `data.rows`/`items`/`results`/`records`/`detalle` |
 | Paginación | `meta`, `pagination`, `paging`; `limit`/`pageSize`, `offset`, `count`/`total`, `page` |
 | `normalizeRecordResponse` | `response.data` o `response` |
@@ -159,7 +159,7 @@ Una respuesta con estructura inesperada produce **lista vacía**, no error. La i
 ## Drift contractual detectado {#drift-contractual-detectado}
 
 | # | Hallazgo | Severidad | Verificación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | D-01 | `{list}/batch/validate` y `{list}/batch/process` se invocan para los 59 recursos, sin que ningún recurso los declare ni haya evidencia de que existan | **CRITICAL** | `grep -n "batchValidate\|batchProcess" resourceDefinitions.ts` → sin coincidencias |
 | D-02 | `/api/infraestructura/aula` se consulta pero **no existe como recurso**; en infraestructura hay `espacio` con `tipo: AULA` | **HIGH** | `ventaClaseLookupApi.ts:190` vs. inventario de 59 recursos |
 | D-03 | `/api/contabilidad/archivo-transaccion/registrar` (singular) frente al recurso `archivos-transaccion` (plural) | MEDIUM | `fileServerApi.ts:43` |

@@ -67,7 +67,7 @@ Ver [integrations/authentication.md](../integrations/authentication.md).
 ## La subida de archivos falla
 
 | Mensaje | Causa | Solución |
-|---|---|---|
+| --- | --- | --- |
 | `Falta configurar VITE_CLOUDINARY_CLOUD_NAME` | Variable ausente | Defínela en `.env` y reinicia |
 | `Falta configurar VITE_CLOUDINARY_UPLOAD_PRESET` | Variable ausente | Ídem |
 | `Cloudinary rechazó la subida.` | Preset inválido, firmado en vez de unsigned, o restricción de tipo/tamaño | Revisa el preset en el panel de Cloudinary |

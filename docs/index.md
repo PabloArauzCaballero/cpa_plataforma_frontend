@@ -14,7 +14,7 @@ El frontend **no contiene lógica de autorización propia**: la autoridad es el 
 ## Stack verificado
 
 | Capa | Tecnología |
-|---|---|
+| --- | --- |
 | UI | React 19.2.7 · CSS Modules · variables CSS |
 | Routing | react-router-dom 7.18.0 (`createBrowserRouter`), SPA/CSR pura |
 | Build | Vite 8 · TypeScript 6 (`strict`) · Yarn Classic 1.22.22 |
@@ -31,7 +31,7 @@ Detalle completo y evidencia: [reports/baseline.md](reports/baseline.md).
 **NO APTO PARA PRODUCCIÓN** — existe 1 requisito bloqueante abierto.
 
 | ID | Bloqueante | Dónde |
-|---|---|---|
+| --- | --- | --- |
 | SEC-01 | Credenciales de administrador embebidas en el código fuente y compiladas al bundle público servido por Cloudflare | [security/frontend-security.md](security/frontend-security.md) |
 
 Veredicto completo y checklist: [reports/production-readiness.md](reports/production-readiness.md) y [reports/final-validation.md](reports/final-validation.md).
@@ -92,7 +92,7 @@ Veredicto completo y checklist: [reports/production-readiness.md](reports/produc
 ## Journeys principales
 
 | Journey | Actor | Ruta de entrada |
-|---|---|---|
+| --- | --- | --- |
 | Iniciar sesión | Personal administrativo | `/login` |
 | Consultar y filtrar un recurso | Operador | `/modulos/:module/:resource` |
 | Alta o edición de un registro | Operador con permiso `CREATE` | modal dentro de la ruta anterior |
@@ -140,7 +140,7 @@ Versión completa con límites de confianza: [architecture/system-context.md](ar
 Declarado explícitamente para que la ausencia no se lea como omisión:
 
 | Ausencia | Motivo |
-|---|---|
+| --- | --- |
 | Especificación OpenAPI del backend | No existe en este repositorio; el contrato se documenta tal como lo **consume** el frontend |
 | Storybook o catálogo visual | No existe en el proyecto; incorporarlo es una propuesta de cambio, no una acción documental |
 | Cobertura de pruebas | Ninguna herramienta la genera hoy |

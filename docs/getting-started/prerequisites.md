@@ -5,7 +5,7 @@ Verificado contra `package.json`, `.yarnrc`, `.yarnrc.yml`, `.npmrc` y `Dockerfi
 ## Herramientas obligatorias
 
 | Herramienta | Versión requerida | Cómo se declara | Verificación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Node.js | 24.x | `Dockerfile` usa `node:24-alpine`; la línea base se ejecutó con `v24.18.0` | `node -v` |
 | Yarn | **Classic 1.22.22** | `"packageManager": "yarn@1.22.22"` en `package.json` | `yarn -v` |
 | Git | cualquiera reciente | — | `git --version` |
@@ -21,7 +21,7 @@ Verificado contra `package.json`, `.yarnrc`, `.yarnrc.yml`, `.npmrc` y `Dockerfi
 ## Herramientas opcionales
 
 | Herramienta | Para qué | Necesaria |
-|---|---|---|
+| --- | --- | --- |
 | Docker + Docker Compose | Levantar la imagen nginx de `Dockerfile` / `docker-compose.yml` | No, solo para probar el empaquetado |
 | Wrangler (`npx wrangler`) | Publicar en Cloudflare Workers | Solo para desplegar |
 | Python 3 + `graphifyy` | Regenerar el grafo de código de `graphify-out/` | No, artefacto de análisis |
@@ -29,7 +29,7 @@ Verificado contra `package.json`, `.yarnrc`, `.yarnrc.yml`, `.npmrc` y `Dockerfi
 ## Lo que NO necesitas
 
 | Herramienta | Motivo |
-|---|---|
+| --- | --- |
 | ESLint / Prettier / Biome | **El proyecto no tiene linter configurado.** No hay `.eslintrc*`, `eslint.config.*` ni `biome.json` |
 | Playwright / Cypress | No hay pruebas E2E |
 | Storybook | No existe catálogo de componentes |
@@ -40,7 +40,7 @@ Verificado contra `package.json`, `.yarnrc`, `.yarnrc.yml`, `.npmrc` y `Dockerfi
 El frontend **no funciona sin el backend**. Necesitas una instancia de la API de CPA alcanzable en `VITE_API_BASE_URL`.
 
 - Para desarrollo local, el valor por defecto documentado en `.env.example` es `http://localhost:3000`.
-- El backend debe aceptar el origen del frontend en su configuración `CORS_ORIGINS`. Ver [security/frontend-security.md](../security/frontend-security.md#cors-desde-la-perspectiva-del-cliente).
+- El backend debe aceptar el origen del frontend en su configuración `CORS_ORIGINS`. Ver [runbook R-06](../operations/runbooks/index.md#r-06).
 - Autenticación: el frontend envía la cabecera `X-Session-Token`. Ver [integrations/authentication.md](../integrations/authentication.md).
 
 ## Navegadores soportados
@@ -50,7 +50,7 @@ El frontend **no funciona sin el backend**. Necesitas una instancia de la API de
 El código usa además:
 
 | API | Uso | Soporte |
-|---|---|---|
+| --- | --- | --- |
 | `color-mix()` en CSS | `--ring-focus` en `theme.css:60` | Chrome 111+, Safari 16.2+, Firefox 113+ |
 | `createPortal` | `Modal.tsx` | React, universal |
 | `URLSearchParams`, `FormData`, `fetch` | `httpClient`, `resourceApi` | universal moderno |

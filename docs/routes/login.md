@@ -1,7 +1,7 @@
 # Ruta `/login`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/login` |
 | **Componente** | `LoginPage` → `LoginForm` |
 | **Archivos** | `src/features/auth/pages/LoginPage.tsx`, `src/features/auth/components/LoginForm.tsx`, `src/features/auth/hooks/useLoginViewModel.ts` |
@@ -35,7 +35,7 @@
 ## Estados de interfaz
 
 | Estado | Representación | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | Inactivo | Formulario con botón «Iniciar sesión» | `LoginForm.tsx:110-113` |
 | Enviando | Botón deshabilitado, spinner, texto «Validando…»; ambos inputs deshabilitados | `LoginForm.tsx:104-108,56,74` |
 | Error de validación local | `<p role="alert">` con icono | `LoginForm.tsx:96-101` |
@@ -67,7 +67,7 @@ Detalle completo: [integrations/authentication.md](../integrations/authenticatio
 ## Componentes
 
 | Componente | Origen | Nota |
-|---|---|---|
+| --- | --- | --- |
 | `LoginForm` | feature `auth` | Monta sus propios inputs en lugar de usar `FormField`. La decisión está justificada en el comentario de `LoginForm.tsx:6-15`: necesita mostrar/ocultar contraseña, icono dentro del control y `autoComplete`, ranuras que `FormField` no expone y que no compensa añadir para los cientos de campos que sí lo usan |
 | `Button` | `shared` | `type="submit"`, `fullWidth` |
 
@@ -80,7 +80,7 @@ Detalle completo: [integrations/authentication.md](../integrations/authenticatio
 Es la pantalla mejor tratada del proyecto:
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Etiquetas asociadas | ✅ `<label htmlFor>` en ambos campos |
 | Errores anunciados | ✅ `role="alert"` + `aria-describedby` apuntando al mensaje |
 | Estado inválido | ✅ `aria-invalid` en ambos inputs cuando hay error |

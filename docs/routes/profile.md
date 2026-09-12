@@ -1,7 +1,7 @@
 # Ruta `/perfil`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/perfil` (fija) |
 | **Componente** | `UserProfilePage` |
 | **Archivos** | `src/features/profile/pages/UserProfilePage.tsx` (214 líneas), `hooks/useUserProfileViewModel.ts`, `services/profileApi.ts`, `services/profileMapper.ts` (167 líneas) |
@@ -29,7 +29,7 @@ Mostrar quién está autenticado: nombre, correo, estado, rol principal, roles y
 ## Estados de interfaz
 
 | Estado | Representación | Línea |
-|---|---|---|
+| --- | --- | --- |
 | Cargando | `PageState` «Cargando perfil» | 33-35 |
 | Error o perfil ausente | `PageState` «No se pudo cargar el perfil» + «Reintentar» | 37-46 |
 | Contenido | Tarjetas de resumen y detalle | 48+ |
@@ -47,7 +47,7 @@ Autenticación: cabecera `X-Session-Token` añadida por `httpClient`.
 ### Reglas de presentación
 
 | Regla | Implementación |
-|---|---|
+| --- | --- |
 | Rol principal | `esSuperUsuario` → «Super usuario»; si no, el primer rol; si no, `tipoUsuario`; si no, «Sin rol principal disponible» (líneas 23-27) |
 | Iniciales del avatar | Dos primeras iniciales del nombre completo; si solo hay una palabra, los dos primeros caracteres; fallback `CP` (líneas 8-13) |
 | Booleanos | «Sí» / «No» (líneas 19-21) |
@@ -65,7 +65,7 @@ Ninguna.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Encabezado | ✅ **Única pantalla con `<h1>` propio** (`<h1>PERFIL DE USUARIO</h1>`, línea 52). Convive con el `<h1>` «Gestión CPA» de `AppShell`: **dos `<h1>` en la misma página**, lo que rompe la jerarquía |
 | Landmark | ✅ Usa `<main>` (línea 49) — pero `AppShell` ya envuelve el contenido en `<main>` (`AppShell.tsx:166`): **`<main>` anidado**, no válido |
 | Iconos | ✅ `aria-hidden="true"` |

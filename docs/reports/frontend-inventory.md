@@ -7,7 +7,7 @@
 ## 1. Resumen cuantitativo
 
 | Elemento | Cantidad | Fuente |
-|---|---:|---|
+| --- | ---: | --- |
 | Rutas registradas | 10 | `src/app/router.tsx` |
 | Páginas con ruta propia | 9 | ídem (la décima es un `PageState` inline) |
 | Páginas sin ruta (compuestas) | 2 | `ResourceListPage.tsx:107-113` |
@@ -33,7 +33,7 @@
 Ver el detalle completo en [routes/route-catalog.md](../routes/route-catalog.md). Resumen:
 
 | Ruta | Componente | Acceso | Estados de UI implementados |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `/login` | `LoginPage` | Pública | carga, error, envío en curso |
 | `/` | `HomePage` | Protegida | contenido estático de módulos |
 | `/modulos/:module` | `ModuleResourcePickerPage` | Protegida | vacío (módulo inexistente), contenido |
@@ -54,7 +54,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ### `administracion` — Administración (7)
 
 | Recurso | Tabla | Clave primaria | Permiso de alta |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `departamento` | `administracion.departamento` | `id_departamento` | `ADMINISTRACION.DEPARTAMENTO.CREATE` |
 | `empleado` | `administracion.empleado` | `id_empleado` | `ADMINISTRACION.EMPLEADO.CREATE` |
 | `empleado-posicion-pago` | `administracion.empleado_posicion_pago` | `id_empleado_posicion` | `ADMINISTRACION.EMPLEADO_POSICION_PAGO.CREATE` |
@@ -66,7 +66,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ### `personas` — Personas (7)
 
 | Recurso | Tabla | Clave primaria | Nota |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `estudiante` | `persona.persona_estudiante` | `id_persona` | Alta transaccional: `POST /api/personas/estudiante/registrar` |
 | `estudiante-padre` | `persona.estudiante_padre` | `id_asociacion` | Tabla de asociación |
 | `padre` | `persona.persona_padre` | `id_padre` | Alta transaccional: `/registrar` |
@@ -80,7 +80,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ### `servicios_educativos` — Servicios educativos (10)
 
 | Recurso | Tabla | Clave primaria | Nota |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `asistencia-clase-curso` | `servicios_educativos.asistencia_clase_curso` | `id_asistencia` | Corrige un registro suelto |
 | `asistencia-masiva` | `servicios_educativos.asistencia_clase_curso` | `id_asistencia` | **Compuesto.** Misma tabla; marca el curso entero |
 | `clase-curso` | `servicios_educativos.clase_curso` | `id_clase_curso` | Coloreado por hora |
@@ -95,7 +95,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ### `contabilidad` — Contabilidad (12)
 
 | Recurso | Tabla | Clave primaria | Nota |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `archivos-transaccion` | `contabilidad.archivos_transaccion` | `id_archivo` | Contiene `link_achivo` **y** `link_archivo` (errata del esquema, replicada) |
 | `centro-costo` | `contabilidad.centro_costo` | `id_centro_costo` | Validación: cuenta ingreso ≠ cuenta costo |
 | `centro-costo-mapa` | `contabilidad.centro_costo_mapa` | `id_cc_mapa` | Validación: entre 1 y 3 entidades asociadas |
@@ -128,7 +128,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ### `seguridad` — Seguridad (5)
 
 | Recurso | Clave primaria | Claves compuestas | Permiso |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `permiso` | `id_permiso` | — | *(vacío)* |
 | `rol` | `id_rol` | — | *(vacío)* |
 | `rol-permiso` | `id_rol` | `id_rol` + `id_permiso` | *(vacío)* |
@@ -142,7 +142,7 @@ Los 59 recursos, tal como los declara `resourceDefinitions.ts`. Todos comparten 
 ## 4. Componentes compartidos
 
 | Componente | Ruta | Reutilización real | Ancla de tutorial |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | `Button` | `shared/components/Button` | 12 importaciones | no |
 | `Card` | `shared/components/Card` | baja | no |
 | `ConfirmDialog` | `shared/components/ConfirmDialog` | 3 | no |
@@ -160,7 +160,7 @@ Ficha completa con props, variantes y estados: [components/catalog.md](../compon
 ## 5. Componentes de feature
 
 | Componente | Feature | Función |
-|---|---|---|
+| --- | --- | --- |
 | `LoginForm` | auth | Formulario de acceso |
 | `ModuleSummary` | dashboard | Tarjeta de módulo en el inicio |
 | `CloudinaryUploadField` | resources | Campo de subida de archivos |
@@ -175,7 +175,7 @@ Ficha completa con props, variantes y estados: [components/catalog.md](../compon
 ## 6. Hooks (view models)
 
 | Hook | Estados locales | Qué orquesta |
-|---|---:|---|
+| --- | ---: | --- |
 | `useResourceListViewModel` | 22 `useState` | Listado, filtros, paginación, alta/edición, borrado lógico, exportación, lookups |
 | `useResourceFormViewModel` | — | Valores, errores y opciones del formulario CRUD |
 | `useTransactionDraftViewModel` | — | Borradores locales y remotos de transacción |
@@ -186,7 +186,7 @@ Ficha completa con props, variantes y estados: [components/catalog.md](../compon
 ## 7. Servicios HTTP
 
 | Servicio | Métodos | Destino |
-|---|---|---|
+| --- | --- | --- |
 | `shared/api/httpClient` | `get/post/put/patch/delete/upload` | Base de todos los demás |
 | `auth/services/authApi` | POST | `/api/auth/publicAuth/login` |
 | `profile/services/profileApi` | GET | `/api/auth/privateAuth/me` |
@@ -207,7 +207,7 @@ Detalle contractual: [integrations/backend-api.md](../integrations/backend-api.m
 ## 8. Clasificación del inventario
 
 | Categoría | Elementos |
-|---|---|
+| --- | --- |
 | **Implementado y alcanzable** | 10 rutas, 59 recursos, 2 pantallas compuestas, 11 componentes compartidos, 16 servicios |
 | **Implementado pero inalcanzable** | `QualityGatePage` |
 | **Implementado y oculto por diseño** | `transaccion-movimiento-cuenta` (accesible por URL, fuera de la navegación) |
@@ -218,7 +218,7 @@ Detalle contractual: [integrations/backend-api.md](../integrations/backend-api.m
 ## 9. Método de verificación
 
 | Afirmación | Cómo se verificó |
-|---|---|
+| --- | --- |
 | Rutas | Lectura íntegra de `src/app/router.tsx` |
 | Recursos y módulos | `grep -oE 'key: "…", module: "…"' resourceDefinitions.ts` → 59 coincidencias |
 | Páginas huérfanas | `grep -rn "<Nombre>Page" src` |

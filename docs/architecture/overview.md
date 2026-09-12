@@ -9,7 +9,7 @@ Es una **SPA de React 100 % cliente** cuyo núcleo es un **motor CRUD genérico 
 ## Las cinco decisiones que explican todo lo demás
 
 | # | Decisión | Consecuencia observable | ADR |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | **CRUD dirigido por datos.** Un array de definiciones genera pantallas, formularios, filtros y validaciones | Añadir un recurso = añadir un objeto, sin escribir componentes. Pero todo el tipado de datos se apoya en `CrudRecord = Record<string, unknown>` | [ADR-0004](../adr/ADR-0004-crud-dirigido-por-datos.md) |
 | 2 | **Cero librerías de estado.** Sin Redux, Zustand, React Query ni SWR | No hay caché entre pantallas; cada navegación recarga. El estado vive en 22 `useState` dentro de un hook de 774 líneas | [ADR-0006](../adr/ADR-0006-sin-libreria-de-estado.md) |
 | 3 | **Tolerancia extrema al contrato del backend.** Cada mapper acepta múltiples alias por campo y cada petición envía el mismo parámetro con varios nombres | El frontend absorbe cambios del backend sin romperse, a costa de que el contrato real sea inobservable | [ADR-0007](../adr/ADR-0007-tolerancia-de-contrato.md) |
@@ -60,7 +60,7 @@ graph TD
 ## Capas y su regla de dependencia
 
 | Capa | Contenido | Puede importar de |
-|---|---|---|
+| --- | --- | --- |
 | `app/` | Composición raíz, router, guarda | todo |
 | `features/*/pages/` | Pantallas | components, hooks, domain, services, shared |
 | `features/*/components/` | Componentes de feature | domain, shared |
@@ -87,7 +87,7 @@ shared/layouts/AppShell/AppShell.tsx:6,8,9   → tutorialAnchors, TutorialLaunch
 Declarado explícitamente para que la ausencia no se confunda con omisión documental:
 
 | Ausencia | Verificado por |
-|---|---|
+| --- | --- |
 | Renderizado en servidor (SSR/SSG/ISR/streaming) | No hay servidor de render; `main.tsx` usa `createRoot` |
 | Store global | Sin Redux/Zustand/Jotai/MobX en `package.json` |
 | Caché de datos de servidor | Sin React Query/SWR; `key={location.pathname}` desmonta en cada navegación |
@@ -104,7 +104,7 @@ Declarado explícitamente para que la ausencia no se confunda con omisión docum
 ## Los tres subsistemas y su desequilibrio
 
 | Subsistema | Peso en el grafo | Pruebas | Valor de negocio |
-|---|---:|---:|---|
+| --- | ---: | ---: | --- |
 | **Tutoriales** | 17 de 32 comunidades | 118 casos (76 %) | Apoyo a la adopción |
 | **Motor CRUD** | 8 comunidades | 12 casos (8 %) | **El producto** |
 | **Pantallas especializadas** (venta-clase, asistencia, catálogos, archivos) | 5 comunidades | 9 casos (6 %) | Alto, operación diaria |
@@ -147,7 +147,7 @@ Camino de error: si `!response.ok`, `httpClient` sanea el mensaje (quita URLs, m
 ## Índice de documentos de arquitectura
 
 | Documento | Contenido |
-|---|---|
+| --- | --- |
 | [system-context.md](system-context.md) | C4 nivel 1: actores y sistemas externos |
 | [containers.md](containers.md) | C4 nivel 2: contenedores de despliegue |
 | [frontend-layers.md](frontend-layers.md) | Capas internas y convenciones de archivo |

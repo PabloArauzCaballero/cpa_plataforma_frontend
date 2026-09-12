@@ -3,7 +3,7 @@
 ## Cuatro tipos de estado y dónde vive cada uno
 
 | Tipo | Mecanismo | Ubicación |
-|---|---|---|
+| --- | --- | --- |
 | **Estado de servidor** | `useState` + `useEffect` por pantalla | Hooks de cada feature |
 | **Estado de cliente** | `useState` local; un único Context | Componentes y `TutorialProvider` |
 | **Estado de URL** | ❌ **No existe** más allá de los parámetros de ruta | — |
@@ -14,7 +14,7 @@
 Verificado en `package.json`:
 
 | Librería | Estado |
-|---|---|
+| --- | --- |
 | Redux / Redux Toolkit | ❌ |
 | Zustand / Jotai / Valtio / Recoil / MobX | ❌ |
 | React Query / TanStack Query / SWR / Apollo | ❌ |
@@ -38,7 +38,7 @@ useEffect(() => { void load(); }, [load]);
 ### Consecuencias medibles
 
 | Consecuencia | Detalle |
-|---|---|
+| --- | --- |
 | **Sin caché** | Combinado con `key={location.pathname}` en `AppShell`, cada navegación descarta los datos y vuelve a pedirlos. Volver atrás recarga todo |
 | **Sin deduplicación** | Dos componentes que necesiten el mismo dato hacen dos peticiones |
 | **Sin reintentos** | Un fallo de red es definitivo hasta que el usuario pulse «Reintentar» |
@@ -54,7 +54,7 @@ useEffect(() => { void load(); }, [load]);
 Estados que gestiona:
 
 | Grupo | Variables |
-|---|---|
+| --- | --- |
 | Datos | `records`, `totalRecords` |
 | Paginación | `page`, `pageSize`, `orderBy`, `orderDir` |
 | Carga | `isLoading`, `isSaving`, `isLoadingEditRecord` |
@@ -98,7 +98,7 @@ No hay Context de tema, idioma, usuario ni notificaciones.
 ### Estado local por componente
 
 | Componente | Estados |
-|---|---|
+| --- | --- |
 | `FileLibraryPage` | 19 |
 | `CatalogosOperativosPage` | 12 |
 | `ResourceBatchPage` | 7 |
@@ -111,7 +111,7 @@ No hay Context de tema, idioma, usuario ni notificaciones.
 ### Inconsistencia de patrón de carga
 
 | Pantalla | Patrón |
-|---|---|
+| --- | --- |
 | Mayoría | `isLoading: boolean` + `error: string \| null` |
 | `CatalogosOperativosPage` | `LoadState` (máquina de estados con `idle`, …) |
 
@@ -124,7 +124,7 @@ Solo los parámetros de ruta (`:module`, `:resource`) viven en la URL. **Búsque
 Consecuencias para el usuario:
 
 | Situación | Resultado |
-|---|---|
+| --- | --- |
 | Compartir un listado filtrado | ❌ Imposible: el enlace abre la lista sin filtrar |
 | Recargar la página | ❌ Se pierden filtros, búsqueda y página |
 | Botón «atrás» del navegador | ❌ No deshace un filtro; sale de la pantalla |
@@ -139,16 +139,16 @@ Ver el inventario completo de claves en [data-and-state/persistence.md](../data-
 Resumen:
 
 | Dato | Clave | Sensibilidad |
-|---|---|---|
+| --- | --- | --- |
 | Token de sesión | `cpa.sessionToken`, `cpa_session_token` | **Alta** |
 | Sesión completa (roles, permisos, `rawUser`) | `cpa.session` | **Alta** |
 | Correo | `cpa.userEmail`, `cpa_user_email` | Media |
-| Borradores de formulario | claves de `localDraftStore` | **Puede contener datos personales** |
+| Borradores de formulario | `cpa.localDraft:<recurso>:<op>` | Media: contiene datos de negocio, **no contraseñas** (saneado), y caduca a los 7 días |
 | Carpetas de la biblioteca | `cpa.fileLibrary.folders.v1` | Baja |
 | Progreso de tutoriales | clave de `LocalTutorialProgressStorage` | Baja |
 | Autoarranque de tutoriales | `AUTOSTART_KEY` | Nula |
 
-Nada está cifrado ni tiene caducidad. `clearStoredSession()` borra **solo** las claves de sesión: borradores, carpetas y progreso **sobreviven al cierre de sesión** y quedan visibles para el siguiente usuario del mismo navegador.
+Nada está cifrado. Solo los borradores caducan (7 días). `clearStoredSession()` borra **únicamente** las claves de sesión: borradores, carpetas y progreso **sobreviven al cierre de sesión** y quedan visibles para el siguiente usuario del mismo navegador.
 
 Es un hallazgo de privacidad relevante en equipos compartidos. Ver [security/privacy.md](../security/privacy.md).
 
@@ -164,14 +164,14 @@ if (requiredPermissions.length === 0) return true;
 if (session.permisos.length === 0) return true;
 ```
 
-Tres caminos devuelven `true` sin comprobar nada. Es una decisión consciente y comentada, pero significa que **la interfaz no es una barrera de seguridad**. Ver [security/threat-model.md](../security/threat-model.md#t-04).
+Tres caminos devuelven `true` sin comprobar nada. Es una decisión consciente y comentada, pero significa que **la interfaz no es una barrera de seguridad**. Ver [security/threat-model.md · T-04](../security/threat-model.md).
 
 Además, al no ser estado reactivo, un cambio de permisos no repinta nada hasta que el componente se vuelva a renderizar por otro motivo.
 
 ## Recomendaciones (propuestas, no ejecutadas)
 
 | # | Propuesta | Beneficio | Tipo |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | Llevar filtros y paginación a `useSearchParams` | Enlaces compartibles, recarga estable, botón atrás coherente | Cambio de producto |
 | 2 | Extraer el estado de `FileLibraryPage` a un hook | Coherencia con el resto | Refactor |
 | 3 | Unificar `LoadState` e `isLoading` | Un solo patrón | Refactor |

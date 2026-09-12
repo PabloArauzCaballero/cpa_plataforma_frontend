@@ -1,0 +1,110 @@
+# PROPUESTA DE PIPELINE — NO ACTIVA
+#
+# Este archivo está deliberadamente en `docs/ci/` y NO en `.github/workflows/`.
+#
+# Motivo: activar CI cambia el comportamiento del repositorio para todo el equipo
+# (los pull requests empezarían a recibir comprobaciones obligatorias). Según la
+# política de este trabajo, eso es un CAMBIO DE PRODUCTO y requiere autorización
+# explícita. Ver docs/governance/change-management.md.
+#
+# Para activarlo:
+#   mkdir -p .github/workflows
+#   cp docs/ci/pipeline-propuesto.yml .github/workflows/frontend.yml
+#
+# Antes de activarlo, leer la sección «Estrategia de adopción de nuevas puertas
+# de calidad» de docs/governance/change-management.md: el pipeline NO debe fallar
+# por deuda preexistente, solo impedir regresiones nuevas.
+
+name: Frontend
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+jobs:
+  calidad:
+    name: Calidad y documentación
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # La versión de Node debe coincidir con la del Dockerfile (node:24-alpine).
+      # El proyecto NO declara `engines.node` ni `.nvmrc`; ver docs/operations/build.md.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: yarn
+
+      # 1. Instalación reproducible. Falla si el lockfile no coincide.
+      - name: Instalación reproducible
+        run: yarn install --frozen-lockfile
+
+      # 2. Verificar que el lockfile no se modificó.
+      - name: El lockfile no cambia
+        run: git diff --exit-code yarn.lock
+
+      # 3. Tipos.
+      - name: Type-check
+        run: yarn typecheck
+
+      # 4. Pruebas. Referencia de la línea base: 12 suites, 156 casos.
+      - name: Pruebas
+        run: yarn test
+
+      # NOTA: no hay paso de lint porque el proyecto NO tiene linter configurado.
+      # Ver G-16 en docs/reports/documentation-gap-analysis.md.
+
+      # 5. Build a un directorio temporal.
+      #    NO se construye sobre dist/, que está versionado y lo sirve Cloudflare.
+      - name: Build de producción
+        run: npx tsc -b && npx vite build --outDir /tmp/dist-ci --emptyOutDir
+
+      # 6. Presupuesto de tamaño del bundle.
+      - name: Presupuesto de bundle
+        run: node scripts/check-bundle-budget.mjs /tmp/dist-ci
+
+      # 7. Ningún secreto compilado.
+      #    Esta comprobación habría detectado SEC-01 antes de publicar.
+      - name: Sin credenciales en el bundle
+        run: |
+          if grep -rInE "(password|contrasena)\s*[:=]\s*['\"][^'\"]{6,}" /tmp/dist-ci/assets/*.js; then
+            echo "ERROR: posible credencial compilada en el bundle."
+            exit 1
+          fi
+          echo "OK: sin credenciales evidentes en el bundle."
+
+      # 8. Enlaces documentales.
+      - name: Enlaces de la documentación
+        run: node scripts/check-doc-links.mjs
+
+      # 9. Cobertura documental: rutas, componentes, sincronía y marcadores.
+      - name: Cobertura documental
+        run: node scripts/check-doc-coverage.mjs
+
+      # 10. Drift entre los endpoints del código y los documentados.
+      - name: Drift de contrato
+        run: node scripts/check-api-contract-drift.mjs
+
+      # 11. Inventarios regenerados, como evidencia del run.
+      - name: Inventarios
+        run: |
+          node scripts/generate-route-inventory.mjs
+          node scripts/generate-component-inventory.mjs
+
+  # ---------------------------------------------------------------------------
+  # Trabajo opcional: portal documental.
+  # Requiere Python y mkdocs-material, que NO son dependencias del proyecto.
+  # ---------------------------------------------------------------------------
+  portal:
+    name: Portal documental (opcional)
+    runs-on: ubuntu-latest
+    if: false          # cambiar a `true` si se decide publicar el portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install mkdocs-material
+      - run: mkdocs build --strict

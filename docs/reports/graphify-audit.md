@@ -15,7 +15,7 @@ Al iniciar **no existía** `graphify-out/` en este repositorio. Sí existen graf
 ### Decisión de alcance: `src/` en modo AST, sin extracción semántica
 
 | Decisión | Motivo |
-|---|---|
+| --- | --- |
 | Raíz de escaneo = `src/`, no la raíz del repo | La raíz incluye `docs/` (78 archivos), `prompt/`, `dist/` y `node_modules`. Un grafo mezclado con prosa y artefactos compilados diluye la señal estructural que se necesita para documentar arquitectura |
 | Solo extracción AST (determinista, sin LLM) | El corpus resultó ser 138 archivos de código y 10 README. La extracción AST es reproducible y verificable; la semántica sobre 10 README aporta poco y no es determinista |
 | Grafo **no dirigido** para clustering | El algoritmo de comunidades de Graphify opera sobre grafo no dirigido. La direccionalidad de los imports se analizó por separado sobre `.graphify_extract.json` |
@@ -36,7 +36,7 @@ Archivos sensibles omitidos: 0
 ## 2. Resultado de la extracción
 
 | Métrica | Valor |
-|---|---:|
+| --- | ---: |
 | Nodos AST extraídos | 989 |
 | Aristas AST extraídas | 2 732 |
 | Nodos en el grafo construido | **988** |
@@ -54,7 +54,7 @@ GRAPH HEALTH WARNING: 135 dangling; 75 collapsed
 ```
 
 | Síntoma | Recuento | Interpretación verificada |
-|---|---:|---|
+| --- | ---: | --- |
 | `dangling_endpoint_edges` | 135 | Aristas cuyo destino **no es un nodo del corpus**: imports a paquetes externos (`react`, `react-router-dom`, `@fortawesome/*`, `driver.js`) y a archivos `.module.css`, que el AST no modela como nodos. **No es corrupción**: es la frontera del corpus |
 | `undirected_same_endpoint_collapsed_edges` | 75 | Pares origen→destino con varias aristas fusionadas al construir el grafo no dirigido. Ejemplo real verificado: `shared/components/DataTable/index.ts → DataTable.tsx` tiene 3 aristas (`imports_from`, `re_exports`, en L1 y L2) que colapsan en una |
 | `exact_duplicate_edges` | 38 | Duplicados exactos, subconjunto del anterior |
@@ -71,7 +71,7 @@ GRAPH HEALTH WARNING: 135 dangling; 75 collapsed
 Recuento derivado de `graph.json` y verificado contra el árbol real de `src/`.
 
 | Tipo de nodo | Cantidad | Ubicación real |
-|---|---:|---|
+| --- | ---: | --- |
 | Páginas (`pages/`) | 12 | 10 enrutadas + 2 compuestas embebidas |
 | Layouts | 1 | `shared/layouts/AppShell` |
 | Features | 8 | `auth`, `catalogs`, `dashboard`, `files`, `profile`, `quality`, `resources`, `tutorials` |
@@ -93,7 +93,7 @@ Recuento derivado de `graph.json` y verificado contra el árbol real de `src/`.
 32 comunidades. Las 10 más grandes concentran el 65 % de los nodos. La cohesión se muestra cruda, sin símbolos.
 
 | # | Etiqueta asignada | Nodos | Cohesión | Lectura |
-|---|---|---:|---:|---|
+| --- | --- | ---: | ---: | --- |
 | C0 | Tutoriales React y Tablero | 80 | 0,056 | El React de tutoriales está entrelazado con el tablero: `AppShell` y `ModuleResourcePickerPage` montan `TutorialLauncher` |
 | C1 | Listados, Tablas y Modales | 74 | 0,055 | `ResourceListPage` + `DataTable` + `Modal` + `SearchFilterBar` + `humanize` |
 | C2 | Servicios de Recursos y Biblioteca de Archivos | 72 | 0,058 | `FileLibraryPage` comparte servicios con `resources` |
@@ -122,7 +122,7 @@ Las 32 etiquetas completas están en `graphify-out/.graphify_labels.json`.
 ## 5. Nodos de alta centralidad (god nodes)
 
 | # | Nodo | Grado | Archivo | Riesgo |
-|---|---|---:|---|---|
+| --- | --- | ---: | --- | --- |
 | 1 | `TutorialEngine` | 38 | `features/tutorials/engine/TutorialEngine.ts` | Alto acoplamiento interno de tutoriales. Mitigado: 28 pruebas |
 | 2 | `TutorialDefinition` | 37 | `features/tutorials/domain/TutorialDefinition.ts` | Tipo central del catálogo |
 | 3 | `tutorialAnchor` | 35 | `features/tutorials/domain/tutorialAnchors.ts` | **Atraviesa la frontera de capas**: componentes de `shared/` importan de `features/tutorials`. Ver §7 |
@@ -143,13 +143,13 @@ Las 32 etiquetas completas están en `graphify-out/.graphify_labels.json`.
 ### Huérfano confirmado
 
 | Elemento | Evidencia | Clasificación |
-|---|---|---|
+| --- | --- | --- |
 | `src/features/quality/pages/QualityGatePage.tsx` (+ su CSS) | `grep -rn "QualityGatePage" src` devuelve **solo** su propia definición. No está en `router.tsx` ni importado por nadie. Comunidad C28 aislada con cohesión 1,0 | Código muerto. No entra al bundle (Vite hace tree-shaking), pero sí al repositorio |
 
 ### Duplicación relevante confirmada
 
 | Elementos | Evidencia | Impacto |
-|---|---|---|
+| --- | --- | --- |
 | `services/persistentDraftApi.ts` y `services/backendDraftApi.ts` | Ambos apuntan a `/api/administracion/registro-borrador` (líneas 27 de cada uno) y exponen `get`/`post`/`patch` | Dos clientes para el mismo recurso. Riesgo de divergencia de comportamiento |
 | `normalizeOption()` y `renderFilterInput()` | Definidos por duplicado en `SearchFilterBar.tsx` y en `ResourceExportModal.tsx` | Lógica de filtros duplicada entre el buscador y el modal de exportación |
 | FontAwesome | Cargado por CDN en `index.html:14` **y** presente como 3 paquetes npm | Doble coste de carga; ver [performance/bundle-analysis.md](../performance/bundle-analysis.md) |
@@ -165,7 +165,7 @@ El análisis de las 2 597 aristas candidatas no reveló ciclos de import entre m
 Cada afirmación del grafo se verificó contra el código. Aquí las discrepancias y confirmaciones que importan.
 
 | # | Afirmación derivada del grafo | Verificación en el repositorio | Veredicto |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | V-01 | El grafo agrupa `AsistenciaMasivaPage` y `VentaClaseBatchPage` dentro de `resources` | `router.tsx` **no las enruta**. `ResourceListPage.tsx:108,112` las renderiza condicionalmente según `resource.composite` | ✅ Confirmado: son pantallas sin URL propia |
 | V-02 | `shared/layouts/AppShell` aparece en la comunidad de tutoriales (C0) | `AppShell.tsx:22` monta `<TutorialProvider>` | ✅ Confirmado: el provider vive en el layout, no en `App.tsx` |
 | V-03 | `shared/components/*` importa de `features/tutorials` | `DataTable.tsx:2`, `Modal.tsx:4`, `AppShell.tsx:6-9` importan `tutorialAnchors` | ✅ Confirmado: **violación de la dirección de dependencia** shared→features. Ver [architecture/module-dependencies.md](../architecture/module-dependencies.md) |
@@ -185,7 +185,7 @@ Cada afirmación del grafo se verificó contra el código. Aquí las discrepanci
 Graphify señaló 5 puentes entre comunidades. Verificados:
 
 | Puente | Relación | Verificación |
-|---|---|---|
+| --- | --- | --- |
 | `InMemoryProgressStorage` → `TutorialProgressStorage` | `implements` | Real: el doble de prueba implementa el puerto de producción. Buena señal de diseño |
 | `Harness` → `TutorialEngine` | `references` | Real: `tutorialEngine.test.ts` define un arnés propio |
 | `mapLoginResponse()` → `buildStoredSessionFromLoginResponse()` | `calls` | Real: `authMapper.ts` delega en `shared/auth/session.ts`. Es el punto donde la respuesta del backend se convierte en sesión persistida |
@@ -207,7 +207,7 @@ Generadas por Graphify y conservadas como guía de exploración:
 ## 10. Artefactos generados y cómo regenerarlos
 
 | Artefacto | Ruta | Contenido |
-|---|---|---|
+| --- | --- | --- |
 | Grafo interactivo | `graphify-out/graph.html` | Visualización navegable, sin servidor |
 | Grafo crudo | `graphify-out/graph.json` | 988 nodos, 2 522 aristas, comunidad por nodo |
 | Informe de auditoría | `graphify-out/GRAPH_REPORT.md` | Salida nativa de Graphify |
@@ -225,7 +225,7 @@ Generadas por Graphify y conservadas como guía de exploración:
 ## 11. Criterio de salida de la Fase 1
 
 | Criterio | Estado |
-|---|---|
+| --- | --- |
 | Artefactos Graphify consultados antes de escribir arquitectura | ✅ Esta auditoría precede a `docs/architecture/**` |
 | Nodos inventariados (rutas, componentes, hooks, servicios, pruebas) | ✅ §3 |
 | Relaciones inventariadas (imports, composición, ciclos, huérfanos, centralidad) | ✅ §5, §6 |

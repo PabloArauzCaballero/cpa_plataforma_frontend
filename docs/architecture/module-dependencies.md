@@ -53,14 +53,14 @@ Los tutoriales guiados necesitan apuntar a elementos concretos del DOM. `tutoria
 **Es una dependencia de valores en tiempo de ejecución**, no solo de tipos: la función se ejecuta en el render.
 
 | Opción de corrección | Coste | Riesgo |
-|---|---|---|
+| --- | --- | --- |
 | Mover `tutorialAnchors` a `shared/tutorials/anchors.ts` | Bajo: es un módulo de constantes puras | Toca 15 importaciones; sin cambio de comportamiento |
 | Pasar los anclajes por props desde las páginas | Alto: cambia la API de 4 componentes compartidos | Cambio de producto |
 | Aceptar y documentar | Cero | La regla queda como aspiración |
 
 **Recomendación:** la primera. Es la única de coste bajo y sin efecto observable. **No se ha ejecutado**: mover archivos de `src/` es un cambio de producto y requiere autorización. Ver [reports/documentation-gap-analysis.md](../reports/documentation-gap-analysis.md).
 
-### Causa 2 — `AppShell` conoce el dominio (3 importaciones)
+### Causa 2 — `AppShell` conoce el dominio (3 importaciones) {#causa-2--appshell-conoce-el-dominio}
 
 ```
 AppShell.tsx:3  → features/dashboard/moduleMeta        (iconos y descripciones de módulo)
@@ -108,7 +108,7 @@ graph LR
 ```
 
 | Origen | Destino | Archivos | Naturaleza |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `dashboard` | `resources` | `ModuleSummary`, `ModuleResourcePickerPage` | Lee `resourceModules` |
 | `dashboard` | `tutorials` | `ModuleSummary`, `HomePage`, `ModuleResourcePickerPage` | Anclajes y lanzador |
 | `catalogs` | `resources` | `catalogosOperativosApi` | Reutiliza tipos/servicios |
@@ -125,7 +125,7 @@ graph LR
 ### Ciclos
 
 | Nivel | Resultado |
-|---|---|
+| --- | --- |
 | **Archivo** | ✅ **Sin ciclos.** Graphify reportó `self_loop_edges: 0` y no se detectaron componentes fuertemente conexos |
 | **Feature** | ❌ **Dos ciclos**: `dashboard ↔ tutorials` y `resources ↔ tutorials` |
 
@@ -147,7 +147,7 @@ export const APP_ROUTE_PATTERNS = [ '/', '/login', '/tutoriales', … ] as const
 ```
 
 | Aspecto | Evaluación |
-|---|---|
+| --- | --- |
 | Motivo | Legítimo y bien argumentado: evita arrastrar el router perezoso a las pruebas |
 | Riesgo | **Drift.** Añadir una ruta a `router.tsx` sin actualizar esta lista hace que la validación de tutoriales la rechace |
 | Mitigación existente | `tutorialValidation.test.ts` (12 casos) comprueba las rutas de los tutoriales contra esta lista, **pero no comprueba esta lista contra `router.tsx`** |
@@ -158,7 +158,7 @@ Cubierto por `scripts/check-doc-coverage.mjs`, que compara ambas fuentes. Ver [g
 ## Nodos de alta centralidad y su riesgo
 
 | Nodo | Grado | Riesgo si cambia | Pruebas |
-|---|---:|---|---:|
+| --- | ---: | --- | ---: |
 | `TutorialEngine` | 38 | Alto, contenido en la feature | 28 |
 | `TutorialDefinition` | 37 | Alto, contenido | — |
 | `tutorialAnchor` | 35 | **Atraviesa capas**: tocarlo afecta a `shared` | indirectas |
@@ -171,7 +171,7 @@ Los tres nodos transversales con más riesgo real de negocio (`CrudRecord`, `Cru
 ## Uso de `shared` desde `features`
 
 | Módulo compartido | Importaciones |
-|---|---:|
+| --- | ---: |
 | `shared/components` | 30 |
 | `shared/api` | 12 |
 | `shared/utils` | 9 |
@@ -184,7 +184,7 @@ Solo **una** feature importa `shared/validation`, pese a que el archivo contiene
 ## Código huérfano y duplicado
 
 | Elemento | Tipo | Acción propuesta |
-|---|---|---|
+| --- | --- | --- |
 | `features/quality/pages/QualityGatePage.tsx` + CSS | Huérfano, 0 importaciones | Eliminar (cambio de producto) |
 | `persistentDraftApi.ts` / `backendDraftApi.ts` | Duplicado: mismo endpoint `/api/administracion/registro-borrador`, misma superficie | Unificar (cambio de producto) |
 | `normalizeOption()` y `renderFilterInput()` | Duplicados en `SearchFilterBar` y `ResourceExportModal` | Extraer a un módulo común |

@@ -33,10 +33,10 @@ graph TB
 ### Aplicación de página única
 
 | Aspecto | Valor |
-|---|---|
+| --- | --- |
 | Tecnología | React 19.2.7, TypeScript 6, Vite 8 |
 | Entrada | `index.html` → `/src/main.tsx` |
-| Artefacto | 13 chunks JS + 12 CSS, con hash en el nombre |
+| Artefacto | 17 chunks JS + 12 CSS, con hash en el nombre |
 | Peso | 865 KiB JS y 121 KiB CSS totales; **148 KiB gzip** en la carga inicial |
 | Ejecución | Íntegramente en el navegador. Sin código de servidor |
 
@@ -47,16 +47,16 @@ Detalle por chunk: [performance/bundle-analysis.md](../performance/bundle-analys
 Todo el estado persistente vive en `localStorage`. **No se usan cookies, `sessionStorage` ni IndexedDB.**
 
 | Espacio de claves | Contenido | Escrito por |
-|---|---|---|
+| --- | --- | --- |
 | `cpa.sessionToken`, `cpa_session_token` | Token de sesión (duplicado) | `shared/auth/session.ts:93` |
 | `cpa.userEmail`, `cpa_user_email` | Correo (duplicado) | `session.ts:94` |
 | `cpa.session` | Objeto de sesión completo en JSON, con roles y permisos | `session.ts:95` |
 | `cpa.fileLibrary.folders.v1` | Carpetas de la biblioteca de archivos | `FileLibraryPage.tsx:146` |
-| Claves de borrador | Borradores locales de formularios | `shared/services/localDraftStore.ts:59` |
+| `cpa.localDraft:<recurso>:<op>` | Borradores de formularios, saneados y con TTL de 7 días | `shared/services/localDraftStore.ts` |
 | Progreso de tutoriales | Avance por tutorial | `LocalTutorialProgressStorage.ts:79` |
 | Autoarranque de tutoriales | Preferencia booleana | `tutorialPreferences.ts:18` |
 
-Duración: **indefinida**. No hay caducidad, ni limpieza programada, ni cifrado. La sesión solo se borra al pulsar «Cerrar sesión» o al recibir un `401`.
+Duración: **indefinida salvo los borradores**, que caducan a los 7 días y se eliminan al leerlos. Nada está cifrado. La sesión solo se borra al pulsar «Cerrar sesión» o al recibir un `401`; carpetas, progreso y borradores **sobreviven al cierre de sesión**.
 
 Análisis de riesgo: [security/browser-storage.md](../security/browser-storage.md).
 
@@ -83,7 +83,7 @@ Dos rutas de despliegue coexisten en el repositorio.
 `Dockerfile` (multietapa) + `docker/nginx.conf`:
 
 | Regla | Efecto |
-|---|---|
+| --- | --- |
 | `location /assets/` → `expires 1y; Cache-Control: public, immutable` | Caché larga, segura porque los nombres llevan hash |
 | `location /` → `try_files $uri $uri/ /index.html` | Reescritura de SPA |
 | `location = /index.html` → `no-cache, no-store, must-revalidate` | El despliegue nuevo se ve de inmediato |
@@ -116,7 +116,7 @@ Propuesta de pipeline (no implementada, requiere autorización): [operations/bui
 ## Contenedores que NO existen
 
 | Elemento | Verificación |
-|---|---|
+| --- | --- |
 | Backend for Frontend (BFF) | El frontend habla directo con la API |
 | Servidor de sesiones | La sesión vive en `localStorage` |
 | Service Worker / PWA | Sin `manifest.json`, sin registro de SW |

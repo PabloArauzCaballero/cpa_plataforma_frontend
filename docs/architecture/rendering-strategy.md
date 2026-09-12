@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 ### Por qué es la decisión correcta aquí
 
 | Factor | Situación |
-|---|---|
+| --- | --- |
 | Audiencia | Personal interno tras autenticación |
 | SEO | Irrelevante: nada debe indexarse |
 | Primera impresión | No hay usuarios anónimos que abandonen |
@@ -27,7 +27,7 @@ Registrado en [ADR-0003](../adr/ADR-0003-renderizado-csr.md).
 ### Coste asumido
 
 | Coste | Medición |
-|---|---|
+| --- | --- |
 | Pantalla vacía hasta ejecutar JS | Chunk inicial de **148 KiB gzip** |
 | Sin contenido sin JavaScript | La aplicación no funciona con JS desactivado |
 | Sin `<noscript>` | `index.html` no ofrece mensaje alternativo |
@@ -54,7 +54,7 @@ El `.then(...)` es necesario porque las páginas se exportan con nombre, no por 
 ### Chunks reales del build
 
 | Chunk | Bytes | gzip | Cuándo se descarga |
-|---|---:|---:|---|
+| --- | ---: | ---: | --- |
 | `index-*.js` | 478 676 | **148 469** | Siempre |
 | `index-*.css` | 23 811 | 5 670 | Siempre |
 | `resourceDefinitions-*.js` | 180 531 | 30 920 | Con la primera pantalla que toque recursos |
@@ -111,7 +111,7 @@ No hay skeletons ni fallbacks por ruta. Ver [components/notifications.md](../com
 Cambiar `key` **desmonta y vuelve a montar** el subárbol completo.
 
 | Consecuencia | Signo |
-|---|---|
+| --- | --- |
 | Estado local descartado en cada navegación | Neutro: se busca ese efecto |
 | Ninguna caché de datos entre pantallas | ➖ Cada vuelta atrás repite todas las peticiones |
 | Transición CSS reproducible por ruta | ➕ Es el motivo declarado (`styles.routeTransition`) |
@@ -122,7 +122,7 @@ Cambiar `key` **desmonta y vuelve a montar** el subárbol completo.
 Uso de `useMemo` y `useCallback` en los view models, principalmente en `useResourceListViewModel`:
 
 | Valor memoizado | Motivo |
-|---|---|
+| --- | --- |
 | `availableFilters` | Recalcula filtros solo si cambian recurso, registros u opciones de lookup |
 | `query` | Objeto estable que alimenta `load` |
 | `load` (`useCallback`) | Evita relanzar el efecto en cada render |
@@ -139,7 +139,7 @@ El riesgo no está en el DOM sino en los datos: al filtrar se descargan hasta 50
 ## Lo que no se hace
 
 | Técnica | Estado |
-|---|---|
+| --- | --- |
 | Prefetch de rutas al pasar el ratón | ❌ |
 | Precarga de chunks críticos (`modulepreload` manual) | ❌ (Vite inyecta el suyo) |
 | `React.memo` / `useTransition` / `useDeferredValue` | ❌ |

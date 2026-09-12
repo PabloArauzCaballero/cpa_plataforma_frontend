@@ -1,7 +1,7 @@
 # Ruta `/contabilidad/archivos`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/contabilidad/archivos` (fija) |
 | **Componente** | `FileLibraryPage` |
 | **Archivo** | `src/features/files/pages/FileLibraryPage.tsx` (605 líneas — la página más extensa) |
@@ -52,7 +52,7 @@ Se leen con `readStoredFolders()` (línea 134) y se escriben en `localStorage` (
 19 `useState` (líneas 175-194). Estados visibles:
 
 | Estado | Variable |
-|---|---|
+| --- | --- |
 | Cargando listado | `isLoading` |
 | Subiendo | `isUploading` |
 | Mensaje informativo | `message` |
@@ -64,7 +64,7 @@ Se leen con `readStoredFolders()` (línea 134) y se escriben en `localStorage` (
 ## Contratos de datos
 
 | Operación | Destino | Servicio |
-|---|---|---|
+| --- | --- | --- |
 | Listar archivos | `GET /api/contabilidad/archivo?{query}` | `fileServerApi.ts:32` |
 | Registrar archivo | `POST /api/contabilidad/archivo/registrar` | `fileServerApi.ts:37` |
 | Asociar a transacción | `POST /api/contabilidad/archivo-transaccion/registrar` | `fileServerApi.ts:43` |
@@ -75,14 +75,14 @@ Ninguno de estos tres endpoints del backend forma parte de los 59 recursos CRUD.
 ## Integración con Cloudinary
 
 | Aspecto | Valor |
-|---|---|
+| --- | --- |
 | Modo | *Unsigned upload preset* |
 | Variables | `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET`, `VITE_CLOUDINARY_LIBRARY_ROOT_FOLDER` |
 | Límite en cliente | 25 MB para archivo genérico (`MAX_GENERIC_FILE_SIZE_BYTES`) |
 | Validación de tipo | Solo para imágenes (`uploadSingleImage`); `uploadSingleFile` **no valida el tipo MIME** |
 | Autenticación | Ninguna. El preset es público por diseño |
 
-> **Riesgo de seguridad SEC-04.** Un preset unsigned permite que cualquiera que lea el bundle suba archivos a la cuenta de Cloudinary, sin sesión en la plataforma. La mitigación no está en el frontend: debe restringirse en el panel de Cloudinary (tipos permitidos, tamaño máximo, carpeta obligatoria, moderación). Ver [security/threat-model.md](../security/threat-model.md#t-06) y [integrations/file-storage.md](../integrations/file-storage.md).
+> **Riesgo de seguridad SEC-04.** Un preset unsigned permite que cualquiera que lea el bundle suba archivos a la cuenta de Cloudinary, sin sesión en la plataforma. La mitigación no está en el frontend: debe restringirse en el panel de Cloudinary (tipos permitidos, tamaño máximo, carpeta obligatoria, moderación). Ver [security/threat-model.md · T-06](../security/threat-model.md) y [integrations/file-storage.md](../integrations/file-storage.md).
 
 ## Componentes
 
@@ -97,7 +97,7 @@ Ninguna.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Copiar URL | ⚠️ Verificar que la confirmación de copiado se anuncie |
 | Rejilla de archivos | ⚠️ Verificar textos alternativos de las previsualizaciones |
 | Subida | ❌ Sin barra de progreso accesible; solo estado booleano `isUploading` |

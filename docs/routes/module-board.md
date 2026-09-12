@@ -1,7 +1,7 @@
 # Ruta `/modulos/:module`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/modulos/:module` |
 | **Componente** | `ModuleResourcePickerPage` |
 | **Archivo** | `src/features/dashboard/pages/ModuleResourcePickerPage.tsx` |
@@ -31,7 +31,7 @@ Tablero del módulo: lista las tablas (recursos) que contiene y permite buscar e
 ## Estados de interfaz
 
 | Estado | Representación | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | Carga de la ruta | `PageState` «Cargando pantalla» | `router.tsx:19` |
 | Módulo inexistente | `PageState` «Módulo no encontrado» | línea 43 |
 | Sin coincidencias de búsqueda | `PageState` «Sin coincidencias» | línea 85 |
@@ -46,7 +46,7 @@ Tablero del módulo: lista las tablas (recursos) que contiene y permite buscar e
 ## Componentes
 
 | Componente | Origen |
-|---|---|
+| --- | --- |
 | `PageState` | `shared` |
 | `TutorialLauncher` | feature `tutorials` (línea 58) |
 | `Link` | react-router-dom |
@@ -59,7 +59,7 @@ Ninguna, salvo los eventos internos del motor de tutoriales si se lanza uno desd
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Búsqueda | ⚠️ El campo de búsqueda no anuncia el número de resultados mediante región activa; el usuario de lector de pantalla no sabe que la lista cambió |
 | Enlaces | ✅ Son `<Link>` reales, navegables con teclado |
 | Estado vacío | ✅ Texto explicativo |

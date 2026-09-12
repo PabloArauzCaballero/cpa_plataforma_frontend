@@ -25,7 +25,7 @@ componentDidCatch(error: Error, info: ErrorInfo): void {
 Interfaz de recuperación: «Algo se desajustó», con el texto «La pantalla tuvo un error inesperado. No se perdió tu sesión», y dos acciones:
 
 | Acción | Implementación |
-|---|---|
+| --- | --- |
 | Recargar pantalla | `window.location.reload()` |
 | Ir al inicio | `window.location.href = '/'` |
 
@@ -34,7 +34,7 @@ Usa `window.location` y no el router porque, tras un error de render, el árbol 
 ### Limitaciones reales
 
 | Limitación | Consecuencia |
-|---|---|
+| --- | --- |
 | **Es el único límite de error** | No hay `ErrorBoundary` por ruta ni por sección. Un fallo en una tabla tumba la aplicación entera |
 | **No se reinicia solo** | `hasError` nunca vuelve a `false`. La única salida es recargar o navegar por `window.location` |
 | **No captura errores asíncronos** | Los límites de React solo capturan errores de render, ciclo de vida y constructores. Un `throw` dentro de un `setTimeout` o de una promesa sin `catch` **no llega aquí** |
@@ -61,7 +61,7 @@ export class HttpError extends Error {
 `fallbackErrorMessage` (líneas 50-57):
 
 | Código | Mensaje al usuario |
-|---|---|
+| --- | --- |
 | 400 | La solicitud no pudo procesarse. Revisa los datos ingresados. |
 | 401 | Tu sesión expiró o no es válida. Vuelve a iniciar sesión. |
 | 403 | No tienes permisos para realizar esta acción. |
@@ -86,7 +86,7 @@ Presente en `request` (línea 104) y en `upload` (línea 133). Borra las 5 clave
 ### Lo que NO hace
 
 | Ausencia | Impacto |
-|---|---|
+| --- | --- |
 | Reintentos | Un fallo de red transitorio es definitivo |
 | Retroceso exponencial | — |
 | Tiempo de espera | **Sin `timeout`**: una petición colgada lo está indefinidamente. El único límite es el del navegador |
@@ -107,7 +107,7 @@ Patrón dominante:
 ```
 
 | Pantalla | Estado de error | Acción de recuperación |
-|---|---|---|
+| --- | --- | --- |
 | `ResourceListPage` | ✅ | Reintentar |
 | `UserProfilePage` | ✅ | Reintentar |
 | `CatalogosOperativosPage` | ✅ | Reintentar |
@@ -131,7 +131,7 @@ Detalle de reglas: [data-and-state/forms-and-validation.md](../data-and-state/fo
 ## Errores silenciosos — el punto débil
 
 | # | Ubicación | Comportamiento | Por qué importa |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | `useResourceListViewModel.ts:425` — carga de lookups | `catch { return [field.name, []] }` | Un select queda **vacío sin explicación**. El usuario cree que no hay opciones |
 | 2 | `resourceMapper.ts:42` — forma desconocida | Devuelve `{ rows: [], meta }` | Se muestra «Sin registros»: **indistinguible de una tabla realmente vacía** |
 | 3 | `useResourceListViewModel.ts:132` — enriquecer transacción | `catch { return record }` | Se edita una transacción **sin sus movimientos**, en silencio |
@@ -155,7 +155,7 @@ Ese criterio, aplicado al resto del frontend, resolvería los cinco fallos silen
 ## Recomendaciones (propuestas, no ejecutadas)
 
 | # | Propuesta | Nivel |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Registrar `HttpError.details` en consola antes de descartarlo | 2 |
 | 2 | Diferenciar «lista vacía» de «respuesta no reconocida» en `normalizeListResult` | 2 |
 | 3 | Mostrar aviso cuando un lookup falla, en vez de un select vacío | 3 |

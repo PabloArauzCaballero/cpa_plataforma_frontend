@@ -14,7 +14,7 @@
 Durante la ejecución de esta fase había **otros dos agentes trabajando sobre el mismo repositorio**. Eso tuvo dos efectos observados y registrados:
 
 | Momento | Observación | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | Inicio de sesión | Árbol de trabajo sucio: `dist/` modificado, `src/features/resources/domain/resourceDefinitions.ts` modificado, `src/shared/components/FormField/SearchableSelect.tsx` sin trackear | `git status --porcelain` |
 | Durante la fase 0 | Apareció `src/__tests__/shared/searchableSelectMatch.test.ts`, que no existía en el primer listado | `find src -type f` antes/después |
 | Fin de la fase 0 | El trabajo ajeno se consolidó en el commit `618e5c3`; árbol limpio | `git log --oneline`, `git status` vacío |
@@ -35,7 +35,7 @@ Medidas de no colisión aplicadas durante todo el trabajo documental:
 Todo lo siguiente fue comprobado en el repositorio, no asumido.
 
 | Elemento | Valor | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | Framework UI | React `^19.2.7` | `package.json` |
 | Router | `react-router-dom` `7.18.0`, `createBrowserRouter` | `package.json`, `src/app/router.tsx:25` |
 | Estrategia de renderizado | SPA 100 % cliente (CSR). Sin SSR, SSG, ISR ni streaming | `src/main.tsx`, ausencia de servidor de render |
@@ -78,7 +78,7 @@ Volumen: **23 475** líneas de TypeScript/TSX y **7 007** líneas de CSS en 138 
 Todos los comandos se ejecutaron sobre `618e5c3`, árbol limpio.
 
 | # | Comando | Herramienta | Resultado | Duración | Observaciones |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 1 | `yarn install --frozen-lockfile` | Yarn 1.22.22 | ✅ éxito | 0,42 s | `success Already up-to-date.` El lockfile **no** se modificó |
 | 2 | `yarn typecheck` (`tsc --noEmit`) | TypeScript 6.0.3 | ✅ 0 errores | 5,65 s | — |
 | 3 | `yarn test` (`jest --runInBand`) | Jest 30 | ✅ 12 suites / **156** pruebas | 2,43 s | 0 fallos, 0 skips, 0 snapshots |
@@ -92,7 +92,7 @@ Todos los comandos se ejecutaron sobre `618e5c3`, árbol limpio.
 ### Detalle de pruebas (12 suites, 156 casos)
 
 | Suite | Casos |
-|---|---:|
+| --- | ---: |
 | `__tests__/tutorials/tutorialEngine.test.ts` | 28 |
 | `__tests__/tutorials/tutorialProgress.test.ts` | 18 |
 | `__tests__/tutorials/tutorialRegistry.test.ts` | 16 |
@@ -116,7 +116,7 @@ Todos los comandos se ejecutaron sobre `618e5c3`, árbol limpio.
 Build de producción del commit `618e5c3` (medido en `outDir` temporal, sin tocar `dist/`).
 
 | Métrica | Valor |
-|---|---:|
+| --- | ---: |
 | JavaScript total | 865 255 B (845 KiB) |
 | CSS total | 123 638 B (121 KiB) |
 | Chunk inicial `index-*.js` | 478 676 B → **148 469 B gzip** |
@@ -144,7 +144,7 @@ No fue posible contrastar contra un OpenAPI del backend: **no hay especificació
 Ningún comando de la línea base falló. Los puntos siguientes **no son fallos de ejecución** sino ausencias estructurales detectadas, registradas aquí para no atribuirlas al trabajo documental:
 
 | ID | Hallazgo | Severidad | Estado |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | P-01 | Credenciales de administrador embebidas en `src/features/auth/hooks/useLoginViewModel.ts:8-9` y compiladas al bundle público | **BLOCKER** | Preexistente. Ver [security/frontend-security.md](../security/frontend-security.md) |
 | P-02 | No hay linter configurado | HIGH | Preexistente |
 | P-03 | No hay pruebas E2E ni de componentes React | HIGH | Preexistente |
@@ -160,7 +160,7 @@ Ningún comando de la línea base falló. Los puntos siguientes **no son fallos 
 ## 7. Limitaciones de esta línea base
 
 | ID | Limitación | Impacto | Mitigación aplicada |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | L-01 | No hay OpenAPI del backend accesible desde este repositorio | No se puede verificar drift contractual de forma automática | Se documentó el contrato **tal como lo consume el frontend** y se marcó el drift como no verificable |
 | L-02 | No hay entorno de navegador ni backend levantado durante la auditoría | Los journeys se verificaron por lectura de código y pruebas, no por ejecución | Se declara explícitamente en cada journey el método de verificación |
 | L-03 | `yarn audit` no se ejecutó para evitar tráfico de red y contención con los otros agentes | Sin inventario de CVEs en esta línea base | Registrado como acción pendiente en [security/dependencies.md](../security/dependencies.md) |
@@ -197,7 +197,7 @@ No hay que revertir nada en `src/`, `dist/`, `package.json` ni `yarn.lock`: **no
 ## 9. Criterio de salida de la Fase 0
 
 | Criterio | Estado |
-|---|---|
+| --- | --- |
 | Repositorio instalable de forma reproducible | ✅ `--frozen-lockfile` sin modificar el lockfile |
 | Línea base ejecutada y registrada | ✅ 4 comandos con resultado, duración y evidencia |
 | Cero archivos funcionales modificados durante el diagnóstico | ✅ verificado con `git status` |

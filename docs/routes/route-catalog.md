@@ -25,7 +25,7 @@ Regenerable con `node scripts/generate-route-inventory.mjs`.
 ## Tabla maestra
 
 | # | Patrón | Componente | Acceso | Carga diferida | Parámetros | Ficha |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | 1 | `/login` | `LoginPage` | Pública | ✅ `lazy` | — | [login.md](login.md) |
 | 2 | `/` (index) | `HomePage` | Protegida | ✅ `lazy` | — | [home.md](home.md) |
 | 3 | `/modulos/:module` | `ModuleResourcePickerPage` | Protegida | ✅ `lazy` | `module` | [module-board.md](module-board.md) |
@@ -44,7 +44,7 @@ Regenerable con `node scripts/generate-route-inventory.mjs`.
 Tres componentes de página **no** están registrados en el router. No son rutas; se documentan aquí para que el inventario sea completo y para que nadie las busque por URL.
 
 | Componente | Cómo se alcanza | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | `VentaClaseBatchPage` | Renderizada por `ResourceListPage` cuando `resource.composite === 'venta-clase-batch'`. URL efectiva: `/modulos/contabilidad/venta-clase` | `ResourceListPage.tsx:107-109` |
 | `AsistenciaMasivaPage` | Renderizada por `ResourceListPage` cuando `resource.composite === 'asistencia-masiva'`. URL efectiva: `/modulos/servicios_educativos/asistencia-masiva` | `ResourceListPage.tsx:111-113` |
 | `QualityGatePage` | **Inalcanzable.** Nadie la importa | `grep -rn "QualityGatePage" src` → solo su propia definición |
@@ -58,7 +58,7 @@ Tres componentes de página **no** están registrados en el router. No son rutas
 `/modulos/:module/:resource` es una sola ruta que produce **59 pantallas distintas** por composición de datos:
 
 | Módulo (`:module`) | Recursos (`:resource`) | Visibles en navegación |
-|---|---:|---:|
+| --- | ---: | ---: |
 | `administracion` | 7 | 7 |
 | `personas` | 7 | 7 |
 | `servicios_educativos` | 10 | 10 |
@@ -118,7 +118,7 @@ Consecuencias reales:
 El proyecto tiene un único componente de estado, `PageState`, con cuatro props (`title`, `message`, `actionLabel`, `onAction`). No existen componentes dedicados de *skeleton*, *toast* ni banner de error. Ver [components/notifications.md](../components/notifications.md).
 
 | Estado | Cómo se representa |
-|---|---|
+| --- | --- |
 | Cargando (ruta) | `PageState` «Cargando pantalla» desde `Suspense` |
 | Cargando (datos, primera vez) | `PageState` «Cargando registros» |
 | Cargando (datos, recarga) | Texto plano «Actualizando resultados...» |

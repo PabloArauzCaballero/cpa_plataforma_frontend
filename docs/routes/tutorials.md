@@ -1,7 +1,7 @@
 # Ruta `/tutoriales`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/tutoriales` (constante `TUTORIAL_CENTER_ROUTE`) |
 | **Componente** | `TutorialCenterPage` |
 | **Archivo** | `src/features/tutorials/pages/TutorialCenterPage.tsx` (275 líneas) |
@@ -37,7 +37,7 @@ graph TD
 ```
 
 | Pieza | Archivo | Responsabilidad |
-|---|---|---|
+| --- | --- | --- |
 | `TutorialProvider` | `react/TutorialProvider.tsx` | Monta el contexto sobre toda el área autenticada |
 | `TutorialEngine` | `engine/TutorialEngine.ts` | Máquina de estados del recorrido (nodo más conectado del grafo: 38 aristas) |
 | `DriverTutorialRenderer` | `engine/DriverTutorialRenderer.ts` | Adaptador a `driver.js` |
@@ -67,7 +67,7 @@ También se puede lanzar un tutorial contextual desde `TutorialLauncher`, presen
 ## Estados de interfaz
 
 | Estado | Representación | Línea |
-|---|---|---|
+| --- | --- | --- |
 | Cargando | `PageState` «Cargando tutoriales» | 92 |
 | Error | `PageState` | 97 |
 | Sin coincidencias | `PageState` | 222 |
@@ -80,7 +80,7 @@ También se puede lanzar un tutorial contextual desde `TutorialLauncher`, presen
 **`/api/onboarding/tutoriales/progreso`** (`services/tutorialProgressApi.ts:37-40`)
 
 | Método | Ruta | Uso |
-|---|---|---|
+| --- | --- | --- |
 | `GET` | `/api/onboarding/tutoriales/progreso` | Progreso completo |
 | `PUT` | `/api/onboarding/tutoriales/progreso/{tutorialId}` | Actualizar un tutorial |
 | `DELETE` | `/api/onboarding/tutoriales/progreso/{tutorialId}` | Reiniciar uno |
@@ -95,7 +95,7 @@ Es el **único punto del frontend con una estrategia real de resiliencia** ante 
 ## Componentes
 
 | Componente | Origen |
-|---|---|
+| --- | --- |
 | `TutorialCard` | feature `tutorials` |
 | `TutorialLauncher` | feature `tutorials` |
 | `PageState` | `shared` |
@@ -107,7 +107,7 @@ Es el **único punto del frontend con una estrategia real de resiliencia** ante 
 `tutorial-started` · `tutorial-completed` · `tutorial-closed` · `tutorial-skipped` · `tutorial-restarted` · `step-skipped` · `action-completed` · `target-missing` · `progress-sync-failed`
 
 | Aspecto | Comportamiento |
-|---|---|
+| --- | --- |
 | Destino | **Ninguno remoto.** Solo memoria (últimos 50 eventos) y consola |
 | En producción | `target-missing` y `progress-sync-failed` se registran siempre con `console.warn`; el resto solo con `debug: true` |
 | Datos personales | Ninguno: solo `tutorialId`, `version`, `stepIndex`, `stepId`, `detail` |
@@ -118,19 +118,19 @@ Catálogo completo: [observability/analytics-events.md](../observability/analyti
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Barra de progreso | ✅ `role="progressbar"` con `aria-valuenow`, `aria-valuemin`, `aria-valuemax` |
 | Filtros | ✅ `aria-pressed` en los botones de filtro |
 | Tarjetas | ✅ Estado textual además del icono |
 | Recorrido guiado | ⚠️ **La accesibilidad del recorrido la determina `driver.js`**, no este código: foco, `aria-live` y navegación por teclado dependen de la librería. No auditado |
-| Movimiento reducido | ❌ No se detecta `prefers-reduced-motion` en ninguna parte del proyecto |
+| Movimiento reducido | ✅ `prefers-reduced-motion` se respeta en `TutorialCenterPage.module.css`, `TutorialCard.module.css` y `tutorialOverlay.css`. **No cubre las animaciones internas de `driver.js`** |
 
 ## Pruebas
 
 **El área mejor probada, con diferencia.**
 
 | Suite | Casos |
-|---|---:|
+| --- | ---: |
 | `tutorialEngine.test.ts` | 28 |
 | `tutorialProgress.test.ts` | 18 |
 | `tutorialRegistry.test.ts` | 16 |

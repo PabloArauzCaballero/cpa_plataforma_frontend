@@ -1,7 +1,7 @@
 # Ruta `/*` (no encontrada)
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `*`, como hijo de `/` |
 | **Componente** | `PageState` **inline** (no hay componente de página dedicado) |
 | **Definición** | `src/app/router.tsx:46` |
@@ -53,7 +53,7 @@ Ninguna. **No se registra ningún evento de ruta no encontrada**, ni en consola.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Encabezado | `PageState` renderiza `<h2>` (`PageState.tsx:15`) |
 | Marcador visual | ✅ `aria-hidden="true"` en el elemento decorativo |
 | Anuncio | ❌ Sin `role="status"` ni región activa: al navegar a una ruta inexistente, un lector de pantalla no anuncia el cambio automáticamente |
@@ -65,7 +65,7 @@ Ninguna.
 ## Casos límite verificados por lectura del código
 
 | Caso | Resultado |
-|---|---|
+| --- | --- |
 | `/modulos/inexistente` | **No** llega aquí. `ModuleResourcePickerPage` sí coincide y muestra su propio `PageState` «Módulo no encontrado» |
 | `/modulos/personas/inexistente` | **No** llega aquí. `ResourceListPage` muestra «Recurso no encontrado» |
 | `/reportes` | ✅ Llega aquí |
@@ -78,5 +78,5 @@ Es decir, **hay tres pantallas distintas de «no encontrado»** con textos disti
 - **Requiere que el servidor reescriba a `index.html`.** Al ser una SPA con `createBrowserRouter`, cualquier recarga de una URL profunda debe servir `index.html`:
   - nginx: `try_files $uri $uri/ /index.html` (`docker/nginx.conf`)
   - Cloudflare Workers: lo hace por defecto el manejador de assets estáticos
-  - Si esta reescritura falla, el usuario recibe un **404 del servidor**, no esta pantalla. Ver [operations/runbooks/pantalla-en-blanco.md](../operations/runbooks/pantalla-en-blanco.md).
+  - Si esta reescritura falla, el usuario recibe un **404 del servidor**, no esta pantalla. Ver [operations/runbooks/pantalla-en-blanco.md](../operations/runbooks/index.md#r-02).
 - Es la única «ruta» que no usa carga diferida: el elemento es inline y viaja en el chunk del router.

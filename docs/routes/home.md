@@ -1,7 +1,7 @@
 # Ruta `/` (inicio)
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/` con `index: true` |
 | **Componente** | `HomePage` → `ModuleSummary` |
 | **Archivos** | `src/features/dashboard/pages/HomePage.tsx`, `src/features/dashboard/components/ModuleSummary.tsx`, `src/features/dashboard/moduleMeta.ts` |
@@ -28,7 +28,7 @@ Página de aterrizaje tras iniciar sesión. Presenta los módulos disponibles co
 ## Estados de interfaz
 
 | Estado | Representación |
-|---|---|
+| --- | --- |
 | Carga de la ruta | `PageState` «Cargando pantalla» (`Suspense`) |
 | Contenido | Siempre. No hay estado vacío, de error ni de carga de datos |
 
@@ -43,7 +43,7 @@ Implicación: el inicio carga instantáneamente incluso con el backend caído. E
 ## Componentes
 
 | Componente | Origen | Función |
-|---|---|---|
+| --- | --- | --- |
 | `ModuleSummary` | feature `dashboard` | Rejilla de tarjetas, una por módulo |
 | `getModuleVisualMeta` | `dashboard/moduleMeta.ts` | Icono y descripción corta de cada módulo |
 
@@ -56,7 +56,7 @@ Ninguna.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Jerarquía de encabezados | ⚠️ `HomePage` empieza en `<h2>` (`HomePage.tsx:11`). El `<h1>` de la página lo aporta `AppShell` («Gestión CPA», `AppShell.tsx:151`), que es el mismo en todas las rutas. **Ninguna pantalla tiene un `<h1>` propio que la identifique** |
 | Iconos decorativos | ✅ `aria-hidden="true"` |
 | Insignia del héroe | ✅ `aria-label="Plataforma operativa CPA"` |
@@ -70,6 +70,6 @@ Ninguna.
 
 ## Notas operativas
 
-- Al ser estática, es la pantalla de referencia para comprobar que la aplicación **carga** cuando se sospecha de un fallo del backend: si `/` se ve pero `/modulos/...` no, el problema está en la API, no en el frontend. Ver [operations/runbooks/backend-caido.md](../operations/runbooks/backend-caido.md).
+- Al ser estática, es la pantalla de referencia para comprobar que la aplicación **carga** cuando se sospecha de un fallo del backend: si `/` se ve pero `/modulos/...` no, el problema está en la API, no en el frontend. Ver [operations/runbooks/backend-caido.md](../operations/runbooks/index.md#r-04).
 - Ancla de tutorial: `TUTORIAL_ANCHORS.homeHero`.
 - El pie de `AppShell` muestra «Versión 1.1.37» **codificada literalmente** en `AppShell.tsx:172`, no leída de `package.json`. Al subir de versión hay que actualizar ambos sitios. Registrado en [reports/documentation-gap-analysis.md](../reports/documentation-gap-analysis.md).

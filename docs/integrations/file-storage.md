@@ -13,7 +13,7 @@ graph LR
 **El binario nunca pasa por el backend.** El backend solo guarda la URL resultante.
 
 | Ventaja | Coste |
-|---|---|
+| --- | --- |
 | El backend no gasta ancho de banda ni almacenamiento | El preset de subida es público |
 | Sin límite de tamaño impuesto por el servidor de aplicación | **Sin control de acceso**: cualquiera con el preset puede subir |
 | Menos latencia | **Sin atomicidad**: puede quedar un binario huérfano |
@@ -21,7 +21,7 @@ graph LR
 ## Configuración
 
 | Variable | Uso | Obligatoria |
-|---|---|---|
+| --- | --- | --- |
 | `VITE_CLOUDINARY_CLOUD_NAME` | Nombre de la cuenta en la URL de subida | Sí, para subir |
 | `VITE_CLOUDINARY_UPLOAD_PRESET` | Preset **unsigned** | Sí, para subir |
 | `VITE_CLOUDINARY_FOLDER` | Carpeta por defecto | No |
@@ -34,7 +34,7 @@ Todas se resuelven en tiempo de build y quedan **en texto plano en el bundle pub
 `src/shared/services/cloudinaryUpload.ts`
 
 | Función | Endpoint | Validación previa |
-|---|---|---|
+| --- | --- | --- |
 | `uploadSingleImage(file, {folder})` | `/v1_1/{cloud}/image/upload` | Tipo MIME debe empezar por `image/`; máximo **10 MB** |
 | `uploadSingleFile(file, {folder})` | `/v1_1/{cloud}/auto/upload` | Máximo **25 MB**. ⚠️ **Sin validación de tipo** |
 | `uploadMultipleImages(files, {folder})` | Varias llamadas a `uploadSingleImage` | Por archivo |
@@ -56,7 +56,7 @@ Si Cloudinary responde OK pero sin `secure_url`, se lanza `Cloudinary no devolvi
 ### Manejo de errores
 
 | Situación | Mensaje |
-|---|---|
+| --- | --- |
 | Falta configuración | `Falta configurar VITE_CLOUDINARY_CLOUD_NAME` / `..._UPLOAD_PRESET` |
 | Archivo no es imagen | `El archivo debe ser una imagen válida.` |
 | Imagen > 10 MB | `La imagen excede el límite de 10 MB.` |
@@ -70,7 +70,7 @@ Mensajes claros y accionables.
 ## Consumidores
 
 | Componente | Función usada | Contexto |
-|---|---|---|
+| --- | --- | --- |
 | `FileLibraryPage` | `uploadSingleFile` | Biblioteca visual de archivos |
 | `CloudinaryUploadField` | `uploadSingleImage` / `uploadMultipleImages` | Campo de formulario para comprobantes |
 
@@ -79,7 +79,7 @@ Mensajes claros y accionables.
 Tras la subida, `FileLibraryPage` registra la URL:
 
 | Operación | Ruta |
-|---|---|
+| --- | --- |
 | Registrar archivo | `POST /api/contabilidad/archivo/registrar` |
 | Asociar a transacción | `POST /api/contabilidad/archivo-transaccion/registrar` |
 | Listar | `GET /api/contabilidad/archivo?{query}` |
@@ -93,7 +93,7 @@ Tipo de asociación por defecto: `SOPORTE`.
 La estructura de carpetas de la biblioteca se guarda en `localStorage` bajo `cpa.fileLibrary.folders.v1` (`FileLibraryPage.tsx:32,134,146`).
 
 | Consecuencia | Detalle |
-|---|---|
+| --- | --- |
 | No es compartida | Cada usuario y cada navegador ve su propia organización |
 | No sobrevive a la limpieza del navegador | Se pierde con los datos del sitio |
 | No se borra al cerrar sesión | `clearStoredSession()` no la toca: **el siguiente usuario del mismo equipo ve las carpetas del anterior** |
@@ -104,18 +104,18 @@ En Cloudinary, una carpeta existe únicamente cuando contiene al menos un archiv
 ## Riesgos de seguridad
 
 | # | Riesgo | Severidad | Mitigación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SEC-04 | El preset unsigned es público: **cualquiera puede subir a la cuenta sin sesión en la plataforma** | **HIGH** | Solo en el panel de Cloudinary: restringir formatos, tamaño máximo, carpeta obligatoria y activar moderación. **No es corregible desde el frontend** |
 | SEC-08 | `uploadSingleFile` no valida el tipo MIME: se puede subir cualquier extensión | MEDIUM | Restringir formatos permitidos en el preset |
 | SEC-09 | Las URLs de Cloudinary son públicas y adivinables si se conoce el `publicId` | MEDIUM | Usar entrega firmada o de acceso restringido para documentos sensibles |
 | SEC-10 | Subida no atómica: binario huérfano si falla el registro en backend | LOW | Proceso de conciliación periódico, o mover la subida al backend |
 
-Modelado en [security/threat-model.md](../security/threat-model.md#t-06).
+Modelado en [security/threat-model.md · T-06](../security/threat-model.md).
 
 ## Lo que no existe
 
 | Elemento | Estado |
-|---|---|
+| --- | --- |
 | Barra de progreso de subida | ❌ Solo un booleano `isUploading` |
 | Cancelación de subida | ❌ Sin `AbortController` |
 | Reintento automático | ❌ |

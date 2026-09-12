@@ -18,7 +18,7 @@ Dos rutas de primer nivel. Todo lo autenticado cuelga de la segunda.
 ## Características de react-router 7 que NO se usan
 
 | Característica | Estado | Consecuencia |
-|---|---|---|
+| --- | --- | --- |
 | `loader` / `action` | ❌ | Los datos se cargan en `useEffect` dentro de los hooks, después del render |
 | `errorElement` | ❌ | Un error de ruta lo captura el `ErrorBoundary` global, no una pantalla por ruta |
 | `defer` / `Await` | ❌ | Sin streaming de datos |
@@ -42,7 +42,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 13 líneas. Lo que hace y lo que **no** hace:
 
 | Comprobación | Estado |
-|---|---|
+| --- | --- |
 | ¿Existe un token en `localStorage`? | ✅ Única comprobación |
 | ¿El token es válido? | ❌ No se verifica contra el backend |
 | ¿Ha caducado? | ❌ No hay fecha de expiración almacenada |
@@ -73,12 +73,12 @@ sequenceDiagram
 
 **Detalle importante:** al recibir un `401` el usuario **no** es redirigido inmediatamente. Se queda en la pantalla, viendo «Tu sesión expiró o no es válida. Vuelve a iniciar sesión.» La redirección ocurre en la **siguiente** navegación.
 
-Es un comportamiento aceptable (evita perder trabajo en curso) pero conviene conocerlo. Ver [operations/runbooks/autenticacion-en-bucle.md](../operations/runbooks/autenticacion-en-bucle.md).
+Es un comportamiento aceptable (evita perder trabajo en curso) pero conviene conocerlo. Ver [operations/runbooks/autenticacion-en-bucle.md](../operations/runbooks/index.md#r-05).
 
 ## Navegación programática
 
 | Origen | Destino | Código |
-|---|---|---|
+| --- | --- | --- |
 | Login correcto | `/` | `navigate('/', { replace: true })` — `useLoginViewModel.ts:24` |
 | Cerrar sesión | `/login` | `navigate('/login', { replace: true })` — `AppShell.tsx` |
 | Sin token | `/login` | `<Navigate to="/login" replace />` — `ProtectedRoute.tsx:11` |
@@ -102,7 +102,7 @@ Todas usan `replace: true`, así que el historial del navegador no acumula entra
 ```
 
 | Elemento | Comportamiento |
-|---|---|
+| --- | --- |
 | Inicio | `NavLink to="/" end` |
 | Tutoriales | `NavLink to={TUTORIAL_CENTER_ROUTE}` |
 | Módulos | `<details>` nativo, abierto por defecto para `personas` y `servicios_educativos` |
@@ -118,7 +118,7 @@ Un módulo cuyos recursos estén todos ocultos por permisos **no aparece**.
 ## Rutas no enlazadas desde la interfaz
 
 | Ruta | Cómo se llega |
-|---|---|
+| --- | --- |
 | `/batch/:module/:resource` | **Solo escribiendo la URL.** Ningún enlace de la aplicación apunta aquí |
 | `/modulos/contabilidad/transaccion-movimiento-cuenta` | Accesible por URL; oculta de la navegación por `hideFromNavigation` |
 
@@ -129,7 +129,7 @@ Verificado: `grep -rn "/batch/" src` solo devuelve la definición del router.
 `AppShell` gestiona un cajón lateral:
 
 | Comportamiento | Implementación |
-|---|---|
+| --- | --- |
 | Cierre al cambiar de ruta | `useEffect` sobre `location.pathname` |
 | Bloqueo del scroll de fondo | `document.body.style.overflow = 'hidden'` mientras está abierto, restaurando el valor previo |
 | Botón de menú | `aria-expanded`, `aria-controls="app-sidebar"`, `aria-label` dinámico |
@@ -142,12 +142,12 @@ Usar un `<button>` real como superposición —en lugar de un `<div>` con `onCli
 Al ser una SPA con historial de navegador, **toda** URL profunda debe servir `index.html`:
 
 | Alojamiento | Regla |
-|---|---|
+| --- | --- |
 | nginx | `try_files $uri $uri/ /index.html` (`docker/nginx.conf`) |
 | Cloudflare Workers | Comportamiento por defecto del manejador de assets |
 | `vite preview` | Lo hace por defecto |
 
-Sin esta regla, recargar `/perfil` devuelve un 404 del servidor. Ver [operations/runbooks/pantalla-en-blanco.md](../operations/runbooks/pantalla-en-blanco.md).
+Sin esta regla, recargar `/perfil` devuelve un 404 del servidor. Ver [runbook R-02](../operations/runbooks/index.md#r-02).
 
 ## Fuente duplicada de rutas
 

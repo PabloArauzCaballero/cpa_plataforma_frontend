@@ -14,7 +14,7 @@ yarn test:watch    # jest --watch
 `jest.config.cjs`:
 
 | Opción | Valor | Consecuencia |
-|---|---|---|
+| --- | --- | --- |
 | `preset` | `ts-jest` | TypeScript compilado en cada ejecución |
 | `testEnvironment` | `jsdom` | Hay `window`, `document` y `localStorage` |
 | `roots` | `<rootDir>/src` | Solo busca dentro de `src/` |
@@ -32,7 +32,7 @@ Efecto medible: las pruebas cubren lógica pura (dominio, mappers, motor de tuto
 ## Qué se prueba hoy
 
 | Suite | Casos | Qué cubre |
-|---|---:|---|
+| --- | ---: | --- |
 | `tutorials/tutorialEngine.test.ts` | 28 | Máquina de estados del motor de tutoriales |
 | `tutorials/tutorialProgress.test.ts` | 18 | Cálculo y persistencia de progreso |
 | `tutorials/tutorialRegistry.test.ts` | 16 | Registro y resolución de tutoriales |
@@ -53,7 +53,7 @@ Efecto medible: las pruebas cubren lógica pura (dominio, mappers, motor de tuto
 Declarado explícitamente:
 
 | Área | Estado |
-|---|---|
+| --- | --- |
 | Componentes React renderizados | ❌ ninguna prueba |
 | Rutas y navegación | ❌ ninguna prueba |
 | Guarda `ProtectedRoute` | ❌ ninguna prueba |

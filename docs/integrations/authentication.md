@@ -52,7 +52,7 @@ export interface StoredUserSession {
 `saveStoredSession` (`session.ts:92-96`) escribe **cinco claves**:
 
 | Clave | Contenido | Motivo de la duplicación |
-|---|---|---|
+| --- | --- | --- |
 | `cpa.sessionToken` | token | Convención con punto |
 | `cpa_session_token` | token | Convención con guion bajo |
 | `cpa.userEmail` | correo | — |
@@ -83,7 +83,7 @@ Implicación para CORS: el backend debe exponer `X-Session-Token` en `Access-Con
 ## Ciclo de vida de la sesión
 
 | Evento | Comportamiento | Código |
-|---|---|---|
+| --- | --- | --- |
 | Inicio de sesión | Se escriben las 5 claves | `session.ts:92-96` |
 | Cada petición | Se lee el token de `localStorage` | `httpClient.ts:83,117` |
 | Respuesta `401` | `clearStoredSession()` | `httpClient.ts:104,133` |
@@ -130,7 +130,7 @@ Es una decisión consciente y razonable —evita bloquear a todos si el backend 
 ### Dónde se aplica
 
 | Lugar | Aplica |
-|---|---|
+| --- | --- |
 | Barra lateral de `AppShell` | ✅ Oculta recursos y módulos completos |
 | `ResourceListPage` | ✅ Crear, editar, inhabilitar, exportar |
 | `ModuleResourcePickerPage` | ❌ Muestra todos los recursos |
@@ -161,13 +161,13 @@ Coste: es imposible saber, leyendo el frontend, cuál es la forma **real** de la
 ## Riesgos abiertos
 
 | # | Riesgo | Severidad | Documento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | SEC-01 | Credenciales de administrador embebidas en el código y en el bundle publicado | **BLOCKER** | [security/frontend-security.md](../security/frontend-security.md) |
 | SEC-02 | Token en `localStorage`: accesible desde cualquier JavaScript de la página; sin protección `HttpOnly` | HIGH | [security/browser-storage.md](../security/browser-storage.md) |
 | SEC-03 | Sin caducidad ni renovación de sesión en el cliente | MEDIUM | [security/session-and-tokens.md](../security/session-and-tokens.md) |
 | SEC-05 | Cerrar sesión no invalida el token en el servidor | MEDIUM | ídem |
 | SEC-06 | `rawUser` persiste el objeto completo del usuario sin filtrar | MEDIUM | [security/privacy.md](../security/privacy.md) |
-| SEC-07 | Modo permisivo: sin permisos del backend, todos los botones son visibles | MEDIUM | [security/threat-model.md](../security/threat-model.md#t-04) |
+| SEC-07 | Modo permisivo: sin permisos del backend, todos los botones son visibles | MEDIUM | [security/threat-model.md · T-04](../security/threat-model.md) |
 
 ## Pruebas
 

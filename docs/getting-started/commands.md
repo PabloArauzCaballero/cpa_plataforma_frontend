@@ -5,7 +5,7 @@ Todos los scripts declarados en `package.json`, con lo que hacen realmente y lo 
 ## Scripts disponibles
 
 | Comando | Ejecuta | Qué hace | Duración medida |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `yarn dev` | `vite --host 0.0.0.0` | Servidor de desarrollo con HMR, escuchando en todas las interfaces de red | — |
 | `yarn build` | `tsc -b && vite build` | Type-check con emisión de `.tsbuildinfo`, luego bundle de producción **en `dist/`** | ~2 s |
 | `yarn preview` | `vite preview` | Sirve `dist/` ya compilado, para verificar el artefacto | — |
@@ -21,7 +21,7 @@ Todos los scripts declarados en `package.json`, con lo que hacen realmente y lo 
 Declarado para evitar que se asuma su existencia:
 
 | Comando esperado | Estado |
-|---|---|
+| --- | --- |
 | `yarn lint` | ❌ **No existe.** El proyecto no tiene linter configurado |
 | `yarn format` | ❌ No existe. No hay Prettier |
 | `yarn test:e2e` | ❌ No existe. No hay pruebas E2E |
@@ -36,7 +36,7 @@ Declarado para evitar que se asuma su existencia:
 ### `yarn typecheck` vs. el `tsc -b` de `yarn build`
 
 | | `yarn typecheck` | `tsc -b` dentro de `yarn build` |
-|---|---|---|
+| --- | --- | --- |
 | Flag | `--noEmit` | modo build incremental |
 | Escribe archivos | No | Sí: `tsconfig.tsbuildinfo` (ignorado por git) |
 | Alcance | `include: ["src"]`, excluyendo `src/__tests__` y `*.test.*` | Idéntico |
@@ -59,7 +59,7 @@ Usa `yarn build` sobre `dist/` únicamente cuando vayas a publicar. Ver [operati
 Añadidos por el trabajo documental. No forman parte del producto y no tienen dependencias externas — solo Node.
 
 | Comando | Qué valida |
-|---|---|
+| --- | --- |
 | `node scripts/check-doc-links.mjs` | Que ningún enlace interno de `docs/` apunte a un archivo inexistente |
 | `node scripts/check-doc-coverage.mjs` | Que las 10 rutas del router y los componentes compartidos tengan ficha documental |
 | `node scripts/generate-route-inventory.mjs` | Regenera el inventario de rutas desde `src/app/router.tsx` |

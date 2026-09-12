@@ -20,7 +20,7 @@ Verificado contra el árbol real; ver [reports/frontend-inventory.md](../reports
 Convención observada en `auth`, `profile` y `resources` (las más completas):
 
 | Subcarpeta | Contenido | Regla |
-|---|---|---|
+| --- | --- | --- |
 | `pages/` | Pantallas. Un archivo `.tsx` + su `.module.css` | Componen; delegan la lógica al hook |
 | `components/` | Componentes propios de la feature | No los usa otra feature |
 | `hooks/` | View models: estado, efectos, orquestación | Son la capa de aplicación |
@@ -30,7 +30,7 @@ Convención observada en `auth`, `profile` y `resources` (las más completas):
 ### Convención de `services/`
 
 | Archivo | Responsabilidad | Ejemplo |
-|---|---|---|
+| --- | --- | --- |
 | `*Api.ts` | Hace la llamada mediante `httpClient` | `authApi.ts` |
 | `*Endpoints.ts` | Centraliza las URLs literales | `authEndpoints.ts:2` |
 | `*Mapper.ts` | Convierte la respuesta cruda al modelo de dominio | `authMapper.ts` |
@@ -39,7 +39,7 @@ Convención observada en `auth`, `profile` y `resources` (las más completas):
 Cumplimiento real:
 
 | Feature | `Api` | `Endpoints` | `Mapper` | `dto/` |
-|---|:---:|:---:|:---:|:---:|
+| --- | :---: | :---: | :---: | :---: |
 | `auth` | ✅ | ✅ | ✅ | ✅ |
 | `profile` | ✅ | ✅ | ✅ | ✅ |
 | `resources` | ✅ | ❌ (URLs en `resourceDefinitions`) | ✅ | ✅ parcial |
@@ -52,7 +52,7 @@ Cumplimiento real:
 ## Inventario de features
 
 | Feature | Páginas | Componentes | Hooks | Servicios | Dominio | Pruebas |
-|---|---:|---:|---:|---:|---:|---:|
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `auth` | 1 | 1 | 1 | 4 | 1 | 0 |
 | `catalogs` | 1 | 0 | 0 | 1 | 0 | 0 |
 | `dashboard` | 2 | 1 | 0 | 0 | 1 | 0 |
@@ -67,7 +67,7 @@ Cumplimiento real:
 ## Capa `shared`
 
 | Subcarpeta | Contenido |
-|---|---|
+| --- | --- |
 | `api/` | `httpClient.ts` — único punto de salida HTTP hacia el backend |
 | `auth/` | `session.ts` — lectura/escritura de sesión y evaluación de permisos |
 | `components/` | 10 familias de componentes de interfaz |
@@ -80,7 +80,7 @@ Cumplimiento real:
 ## Reglas de dependencia y su cumplimiento
 
 | Regla | Estado | Evidencia |
-|---|---|---|
+| --- | --- | --- |
 | `domain/` no importa de `services/` ni de React | ✅ Cumplida | Sin importaciones cruzadas detectadas |
 | `services/` no importa de `pages/` ni de `components/` | ✅ Cumplida | — |
 | `pages/` no llama a `fetch` directamente | ⚠️ **Una excepción**: `AsistenciaMasivaPage.tsx:21` contiene el literal `/api/personas/estudiante` en la propia página | `grep -n "'/api/" src/features/resources/pages/` |
@@ -90,7 +90,7 @@ Cumplimiento real:
 ## Dónde vive cada tipo de lógica
 
 | Tipo de lógica | Ubicación canónica | Ejemplo real |
-|---|---|---|
+| --- | --- | --- |
 | Reglas de negocio puras | `features/*/domain/` | `formValidation.ts` (en `shared`), `transactionFormModel.ts` |
 | Orquestación de pantalla | `features/*/hooks/` | `useResourceListViewModel` |
 | Acceso a datos | `features/*/services/` | `resourceApi.ts` |
@@ -111,7 +111,7 @@ Es la razón por la que `shared/validation/` importa tipos de `features/resource
 `@/` → `src/`, declarado en **tres** archivos que deben mantenerse sincronizados:
 
 | Archivo | Clave |
-|---|---|
+| --- | --- |
 | `vite.config.ts` | `resolve.alias` |
 | `tsconfig.json` | `compilerOptions.paths` |
 | `jest.config.cjs` | `moduleNameMapper` |
@@ -123,7 +123,7 @@ Desincronizarlos produce fallos distintos en build, type-check y pruebas. Regist
 Las pruebas **no** están junto al código: viven en `src/__tests__/`, replicando parcialmente la estructura de features.
 
 | Elección | Consecuencia |
-|---|---|
+| --- | --- |
 | `src/__tests__/<feature>/` | `tsconfig.json` puede excluirlas limpiamente del build |
 | `testMatch: **/__tests__/**/*.test.ts` | **Solo `.ts`**: ningún archivo `.tsx` se ejecuta, luego no hay pruebas de componente |
 

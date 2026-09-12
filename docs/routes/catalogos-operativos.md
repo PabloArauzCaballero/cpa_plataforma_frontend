@@ -1,7 +1,7 @@
 # Ruta `/contabilidad/catalogos-cuentas-operativas`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/contabilidad/catalogos-cuentas-operativas` (fija, sin parámetros) |
 | **Componente** | `CatalogosOperativosPage` |
 | **Archivo** | `src/features/catalogs/pages/CatalogosOperativosPage.tsx` (353 líneas) |
@@ -34,7 +34,7 @@ Es la pantalla que hace que el parte de clases pasadas pueda contabilizarse: sin
 ## Estados de interfaz
 
 | Estado | Representación | Línea |
-|---|---|---|
+| --- | --- | --- |
 | Cargando | `PageState` «Cargando catálogos» | 152 |
 | Error de carga | `PageState` «No se pudieron cargar los catálogos» + «Reintentar» | 156 |
 | Contenido | Pestañas con tablas | — |
@@ -46,7 +46,7 @@ Modelo de carga con `LoadState` (`idle`/…), distinto del patrón booleano `isL
 ## Contratos de datos
 
 | Operación | Método y ruta |
-|---|---|
+| --- | --- |
 | Opciones de cuenta | `GET /api/contabilidad/cuenta` |
 | Configuración operativa | `GET /api/contabilidad/configuracion-cuenta-operativa` |
 | Crear configuración | `POST /api/contabilidad/configuracion-cuenta-operativa` |
@@ -70,7 +70,7 @@ Ninguna.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Pestañas | ⚠️ `role="tablist"` presente, pero conviene verificar `role="tab"`, `aria-selected` y navegación con flechas |
 | Tablas | ⚠️ Sin `<caption>` ni `scope` |
 | Guardado | ❌ El mensaje de éxito no se anuncia por región activa |

@@ -1,7 +1,7 @@
 # Ruta `/modulos/:module/:resource`
 
 | | |
-|---|---|
+| --- | --- |
 | **Patrón** | `/modulos/:module/:resource` |
 | **Componente** | `ResourceListPage` → `ResourceListContent` |
 | **Archivos** | `src/features/resources/pages/ResourceListPage.tsx` (283 líneas), `src/features/resources/hooks/useResourceListViewModel.ts` (774 líneas) |
@@ -19,7 +19,7 @@ Pantalla universal de trabajo: listar, buscar, filtrar, paginar, crear, editar, 
 Protegida por `ProtectedRoute`. Además calcula cuatro permisos derivados (`ResourceListPage.tsx:119-122`):
 
 | Acción | Permiso evaluado | Efecto si falta |
-|---|---|---|
+| --- | --- | --- |
 | Crear | `resource.permissions` tal cual (`create=MODULO.TABLA.CREATE`) | No aparece el botón «Crear» |
 | Editar | El mismo con `create=`→`update=` y `.CREATE`→`.UPDATE` | No aparece el icono de lápiz |
 | Inhabilitar | Ídem con `delete=` / `.DELETE` | No aparece el icono de papelera |
@@ -32,7 +32,7 @@ La derivación es **textual** (`resolveActionPermission`, líneas 88-93): sustit
 > - el permiso requerido está vacío, **o**
 > - `session.permisos` está vacío (comentario explícito: *«si el sistema todavía no envía matriz de permisos, el frontend no inventa bloqueos»*).
 >
-> Si el backend no devuelve permisos en el login, **todos los botones se muestran a todo el mundo**. La autorización real recae íntegramente en el backend. Ver [security/threat-model.md](../security/threat-model.md#t-04).
+> Si el backend no devuelve permisos en el login, **todos los botones se muestran a todo el mundo**. La autorización real recae íntegramente en el backend. Ver [security/threat-model.md · T-04](../security/threat-model.md).
 
 ## Flujo de usuario
 
@@ -63,7 +63,7 @@ flowchart TD
 No existe borrado físico. `buildDisablePayload` (líneas 170-184) detecta la columna de estado y respeta su tipo:
 
 | Tipo de columna | Payload enviado |
-|---|---|
+| --- | --- |
 | Booleana, o campo `es_activo` / `activo` | `{ [columna]: false }` |
 | Texto | `{ [columna]: 'Inactivo' }` |
 
@@ -72,7 +72,7 @@ Si el registro no tiene ninguna columna de estado, `canDisable` devuelve `false`
 ## Estados de interfaz
 
 | Estado | Representación | Línea |
-|---|---|---|
+| --- | --- | --- |
 | Recurso inexistente | `PageState` «Recurso no encontrado» | 100 |
 | Carga inicial | `PageState` «Cargando registros» | 129 |
 | Recarga con datos ya en pantalla | Texto «Actualizando resultados...» | 163 |
@@ -90,7 +90,7 @@ Once estados distintos. Es la pantalla con el catálogo de estados más completo
 ## Contratos de datos
 
 | Operación | Método y ruta | Servicio |
-|---|---|---|
+| --- | --- | --- |
 | Listar | `GET {resource.endpoints.list}?page&limit&offset&orderBy&orderDir&q&search&term&onlyActivos&only_activos&includeInactive&include_inactive&<filtros>&filter_<filtros>` | `listResource` |
 | Listar todo | Igual, paginando de 200 en 200 hasta 50 000 | `listAllResource` |
 | Detalle | `GET {resource.endpoints.detail(id)}` | `getResource` |
@@ -105,7 +105,7 @@ Once estados distintos. Es la pantalla con el catálogo de estados más completo
 ## Componentes
 
 | Componente | Origen | Papel |
-|---|---|---|
+| --- | --- | --- |
 | `ResourceHeader` | resources | Título, contadores, ayuda, lanzador de tutorial |
 | `SearchFilterBar` | shared | Buscador, filtros, crear, recargar, exportar |
 | `DataTable` | shared | Tabla con badges de estado y acciones por fila |
@@ -120,7 +120,7 @@ Once estados distintos. Es la pantalla con el catálogo de estados más completo
 ## Comportamientos específicos por recurso
 
 | Recurso | Comportamiento |
-|---|---|
+| --- | --- |
 | `clase-por-hora`, `clase-curso`, `aula` | Orden visual por hora y coloreado de filas en 8 tonos (`getHourTone`, líneas 55-62). Se muestra una leyenda |
 | `transaccion` | Formulario compuesto + enriquecimiento con movimientos al editar |
 | `venta-clase` | Sustituida por `VentaClaseBatchPage` |
@@ -140,7 +140,7 @@ Ninguna. Solo eventos internos del motor de tutoriales.
 ## Accesibilidad
 
 | Aspecto | Estado |
-|---|---|
+| --- | --- |
 | Tabla | ⚠️ `<table>` sin `<caption>` ni `scope` en los `<th>` (`DataTable.tsx:86`) |
 | Acciones de fila | ✅ `aria-label="Editar registro"` / `"Inhabilitar registro"` |
 | Badges de estado | ⚠️ Estado codificado por color y texto; el texto está presente, correcto |
@@ -155,7 +155,7 @@ Ver [accessibility/audit-report.md](../accessibility/audit-report.md).
 ## Pruebas
 
 | Elemento | Cobertura |
-|---|---|
+| --- | --- |
 | `ResourceListPage` | ❌ ninguna |
 | `useResourceListViewModel` (774 líneas, 22 estados) | ❌ ninguna |
 | `resourceMapper` (`normalizeListResult`) | ✅ 3 casos |

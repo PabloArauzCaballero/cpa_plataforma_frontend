@@ -36,7 +36,7 @@ graph TB
 ## Actores
 
 | Actor | Descripción | Cómo se identifica |
-|---|---|---|
+| --- | --- | --- |
 | Personal administrativo CPA | Único tipo de usuario. Opera los 59 recursos según sus permisos | Usuario/correo + contraseña contra el backend |
 
 **No hay usuarios anónimos**: la única ruta pública es `/login`. No hay portal de estudiantes, padres ni tutores en este frontend, aunque esas entidades existan como **datos** en el sistema.
@@ -46,7 +46,7 @@ graph TB
 ### CPA Plataforma Backend
 
 | Aspecto | Valor |
-|---|---|
+| --- | --- |
 | Protocolo | REST sobre HTTPS, JSON |
 | Base URL | `VITE_API_BASE_URL`, fijada en tiempo de build |
 | Autenticación | Cabecera `X-Session-Token` |
@@ -59,18 +59,18 @@ El frontend **no valida el token**: cualquier cadena en `localStorage` lo hace p
 ### Cloudinary
 
 | Aspecto | Valor |
-|---|---|
+| --- | --- |
 | Uso | Subida de comprobantes, imágenes y documentos |
 | Ruta | **Navegador → Cloudinary, directo.** No pasa por el backend |
 | Autenticación | Ninguna. *Unsigned upload preset* público |
 | Endpoints | `api.cloudinary.com/v1_1/{cloud}/image/upload` y `/auto/upload` |
 
-Es la única integración que **atraviesa el límite de confianza sin credencial de sesión**. Ver [security/threat-model.md](../security/threat-model.md#t-06).
+Es la única integración que **atraviesa el límite de confianza sin credencial de sesión**. Ver [security/threat-model.md · T-06](../security/threat-model.md).
 
 ### cdnjs.cloudflare.com
 
 | Aspecto | Valor |
-|---|---|
+| --- | --- |
 | Uso | Hoja de estilos de FontAwesome 6.5.2 |
 | Declaración | `index.html:14` |
 | Integridad | ❌ **Sin `integrity` (SRI) ni `crossorigin`** |
@@ -117,7 +117,7 @@ Modelado formal con STRIDE en [security/threat-model.md](../security/threat-mode
 ## Lo que NO existe en el contexto
 
 | Elemento | Verificación |
-|---|---|
+| --- | --- |
 | Proveedor de identidad externo (OAuth, SSO, SAML) | El login es directo contra el backend |
 | Pasarela de pagos | Ninguna referencia |
 | Servicio de correo o notificaciones push | Ninguna referencia |

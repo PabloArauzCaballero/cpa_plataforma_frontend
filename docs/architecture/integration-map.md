@@ -55,7 +55,7 @@ graph LR
 ## Tabla de trazabilidad
 
 | Pantalla | Servicio | Endpoint | Método | Prueba |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `LoginPage` | `authApi` | `/api/auth/publicAuth/login` | POST | ❌ |
 | `UserProfilePage` | `profileApi` | `/api/auth/privateAuth/me` | GET | ❌ |
 | `ResourceListPage` | `resourceApi` | `{resource.endpoints.list}` | GET | ⚠️ solo el mapper (3 casos) |
@@ -95,7 +95,7 @@ graph LR
 ## Anomalías detectadas
 
 | # | Anomalía | Detalle | Severidad |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | A-01 | **Endpoints de batch sin declarar** | Ningún recurso declara `batchValidate`/`batchProcess`; se usa siempre `{list}/batch/validate` y `/process`. Sin evidencia de que existan en el backend | CRITICAL |
 | A-02 | **Recurso `aula` inexistente** | `ventaClaseLookupApi.ts:190` consulta `/api/infraestructura/aula`, pero **no hay ningún recurso `aula`** entre los 59 de `resourceDefinitions`. En infraestructura existe `espacio` con `tipo: AULA`. `ResourceListPage.tsx:56` también menciona `resource.key === 'aula'` para el coloreado por hora, una condición que nunca se cumple | HIGH |
 | A-03 | **Servicios de borrador duplicados** | `persistentDraftApi` y `backendDraftApi` apuntan al mismo endpoint con la misma superficie | MEDIUM |
@@ -106,7 +106,7 @@ graph LR
 ## Integraciones que NO existen
 
 | Tipo | Estado |
-|---|---|
+| --- | --- |
 | WebSockets | ❌ `grep -rn "WebSocket" src` → sin resultados |
 | Server-Sent Events | ❌ `EventSource` sin uso |
 | Polling | ❌ Sin `setInterval` para datos |
@@ -120,8 +120,8 @@ graph LR
 ## Integraciones con terceros
 
 | Servicio | Uso | Autenticación | Riesgo |
-|---|---|---|---|
-| **Cloudinary** | Subida directa desde el navegador | Unsigned preset público | Alto: subida sin sesión. Ver [security/threat-model.md](../security/threat-model.md#t-06) |
+| --- | --- | --- | --- |
+| **Cloudinary** | Subida directa desde el navegador | Unsigned preset público | Alto: subida sin sesión. Ver [security/threat-model.md · T-06](../security/threat-model.md) |
 | **cdnjs.cloudflare.com** | CSS de FontAwesome | Ninguna | Medio: sin SRI, sin CSP. Ver [security/dependencies.md](../security/dependencies.md) |
 
 ## Cómo verificar el mapa
