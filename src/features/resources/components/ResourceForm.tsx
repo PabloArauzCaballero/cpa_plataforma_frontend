@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faDatabase, faEraser, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faDatabase, faEraser, faFilePdf, faFloppyDisk, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/shared/components/Button';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import type { ResolvedOptions } from '../domain/changeSummary';
@@ -9,6 +9,7 @@ import type { CrudRecord, CrudResourceDefinition } from '../domain/CrudResource'
 import { useResourceFormViewModel } from '../hooks/useResourceFormViewModel';
 import { humanizeFieldLabel } from '@/shared/utils/humanize';
 import { CloudinaryUploadField } from './CloudinaryUploadField';
+import { downloadPrintableForm } from '../utils/printableFormPdf';
 import { buildResourceDraftKey, deleteLocalDraft, hasLocalDraft, readLocalDraft, saveLocalDraft } from '@/shared/services/localDraftStore';
 import {
   discardPersistentDraft,
@@ -232,6 +233,27 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
     }
   }
 
+  /**
+   * Hoja en blanco para quien prefiere llenar a mano. Se imprimen todos los
+   * campos, también los que en pantalla dependen de otro (esos van en su propio
+   * bloque), porque en papel no se sabe de antemano qué va a marcar la persona.
+   */
+  function downloadPaperForm() {
+    downloadPrintableForm({
+      resource,
+      fields: resource.fields.filter((field) => !shouldHideTechnicalMirrorField(resource, field.name)),
+      // Las condicionadas se resuelven dentro del plan con todas sus variantes;
+      // aquí solo aportan las listas de catálogo que ya cargó el formulario.
+      resolveOptions: (field) => (field.conditionalOptions ? undefined : viewModel.getFieldOptions(field)),
+      attachmentLabel: (field) => {
+        const imagen = getCloudinaryImageField(field.name);
+        if (imagen) return imagen.label;
+        if (isCloudinaryArchivoTransaccionField(resource, field.name)) return 'Imagen del comprobante';
+        return undefined;
+      },
+    });
+  }
+
   function goToPreviousDraft() {
     setSelectedDraftIndex((current) => Math.max(0, current - 1));
   }
@@ -260,6 +282,15 @@ export function ResourceForm({ resource, record, isSaving, onSubmit, onCancel }:
         void onSubmit(payload, resolvedOptions);
       }}
     >
+      {isJsonMode ? null : (
+        <div className={styles.paperBar}>
+          <span>¿La persona prefiere llenarlo en papel? Descarga la hoja en blanco, imprímela y luego carga aquí sus datos.</span>
+          <Button type="button" variant="ghost" onClick={downloadPaperForm}>
+            <FontAwesomeIcon icon={faFilePdf} /> Descargar formulario PDF
+          </Button>
+        </div>
+      )}
+
       {isJsonMode ? (
         <label className={styles.jsonField}>
           <span>Datos JSON</span>

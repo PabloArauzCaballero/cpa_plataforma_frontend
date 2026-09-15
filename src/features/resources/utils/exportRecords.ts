@@ -58,8 +58,7 @@ function buildExcelHtml(records: CrudRecord[], columns: string[], title: string,
 </html>`;
 }
 
-function downloadTextFile(content: string, filename: string, mimeType: string) {
-  const blob = new Blob([content], { type: mimeType });
+export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -70,7 +69,11 @@ function downloadTextFile(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-function safeFilename(value: string): string {
+function downloadTextFile(content: string, filename: string, mimeType: string) {
+  downloadBlob(new Blob([content], { type: mimeType }), filename);
+}
+
+export function safeFilename(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
