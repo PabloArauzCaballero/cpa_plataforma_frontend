@@ -27,6 +27,38 @@
   gap: clamp(1rem, 1.8vw, 1.35rem) clamp(1.1rem, 2vw, 1.55rem);
 }
 
+/* Aviso para imprimir la hoja en blanco. Va arriba y fuera de la barra de
+   acciones: en móvil esa barra queda fija al pie y un tercer botón la saturaba. */
+.paperBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--border-hairline);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.paperBar span {
+  color: var(--text-on-light-secondary);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.paperBar button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@media (max-width: 720px) {
+  .paperBar {
+    display: grid;
+  }
+}
+
 .jsonField {
   display: grid;
   gap: var(--space-2);
